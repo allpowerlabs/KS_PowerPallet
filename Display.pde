@@ -268,7 +268,7 @@ void DoDisplay() {
     sprintf(buf, "GraLen%3i  ", grate_on_interval);
     Disp_PutStr(buf);
     Disp_RC(1,11);
-    if (grate_motor_state == GRATE_MOTOR_OFF) {
+    if (grate_motor_state == GRATE_MOTOR_OFF) {  
       Disp_PutStr("Grate Off");
     } 
     else {
@@ -342,7 +342,9 @@ void DoDisplay() {
       if (key == 2) {
         grate_motor_state = GRATE_MOTOR_OFF;
       }
+      if (key == 3) {
       grate_val = GRATE_SHAKE_CROSS;
+      }
       Disp_RC(3,0);
       Disp_PutStr("NEXT  ADV  OFF   ON ");
       Disp_RC(1,11);
