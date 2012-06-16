@@ -254,7 +254,7 @@ void DoDisplay() {
       break;
     }
     break;
-  case DISPLAY_GRATE:
+  case DISPLAY_GRATE: 
     int vmin,vmax;
     item_count = 4;
     Disp_RC(0,0);
@@ -347,9 +347,54 @@ void DoDisplay() {
       Disp_PutStr("NEXT  ADV  OFF   ON ");
       Disp_RC(1,11);
       Disp_CursOn();
-      break;  
+      break; 
     }
-
+    break;
+  case DISPLAY_SERVO:   //need to add constraints for min and max?
+    item_count = 2;
+    Disp_RC(0,0);
+    sprintf(buf, "ServoMin%3i", int(premix_valve_closed));
+    Disp_PutStr(buf);
+    Disp_RC(0,11);
+    sprintf(buf, " Max %3i", int(premix_valve_open));
+    Disp_PutStr(buf);
+    //Row 1
+    Disp_RC(1,0);
+    Disp_PutStr(" Careful of Sides!  "); 
+    Disp_RC(2,0);
+    Disp_PutStr("                    ");
+    switch (cur_item) {
+    case 1: // Servo Min
+      Servo_Mixture.write(premix_valve_closed);
+      if (key == 2) {
+        if (premix_valve_closed + 1 < premix_valve_open){
+          premix_valve_closed += 1;
+        }
+      }
+      if (key == 3) {
+        premix_valve_closed -= 1;
+      }
+      Disp_RC(3,0);
+      Disp_PutStr("NEXT  ADV   +    -  ");
+      Disp_RC(0,0);
+      Disp_CursOn();
+      break;
+    case 2: //Servo Max 
+      Servo_Mixture.write(premix_valve_open);
+      if (key == 2) {
+        premix_valve_open += 1;
+      }
+      if (key == 3) {
+        if (premix_valve_open - 1 > premix_valve_closed) {
+          premix_valve_open -= 1;
+        }
+      }
+      Disp_RC(3,0);
+      Disp_PutStr("NEXT  ADV   +    -  ");
+      Disp_RC(0,11);
+      Disp_CursOn();
+      break;
+    }
     break;
     //    case DISPLAY_TEMP2:
     //      break;
@@ -376,6 +421,9 @@ void TransitionDisplay(int new_state) {
     cur_item = 1;
     break;
   case DISPLAY_TESTING:
+    cur_item = 1;
+    break;
+  case DISPLAY_SERVO:
     cur_item = 1;
     break;
   }
@@ -411,8 +459,16 @@ void DoKeyInput() {
       }
       break;
     case DISPLAY_TESTING:
+      if (engine_state == ENGINE_OFF){
+        TransitionDisplay(DISPLAY_SERVO);
+      } else {
       TransitionDisplay(DISPLAY_REACTOR);
       TransitionTesting(TESTING_OFF);
+      }
+      break;
+    case DISPLAY_SERVO:
+      WriteServo();
+      TransitionDisplay(DISPLAY_REACTOR);
       break;
     }
     key = -1; //key caught

@@ -133,6 +133,7 @@ Servo Servo_Throttle;
 #define DISPLAY_LAMBDA 4
 #define DISPLAY_GRATE 5
 #define DISPLAY_TESTING 6
+#define DISPLAY_SERVO 7
 
 //Testing States
 #define TESTING_OFF 0
@@ -287,8 +288,13 @@ volatile int energy_period;
 //double premix_valve_open = 153; //calibrated angle for servo valve open
 //double premix_valve_closed = 53; //calibrated angle for servo valve closed (must be smaller value than open)
 //PP20 Jewen Throttle - apparent variation in throttle angle to servo angle in this batch, need to add calibration/storage in EEPROM...
-double premix_valve_open = 133; 
+
+byte servo_min,servo_max;
+double premix_valve_open = 133;
 double premix_valve_closed = 68;
+
+ //premix_valve_closed
+ //premix_valve_open
 //Jewen Throttle
 //double premix_valve_open = 110; //calibrated angle for servo valve open
 //double premix_valve_closed = 30; //calibrated angle for servo valve closed (must be smaller value than open)
@@ -429,6 +435,7 @@ void setup() {
   nextTime3 = millis() + loopPeriod3;
   
   LoadPressureSensorCalibration();
+  LoadServo();
   //LoadLambda(); - must save lambda data first?
   Serial.begin(57600);
 

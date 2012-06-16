@@ -144,7 +144,7 @@ void WriteLambda(double setpoint) {
   EEPROM.write(13, val);
   EEPROM.write(14, p);
   EEPROM.write(15, i);
-  Serial.println("#Writing lambda setttings to EEPROM");
+  Serial.println("#Writing lambda settings to EEPROM");
 }
 
 void LoadLambda() {

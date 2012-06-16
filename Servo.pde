@@ -18,6 +18,27 @@ void PulseServo(int servo_pin,double angle) {
   digitalWrite(servo_pin,LOW);
 }
 
+void LoadServo() {
+  servo_min = EEPROM.read(23);
+  if (servo_min != 255) {  //if EEPROM in default value, then default to 133
+    premix_valve_open = int(servo_min);
+  }
+  servo_max = EEPROM.read(22);
+  if (servo_max != 255) { //if EEPROM in default value, then default to 68
+    premix_valve_closed = int(servo_max);
+  } 
+}
+
+void WriteServo(){
+  if ((servo_min != premix_valve_closed) or (servo_max != premix_valve_open)){
+    EEPROM.write(22,premix_valve_closed);
+    EEPROM.write(23,premix_valve_open);
+    servo_min = premix_valve_closed;
+    servo_max = premix_valve_open;
+    Serial.println("#Writing Servo positions settings to EEPROM");
+  }
+}
+
 // code for driving servos w/ dead band
 //void DoServos() {
 //  if (servo_alt == 1) { // pulse every other time through the loop
