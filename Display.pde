@@ -398,6 +398,24 @@ void DoDisplay() {
       break;
     }
     break;
+    case DISPLAY_CALIBRATE_PRESSURE:
+      item_count = 1;
+      Disp_RC(0,0);
+      Disp_PutStr("Calibrate Pressure  ");
+      Disp_RC(1,0);
+      Disp_PutStr("Sensors to zero?    ");
+      Disp_RC(2,0);
+      Disp_PutStr("                    ");
+      Disp_RC(3,0);
+      Disp_PutStr("NEXT       YES      ");
+      if (key == 2) {
+        CalibratePressureSensors();
+        LoadPressureSensorCalibration();
+        Disp_RC(2,0);
+        Disp_PutStr("   CALIBRATED!      ");
+      }
+
+    break;
     //    case DISPLAY_TEMP2:
     //      break;
     //    case DISPLAY_FETS:
@@ -426,6 +444,9 @@ void TransitionDisplay(int new_state) {
     cur_item = 1;
     break;
   case DISPLAY_SERVO:
+    cur_item = 1;
+    break;
+  case DISPLAY_CALIBRATE_PRESSURE:
     cur_item = 1;
     break;
   }
@@ -470,6 +491,9 @@ void DoKeyInput() {
       break;
     case DISPLAY_SERVO:
       WriteServo();
+      TransitionDisplay(DISPLAY_CALIBRATE_PRESSURE);  //assume that engine state is off because we are already in DISPLAY_SERVO
+      break;
+    case DISPLAY_CALIBRATE_PRESSURE:
       TransitionDisplay(DISPLAY_REACTOR);
       break;
     }

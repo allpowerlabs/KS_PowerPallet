@@ -134,6 +134,7 @@ Servo Servo_Throttle;
 #define DISPLAY_GRATE 5
 #define DISPLAY_TESTING 6
 #define DISPLAY_SERVO 7
+#define DISPLAY_CALIBRATE_PRESSURE 8
 
 //Testing States
 #define TESTING_OFF 0
@@ -215,7 +216,7 @@ int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} }
 #if ANA_OIL_PRESSURE != ABSENT
 int EngineOilPressureValue;
 enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_HIGH = 1} EngineOilPressureLevel;
-int EngineOilPressureLevelBoundary[2][2] = { { 0, 500}, {600, 1024} };
+int EngineOilPressureLevelBoundary[2][2] = { { 0, 500}, {600, 1024} };  
 #endif
 
 // Loop variables - 0 is longest, 3 is most frequent, place code at different levels in loop() to execute more or less frequently
