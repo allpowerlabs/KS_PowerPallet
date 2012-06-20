@@ -15,66 +15,66 @@ void TransitionTesting(int new_state) {
   case TESTING_OFF:
     break;
   case TESTING_FUEL_AUGER:
-    analogWrite(FET_AUGER,255);
-    analogWrite(FET_GRATE,0);
-    analogWrite(FET_IGNITION,0);
-    analogWrite(FET_STARTER,0);
-    analogWrite(FET_FLARE_IGNITOR,0);
-    analogWrite(FET_O2_RESET,0);
+    digitalWrite(FET_AUGER,HIGH);
+    digitalWrite(FET_GRATE,LOW);
+    digitalWrite(FET_IGNITION,LOW);
+    digitalWrite(FET_STARTER,LOW);
+    digitalWrite(FET_FLARE_IGNITOR,LOW);
+    digitalWrite(FET_O2_RESET,LOW);
     digitalWrite(FET_ALARM,LOW); // FET6 can't generate PWM due to Servo library using the related timer
     break;
   case TESTING_GRATE:
-    analogWrite(FET_AUGER,0); 
-    analogWrite(FET_GRATE,255);
-    analogWrite(FET_IGNITION,0);
-    analogWrite(FET_STARTER,0);
-    analogWrite(FET_FLARE_IGNITOR,0);
-    analogWrite(FET_O2_RESET,0);
+    digitalWrite(FET_AUGER,LOW); 
+    digitalWrite(FET_GRATE,HIGH);
+    digitalWrite(FET_IGNITION,LOW);
+    digitalWrite(FET_STARTER,LOW);
+    digitalWrite(FET_FLARE_IGNITOR,LOW);
+    digitalWrite(FET_O2_RESET,LOW);
     digitalWrite(FET_ALARM,LOW); // FET6 can't generate PWM due to Servo library using the related timer
     break;
   case TESTING_ENGINE_IGNITION:
-    analogWrite(FET_AUGER,0);
-    analogWrite(FET_GRATE,0);
-    analogWrite(FET_IGNITION,255);
-    analogWrite(FET_STARTER,0);
-    analogWrite(FET_FLARE_IGNITOR,0);
-    analogWrite(FET_O2_RESET,0);
+    digitalWrite(FET_AUGER,LOW);
+    digitalWrite(FET_GRATE,LOW);
+    digitalWrite(FET_IGNITION,HIGH);
+    digitalWrite(FET_STARTER,LOW);
+    digitalWrite(FET_FLARE_IGNITOR,LOW);
+    digitalWrite(FET_O2_RESET,LOW);
     digitalWrite(FET_ALARM,LOW); // FET6 can't generate PWM due to Servo library using the related timer
     break;
   case TESTING_STARTER:
-    analogWrite(FET_AUGER,0);
-    analogWrite(FET_GRATE,0);
-    analogWrite(FET_IGNITION,0);
-    analogWrite(FET_STARTER,255);
-    analogWrite(FET_FLARE_IGNITOR,0);
-    analogWrite(FET_O2_RESET,0);
+    digitalWrite(FET_AUGER,LOW);
+    digitalWrite(FET_GRATE,LOW);
+    digitalWrite(FET_IGNITION,LOW);
+    digitalWrite(FET_STARTER,HIGH);
+    digitalWrite(FET_FLARE_IGNITOR,LOW);
+    digitalWrite(FET_O2_RESET,LOW);
     digitalWrite(FET_ALARM,LOW); // FET6 can't generate PWM due to Servo library using the related timer
     break;	
   case TESTING_FLARE_IGNITOR:
-    analogWrite(FET_AUGER,0);
-    analogWrite(FET_GRATE,0);
-    analogWrite(FET_IGNITION,0);
-    analogWrite(FET_STARTER,0);
-    analogWrite(FET_FLARE_IGNITOR,255);
-    analogWrite(FET_O2_RESET,0);
+    digitalWrite(FET_AUGER,LOW);
+    digitalWrite(FET_GRATE,LOW);
+    digitalWrite(FET_IGNITION,LOW);
+    digitalWrite(FET_STARTER,LOW);
+    digitalWrite(FET_FLARE_IGNITOR,HIGH);
+    digitalWrite(FET_O2_RESET,LOW);
     digitalWrite(FET_ALARM,LOW); // FET6 can't generate PWM due to Servo library using the related timer
     break;
   case TESTING_O2_RESET:
-    analogWrite(FET_AUGER,0);
-    analogWrite(FET_GRATE,0);
-    analogWrite(FET_IGNITION,0);
-    analogWrite(FET_STARTER,0);
-    analogWrite(FET_FLARE_IGNITOR,0);
-    analogWrite(FET_O2_RESET,255);
+    digitalWrite(FET_AUGER,LOW);
+    digitalWrite(FET_GRATE,LOW);
+    digitalWrite(FET_IGNITION,LOW);
+    digitalWrite(FET_STARTER,LOW);
+    digitalWrite(FET_FLARE_IGNITOR,LOW);
+    digitalWrite(FET_O2_RESET,HIGH);
     digitalWrite(FET_ALARM,LOW); // FET6 can't generate PWM due to Servo library using the related timer
     break;
   case TESTING_ALARM:
-    analogWrite(FET_AUGER,0);
-    analogWrite(FET_GRATE,0);
-    analogWrite(FET_IGNITION,0);
-    analogWrite(FET_STARTER,0);
-    analogWrite(FET_FLARE_IGNITOR,0);
-    analogWrite(FET_O2_RESET,0);
+    digitalWrite(FET_AUGER,LOW);
+    digitalWrite(FET_GRATE,LOW);
+    digitalWrite(FET_IGNITION,LOW);
+    digitalWrite(FET_STARTER,LOW);
+    digitalWrite(FET_FLARE_IGNITOR,LOW);
+    digitalWrite(FET_O2_RESET,LOW);
     digitalWrite(FET_ALARM,HIGH); // FET6 can't generate PWM due to Servo library using the related timer
     break;
   case TESTING_ANA_LAMBDA:

@@ -5,10 +5,10 @@ void DoFlare() {
     case FLARE_USER_SET:
       if (P_reactorLevel != OFF && engine_state != ENGINE_ON) {
         ignitor_on = true;
-        analogWrite(FET_FLARE_IGNITOR,255);
+        digitalWrite(FET_FLARE_IGNITOR,HIGH);
       } else {
         ignitor_on = false;
-        analogWrite(FET_FLARE_IGNITOR,0);
+        digitalWrite(FET_FLARE_IGNITOR,LOW);
       }
       break;
   }

@@ -36,10 +36,10 @@ void DoAuger() {
   
   #if FET_AUGER != ABSENT && ANA_FUEL_SWITCH != ABSENT
   if (auger_on) {
-    analogWrite(FET_AUGER,255);
+    digitalWrite(FET_AUGER,HIGH);
     auger_on = true;
   } else {
-    analogWrite(FET_AUGER,0);
+    digitalWrite(FET_AUGER,LOW);
     auger_on = false;
   }
   #endif

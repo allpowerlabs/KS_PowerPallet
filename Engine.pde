@@ -56,27 +56,27 @@ void TransitionEngine(int new_state) {
   engine_state_entered = millis();
   switch (new_state) {
     case ENGINE_OFF:
-      analogWrite(FET_IGNITION,0);
-      analogWrite(FET_STARTER,0);
+      digitalWrite(FET_IGNITION,LOW);
+      digitalWrite(FET_STARTER,LOW);
       Serial.println("# New Engine State: Off");
       TransitionMessage("Engine: Off         ");
       break;
     case ENGINE_ON:
-      analogWrite(FET_IGNITION,255);
-      analogWrite(FET_STARTER,0);
+      digitalWrite(FET_IGNITION,HIGH);
+      digitalWrite(FET_STARTER,LOW);
       Serial.println("# New Engine State: On");
       TransitionMessage("Engine: Running    ");
       break;
     case ENGINE_STARTING:
-      analogWrite(FET_IGNITION,255);
-      analogWrite(FET_STARTER,255);
+      digitalWrite(FET_IGNITION,HIGH);
+      digitalWrite(FET_STARTER,HIGH);
       engine_end_cranking = millis() + engine_crank_period;
       Serial.println("# New Engine State: Starting");
       TransitionMessage("Engine: Starting    ");
       break;
     case ENGINE_GOV_TUNING:
-      analogWrite(FET_IGNITION,255);
-      analogWrite(FET_STARTER,0);
+      digitalWrite(FET_IGNITION,HIGH);
+      digitalWrite(FET_STARTER,LOW);
       Serial.println("# New Engine State: Governor Tuning");
       TransitionMessage("Engine: Gov Tuning  ");
       break;
