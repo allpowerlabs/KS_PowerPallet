@@ -1,5 +1,6 @@
 void DoDisplay() {
   boolean disp_alt; // Var for alternating value display
+  String relay_state = "   ";
   char buf[20];
   if (millis() % 2000 > 1000) {
     disp_alt = false;
@@ -7,6 +8,7 @@ void DoDisplay() {
   else {
     disp_alt = true;
   }
+  relay_num = 0;
   switch (display_state) {
   case DISPLAY_SPLASH:
     //Row 0
@@ -398,54 +400,53 @@ void DoDisplay() {
       break;
     }
     break;
-    case DISPLAY_CALIBRATE_PRESSURE:
-      item_count = 1;
-      Disp_RC(0,0);
-      Disp_PutStr("Calibrate Pressure  ");
-      Disp_RC(1,0);
-      Disp_PutStr("Sensors to zero?    ");
+  case DISPLAY_CALIBRATE_PRESSURE:
+    item_count = 1;
+    Disp_RC(0,0);
+    Disp_PutStr("Calibrate Pressure  ");
+    Disp_RC(1,0);
+    Disp_PutStr("Sensors to zero?    ");
+    Disp_RC(2,0);
+    Disp_PutStr("                    ");
+    Disp_RC(3,0);
+    Disp_PutStr("NEXT       YES      ");
+    if (key == 2) {
+      CalibratePressureSensors();
+      LoadPressureSensorCalibration();
       Disp_RC(2,0);
-      Disp_PutStr("                    ");
-      Disp_RC(3,0);
-      Disp_PutStr("NEXT       YES      ");
-      if (key == 2) {
-        CalibratePressureSensors();
-        LoadPressureSensorCalibration();
-        Disp_RC(2,0);
-        Disp_PutStr("   CALIBRATED!      ");
-      }
-      case DISPLAY_RELAY:
-      item_count = 1;
-      int relays = 7;
-      Disp_RC(0,0);
-      sprintf(buf, "Test Relay: %1i", relay_num);
-      Disp_PutStr(buf);
-      Disp_RC(1,0);
-      Disp_PutStr("                    ");
-      Disp_RC(2,0);
-      Disp_PutStr("                    ");
-      Disp_RC(3,0);
-      Disp_PutStr("NEXT  ADV   ON   OFF");
-      if (key == 1) {
-        relayOff(relay_num);
-        if (relay_num <= relays) {
-           relay_num += 1;
-        } else { 
-          relay_num = 0;
-        }
-      }
-      if (key == 2) {
-        relayOn(relay_num);
-        Disp_RC(1,0);
-        Disp_PutStr("         ON         ");
-      }
-      if (key == 2) {
-        relayOff(relay_num);
-        Disp_RC(1,0);
-        Disp_PutStr("         OFF        ");
-      }
-
+      Disp_PutStr("   CALIBRATED!      ");
+    }
     break;
+  case DISPLAY_RELAY:
+    item_count = 1;
+    Disp_RC(0,0);
+    sprintf(buf, "Test Relay: %1i       ", relay_num, relay_state);
+    Disp_PutStr(buf);
+    Disp_RC(1,0);
+    Disp_PutStr("                    ");
+    Disp_RC(2,0);
+    Disp_PutStr("                    ");
+    Disp_RC(3,0);
+    Disp_PutStr("NEXT  ADV   ON   OFF");
+    if (key == 1) {
+      relayOff(relay_num);
+      if (relay_num < relay_count) {
+         relay_num += 1;
+      } else { 
+        relay_num = 0;
+      }
+    }
+    if (key == 2) {
+      relayOn(relay_num);
+      Disp_RC(1,0);
+      relay_state = "ON ";
+    }
+    if (key == 3) {
+      relayOff(relay_num);
+      Disp_RC(1,0);
+      relay_state = "OFF";
+    }
+  break;
     //    case DISPLAY_TEMP2:
     //      break;
     //    case DISPLAY_FETS:
@@ -481,7 +482,6 @@ void TransitionDisplay(int new_state) {
     break;
   case DISPLAY_RELAY:
     cur_item = 1;
-    relay_num = 0;
     break;  
     
   }
