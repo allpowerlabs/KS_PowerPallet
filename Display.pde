@@ -414,6 +414,31 @@ void DoDisplay() {
         Disp_RC(2,0);
         Disp_PutStr("   CALIBRATED!      ");
       }
+      case DISPLAY_RELAY:
+      item_count = 1;
+      int relays = 7;
+      Disp_RC(0,0);
+      sprintf(buf, "Test Relay: %1i", relay_num);
+      Disp_PutStr(buf);
+      Disp_RC(1,0);
+      Disp_PutStr("                    ");
+      Disp_RC(2,0);
+      Disp_PutStr("                    ");
+      Disp_RC(3,0);
+      Disp_PutStr("NEXT  ADV   ON   OFF");
+      if (key == 1) {
+        if (relay_num <= relays) {
+           relay_num += 1;
+        } else { 
+          relay_num = 0;
+        }
+      }
+      if (key == 2) {
+        relayOn(relay_num);
+      }
+      if (key == 2) {
+        relayOff(relay_num);
+      }
 
     break;
     //    case DISPLAY_TEMP2:
@@ -449,6 +474,11 @@ void TransitionDisplay(int new_state) {
   case DISPLAY_CALIBRATE_PRESSURE:
     cur_item = 1;
     break;
+  case DISPLAY_RELAY:
+    cur_item = 1;
+    relay_num = 0;
+    break;  
+    
   }
   display_state=new_state;
 }
@@ -493,7 +523,10 @@ void DoKeyInput() {
       WriteServo();
       TransitionDisplay(DISPLAY_CALIBRATE_PRESSURE);  //assume that engine state is off because we are already in DISPLAY_SERVO
       break;
-    case DISPLAY_CALIBRATE_PRESSURE:
+    case DISPLAY_CALIBRATE_PRESSURE:                 //assume that engine state is off
+      TransitionDisplay(DISPLAY_RELAY);
+      break;
+    case DISPLAY_RELAY:
       TransitionDisplay(DISPLAY_REACTOR);
       break;
     }

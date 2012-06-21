@@ -17,7 +17,7 @@ void DoEngine() {
       if (P_reactorLevel == OFF & millis()-engine_state_entered > 10000) { //if reactor is at low vacuum after ten seconds, engine did not catch, so turn off
         TransitionEngine(ENGINE_OFF);
       }
-      if (P_reactorLevel == OIL_P_LOW && millis()-engine_state_entered>15000) {  //if reactor is at low oil pressure for more than 15 seconds (5 seconds past low oil alarm), turn off engine.
+      if (P_reactorLevel == OIL_P_LOW && millis()-engine_state_entered>10000) {  //if reactor is at low oil pressure for more than 10 seconds (3 seconds past low oil alarm), turn off engine.
         TransitionEngine(ENGINE_OFF);
       }
 //      #ifdef INT_HERTZ

@@ -135,6 +135,7 @@ Servo Servo_Throttle;
 #define DISPLAY_TESTING 6
 #define DISPLAY_SERVO 7
 #define DISPLAY_CALIBRATE_PRESSURE 8
+#define DISPLAY_RELAY 9
 
 //Testing States
 #define TESTING_OFF 0
@@ -364,6 +365,15 @@ float servo2_db = 0; // used to deadband the servo movement
 
 //Serial
 char serial_last_input = '\0'; // \0 is the ABSENT character
+
+byte shiftRegister = 0;  //Holder for all 8 relay states (8 bits, initialized to B00000000, all relays off)
+
+int dataPin = 50;  //To SRIN on Relay Board, Bottom Right Pin on Relay Board when XR IN at top.
+int latchPin = 51; //To RCK on Relay Board, Second Pin from Bottom on Right hand side
+int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left hand side
+int relay_num;
+
+int sec = 1000;
 
 // Alarm
 boolean auger_on = false;
