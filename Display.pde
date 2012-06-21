@@ -427,6 +427,7 @@ void DoDisplay() {
       Disp_RC(3,0);
       Disp_PutStr("NEXT  ADV   ON   OFF");
       if (key == 1) {
+        relayOff(relay_num);
         if (relay_num <= relays) {
            relay_num += 1;
         } else { 
@@ -435,9 +436,13 @@ void DoDisplay() {
       }
       if (key == 2) {
         relayOn(relay_num);
+        Disp_RC(1,0);
+        Disp_PutStr("         ON         ");
       }
       if (key == 2) {
         relayOff(relay_num);
+        Disp_RC(1,0);
+        Disp_PutStr("         OFF        ");
       }
 
     break;
