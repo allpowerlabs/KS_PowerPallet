@@ -9,6 +9,7 @@ void DoLambda() {
       case LAMBDA_CLOSEDLOOP:
         //don't reset changed PID values
         //lambda_PID.SetTunings(lambda_P[0], lambda_I[0], lambda_D[0]);
+        smoothedLambda = smooth(lambda_input, smooth_filter_Lambda, smoothedLambda);   //Only set this value when in closedloop to keep bad O2 readings out
         lambda_PID.Compute();
         SetPremixServoAngle(lambda_output);
         if (engine_state == ENGINE_OFF) {
@@ -21,6 +22,9 @@ void DoLambda() {
         if (serial_last_input == 'O') {
           TransitionLambda(LAMBDA_SPSTEPTEST);
           serial_last_input = '\0';
+        }
+        if (lambda_input < 0.52) {
+          TransitionLambda(LAMBDA_NO_SIGNAL);
         }
         break;
       case LAMBDA_SEALED:
@@ -60,6 +64,15 @@ void DoLambda() {
         }
         SetPremixServoAngle(lambda_output);
         break;
+      case LAMBDA_NO_SIGNAL:
+        if ((lambda_state_name == "Resetting O2 Relay") and (millis() - lambda_state_entered > sec/2)) {
+          digitalWrite(FET_O2_RESET, LOW);
+          TransitionLambda(LAMBDA_CLOSEDLOOP);
+        }
+        if (lambda_input > 0.52) {
+          TransitionLambda(LAMBDA_CLOSEDLOOP);
+        }
+        break;
      }
 }
 
@@ -76,7 +89,9 @@ void TransitionLambda(int new_state) {
      case LAMBDA_SPSTEPTEST:
        loopPeriod1 = loopPeriod1*4; //return to normal datalogging rate
        break;
-  }
+     case LAMBDA_NO_SIGNAL:
+       break;
+   }
   Serial.print("# Lambda switching from ");
   Serial.print(lambda_state_name);
   
@@ -110,7 +125,16 @@ void TransitionLambda(int new_state) {
       lambda_setpoint = random(8,12)/10.0; //steps in random 10% increments of control output limits
       loopPeriod1 = loopPeriod1/4; //fast datalogging
       break;
-  }
+    case LAMBDA_NO_SIGNAL:
+      lambda_state_name = "O2 signal loss";
+      lambda_PID.SetMode(MANUAL);
+      lambda_setpoint = smoothedLambda;
+      if (millis() - lambda_state_entered > sec/4) {
+        digitalWrite(FET_O2_RESET, HIGH);
+        lambda_state_name = "Resetting O2 Relay";
+      }
+      break;
+    }
   Serial.print(" to ");  
   Serial.println(lambda_state_name);
 }
@@ -166,3 +190,15 @@ void LoadLambda() {
   lambda_setpoint = val;
   lambda_setpoint_mode[0] = val;
 }
+
+int smooth(int data, float filterVal, float smoothedVal){
+  if (filterVal > 1){      // check to make sure param's are within range
+    filterVal = .99;
+  }
+  else if (filterVal <= 0){
+    filterVal = 0;
+  }
+  smoothedVal = (data * (1 - filterVal)) + (smoothedVal  *  filterVal);
+  
+  return (int)smoothedVal;
+ }

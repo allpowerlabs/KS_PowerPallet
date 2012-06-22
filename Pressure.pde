@@ -2,7 +2,6 @@
 
 void DoPressure() {
   UpdateCalibratedPressure();
-  //P_comb_smooth = smooth(P_comb,0.999,P_comb_smooth);
 }
 
 void CalibratePressureSensors() {
@@ -49,14 +48,4 @@ void UpdateCalibratedPressure() {
   }
 }
 
-float smooth(int data, float filterVal, float smoothedVal) {
-  if (filterVal > 1){      // check to make sure param's are within range
-    filterVal = .99;
-  }
-  else if (filterVal <= 0){
-    filterVal = 0;
-  }
-  smoothedVal = (data * (1 - filterVal)) + (smoothedVal  *  filterVal);
-  return smoothedVal;
-}
 
