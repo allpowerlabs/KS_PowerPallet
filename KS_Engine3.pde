@@ -371,7 +371,7 @@ byte shiftRegister = 0;  //Holder for all 8 relay states (8 bits, initialized to
 int dataPin = 50;  //To SRIN on Relay Board, Bottom Right Pin on Relay Board when XR IN at top.
 int latchPin = 51; //To RCK on Relay Board, Second Pin from Bottom on Right hand side
 int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left hand side
-int relay_num;
+int relay_num = 0;
 int relay_count = 8;
 
 int sec = 1000;

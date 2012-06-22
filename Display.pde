@@ -1,6 +1,5 @@
 void DoDisplay() {
   boolean disp_alt; // Var for alternating value display
-  String relay_state = "   ";
   char buf[20];
   if (millis() % 2000 > 1000) {
     disp_alt = false;
@@ -8,7 +7,6 @@ void DoDisplay() {
   else {
     disp_alt = true;
   }
-  relay_num = 0;
   switch (display_state) {
   case DISPLAY_SPLASH:
     //Row 0
@@ -418,9 +416,9 @@ void DoDisplay() {
     }
     break;
   case DISPLAY_RELAY:
-    item_count = 1;
+    item_count = 8;
     Disp_RC(0,0);
-    sprintf(buf, "Test Relay: %1i       ", relay_num, relay_state);
+    sprintf(buf, "Test Relay: %1i       ", cur_item);
     Disp_PutStr(buf);
     Disp_RC(1,0);
     Disp_PutStr("                    ");
@@ -428,23 +426,11 @@ void DoDisplay() {
     Disp_PutStr("                    ");
     Disp_RC(3,0);
     Disp_PutStr("NEXT  ADV   ON   OFF");
-    if (key == 1) {
-      relayOff(relay_num);
-      if (relay_num < relay_count) {
-         relay_num += 1;
-      } else { 
-        relay_num = 0;
-      }
-    }
     if (key == 2) {
-      relayOn(relay_num);
-      Disp_RC(1,0);
-      relay_state = "ON ";
+      relayOn(cur_item);
     }
     if (key == 3) {
-      relayOff(relay_num);
-      Disp_RC(1,0);
-      relay_state = "OFF";
+      relayOff(cur_item);
     }
   break;
     //    case DISPLAY_TEMP2:
@@ -483,7 +469,6 @@ void TransitionDisplay(int new_state) {
   case DISPLAY_RELAY:
     cur_item = 1;
     break;  
-    
   }
   display_state=new_state;
 }
