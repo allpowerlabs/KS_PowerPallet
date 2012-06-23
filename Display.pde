@@ -433,6 +433,24 @@ void DoDisplay() {
       relayOff(cur_item);
     }
   break;
+  case DISPLAY_CONFIG:
+    item_count = 2;
+    Disp_RC(0,0);
+    sprintf(buf, "Config:%s            ", Configuration[cur_item]);
+    Disp_PutStr(buf);
+    Disp_RC(1,0);
+    Disp_PutStr("                    ");
+    Disp_RC(2,0);
+    Disp_PutStr("                    ");
+    Disp_RC(3,0);
+    Disp_PutStr("NEXT  ADV   ON   OFF");
+    if (key == 2) {
+      saveConfig(cur_item, 1);
+    }
+    if (key == 3) {
+      saveConfig(cur_item, 0);
+    }
+  break;
     //    case DISPLAY_TEMP2:
     //      break;
     //    case DISPLAY_FETS:
@@ -468,7 +486,10 @@ void TransitionDisplay(int new_state) {
     break;
   case DISPLAY_RELAY:
     cur_item = 1;
-    break;  
+    break; 
+  case DISPLAY_CONFIG: 
+    cur_item = 1;
+    break;
   }
   display_state=new_state;
 }
@@ -517,6 +538,9 @@ void DoKeyInput() {
       TransitionDisplay(DISPLAY_RELAY);
       break;
     case DISPLAY_RELAY:
+      TransitionDisplay(DISPLAY_CONFIG);
+      break;
+    case DISPLAY_CONFIG:
       TransitionDisplay(DISPLAY_REACTOR);
       break;
     }
@@ -546,4 +570,6 @@ void TransitionMessage(String t_message) {
   transition_entered = millis();
 }
 
-
+void saveConfig(int item, int state){
+  //save state to EEPROM
+}

@@ -138,6 +138,7 @@ Servo Servo_Throttle;
 #define DISPLAY_SERVO 7
 #define DISPLAY_CALIBRATE_PRESSURE 8
 #define DISPLAY_RELAY 9
+#define DISPLAY_CONFIG 10
 
 //Testing States
 #define TESTING_OFF 0
@@ -157,8 +158,13 @@ Servo Servo_Throttle;
 int testing_state = TESTING_OFF;
 unsigned long testing_state_entered = 0;
 static char *TestingStateName[] = { "Off","Auger","Grate","Engine","Starter","Flare","O2 Reset","Alarm","ANA_Lambda","ANA_Eng_Switch","ANA_Fuel_Switch","ANA_Oil"};
+
 // Datalogging variables
 int lineCount = 0;
+
+//Configuration Variables
+static char *Configuration[] = { "Engine", "Relay Board"};
+static char *Config_Choices[2][2] = {{"10k","20k"},{"YES","NO"}};
 
 // Grate turning variables
 int grateMode = GRATE_SHAKE_PRATIO; //set default starting state
