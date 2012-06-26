@@ -23,7 +23,7 @@
 //constant definitions
 #define ABSENT -500
 
-#define CODE_VERSION "v1.00"
+#define CODE_VERSION "v1.1b"
 
 // Analog Input Mapping
 #define ANA_LAMBDA ANA0
@@ -163,8 +163,14 @@ static char *TestingStateName[] = { "Off","Auger","Grate","Engine","Starter","Fl
 int lineCount = 0;
 
 //Configuration Variables
-static char *Configuration[] = { "Engine", "Relay Board"};
-static char *Config_Choices[2][2] = {{"10k","20k"},{"YES","NO"}};
+static char *Configuration[] = { "Engine     ", "Relay Board", "Fet Blower "};  //Load from EEPROM??
+static char *Config_Choices[] = {"10k  20k","YES  NO ", "YES NO "}; //8 char options for last two buttons, Load from EEPROM??
+int config_var;
+byte config_changed = false;
+int engine_type = getConfig(0);
+byte relay_board = getConfig(1);
+byte fet_blower = getConfig(2);
+
 
 // Grate turning variables
 int grateMode = GRATE_SHAKE_PRATIO; //set default starting state

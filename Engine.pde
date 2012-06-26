@@ -126,4 +126,7 @@ void DoBattery() {
   #endif
 }
 
+int get20kPSI(int pressure_reading){  //returns oil pressure in PSI for 20k
+  return (pressure_reading-512)/-2;
+}
 

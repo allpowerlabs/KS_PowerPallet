@@ -12,11 +12,10 @@ void DoFlare() {
       }
       break;
   }
-  //The following was removed as we are now using PWM controllers outside of code, also analogWrite has problems with Servo library.
-//  #if FET_BLOWER != ABSENT
-//  blower_dial = analogRead(ANA_BLOWER_DIAL);
-//  analogWrite(FET_BLOWER,blower_dial/4);
-//  #endif
+  if (fet_blower == 1){
+    blower_dial = analogRead(ANA_BLOWER_DIAL);
+    analogWrite(FET_BLOWER,blower_dial/4);
+  }
 }
 
 void DoReactor() {

@@ -199,6 +199,5 @@ int smooth(int data, float filterVal, float smoothedVal){
     filterVal = 0;
   }
   smoothedVal = (data * (1 - filterVal)) + (smoothedVal  *  filterVal);
-  
   return (int)smoothedVal;
  }

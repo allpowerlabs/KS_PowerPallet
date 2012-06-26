@@ -1,5 +1,6 @@
 void DoDisplay() {
   boolean disp_alt; // Var for alternating value display
+  char choice[5] = "    ";
   char buf[20];
   if (millis() % 2000 > 1000) {
     disp_alt = false;
@@ -434,21 +435,58 @@ void DoDisplay() {
     }
   break;
   case DISPLAY_CONFIG:
-    item_count = 2;
+    item_count = sizeof(Config_Choices)/sizeof(Config_Choices[0]);
+    if (config_changed == false){
+      config_var = getConfig(cur_item);
+    }
+    if (config_var == 255){  //if EEPROM in default state, set to default value of 0
+      config_var = 0;
+    }
     Disp_RC(0,0);
-    sprintf(buf, "Config:%s            ", Configuration[cur_item]);
+    sprintf(buf, "Config:%s            ", Configuration[cur_item-1]);
     Disp_PutStr(buf);
     Disp_RC(1,0);
-    Disp_PutStr("                    ");
-    Disp_RC(2,0);
-    Disp_PutStr("                    ");
-    Disp_RC(3,0);
-    Disp_PutStr("NEXT  ADV   ON   OFF");
-    if (key == 2) {
-      saveConfig(cur_item, 1);
+    if (Config_Choices[cur_item-1] =="+    -  "){
+      sprintf(buf, "          %3i       ", config_var);
+    }  else {
+      if (config_var == 0){
+      choice[0] = Config_Choices[cur_item-1][0];
+      choice[1] = Config_Choices[cur_item-1][1];
+      choice[2] = Config_Choices[cur_item-1][2];
+      choice[3] = Config_Choices[cur_item-1][3];
+      } else {
+        choice[0] = Config_Choices[cur_item-1][4];
+        choice[1] = Config_Choices[cur_item-1][5];
+        choice[2] = Config_Choices[cur_item-1][6];
+        choice[3] = Config_Choices[cur_item-1][7];
+      }
+      sprintf(buf, "     %s   ", choice);
     }
+    Disp_PutStr(buf);
+    Disp_RC(2,0);
+    Disp_PutStr("ADV to save choice  ");
+    Disp_RC(3,0);
+    sprintf(buf, "NEXT  ADV   %s", Config_Choices[cur_item-1]);
+    Disp_PutStr(buf);
+    if (Config_Choices[cur_item-1] =="+    -  "){
+      if (key == 2) {
+        config_var += 1;
+        config_changed = true;
+     }
     if (key == 3) {
-      saveConfig(cur_item, 0);
+        config_var -= 1;
+        config_changed = true;
+      }
+    }
+    else {
+      if (key == 2) {  
+        config_var = 0;
+        config_changed = true;
+      }
+      if (key == 3) {
+        config_var = 1;
+        config_changed = true;
+      }
     }
   break;
     //    case DISPLAY_TEMP2:
@@ -547,10 +585,15 @@ void DoKeyInput() {
     key = -1; //key caught
   }
   if (key == 1) {
+    if (display_state == DISPLAY_CONFIG){
+      saveConfig(cur_item, config_var);
+      config_changed = false;
+    }
     cur_item++;
     if (cur_item>item_count) {
       cur_item = 1;
     }
+    
     key = -1; //key caught
   }
 }
@@ -570,6 +613,10 @@ void TransitionMessage(String t_message) {
   transition_entered = millis();
 }
 
-void saveConfig(int item, int state){
-  //save state to EEPROM
+void saveConfig(int item, int state){  //EEPROM:  0-499 for internal states, 500-999 for configurable states, 1000-4000 for data logging configurations.
+  EEPROM.write(500+item, state);
+}
+
+int getConfig(int item){
+  return int(EEPROM.read(500+item));
 }
