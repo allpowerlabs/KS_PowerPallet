@@ -164,12 +164,12 @@ int lineCount = 0;
 
 //Configuration Variables
 static char *Configuration[] = { "Engine     ", "Relay Board", "Fet Blower "};  //Load from EEPROM??
-static char *Config_Choices[] = {"10k  20k","YES  NO ", "YES NO "}; //8 char options for last two buttons, Load from EEPROM??
+static char *Config_Choices[] = {"10k 20k ","YES NO  ", "YES NO  "}; //8 char options for last two buttons, Load from EEPROM??
 int config_var;
 byte config_changed = false;
-int engine_type = getConfig(0);
-byte relay_board = getConfig(1);
-byte fet_blower = getConfig(2);
+int engine_type = getConfig(1);
+byte relay_board = getConfig(2);
+byte fet_blower = getConfig(3);
 
 
 // Grate turning variables
