@@ -88,15 +88,15 @@ void TransitionEngine(int new_state) {
 }
 
 void DoOilPressure() {
-  #if ANA_OIL_PRESSURE != ABSENT
-  EngineOilPressureValue = analogRead(ANA_OIL_PRESSURE);
-  if (EngineOilPressureValue > EngineOilPressureLevelBoundary[OIL_P_LOW][0] && EngineOilPressureValue < EngineOilPressureLevelBoundary[OIL_P_LOW][1]) {
-    EngineOilPressureLevel = OIL_P_LOW;
+  if (engine_type == 1){  //20k has analog oil pressure reader
+    EngineOilPressureValue = analogRead(ANA_OIL_PRESSURE);  
+    if (EngineOilPressureValue > EngineOilPressureLevelBoundary[OIL_P_LOW][0] && EngineOilPressureValue < EngineOilPressureLevelBoundary[OIL_P_LOW][1]) {
+      EngineOilPressureLevel = OIL_P_LOW;
+    }
+    if (EngineOilPressureValue > EngineOilPressureLevelBoundary[OIL_P_HIGH][0] && EngineOilPressureValue < EngineOilPressureLevelBoundary[OIL_P_HIGH][1]) {
+      EngineOilPressureLevel = OIL_P_HIGH;
+    }
   }
-  if (EngineOilPressureValue > EngineOilPressureLevelBoundary[OIL_P_HIGH][0] && EngineOilPressureValue < EngineOilPressureLevelBoundary[OIL_P_HIGH][1]) {
-    EngineOilPressureLevel = OIL_P_HIGH;
-  }
-  #endif
 }
 
 void DoGovernor() {
@@ -127,6 +127,6 @@ void DoBattery() {
 }
 
 int get20kPSI(int pressure_reading){  //returns oil pressure in PSI for 20k
-  return (pressure_reading-512)/-2;
+  return (pressure_reading-512)/-2;  //alternately use : analogRead(ANA_OIL_PRESSURE) instead of passing pressure_reading
 }
 

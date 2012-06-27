@@ -139,6 +139,7 @@ Servo Servo_Throttle;
 #define DISPLAY_CALIBRATE_PRESSURE 8
 #define DISPLAY_RELAY 9
 #define DISPLAY_CONFIG 10
+#define DISPLAY_PHIDGET 11
 
 //Testing States
 #define TESTING_OFF 0
@@ -221,18 +222,14 @@ static char *FuelSwitchLevelName[] = { "Off","On"};
 #endif
 
 //Auger Current Levels
-#if ANA_AUGER_CURRENT != ABSENT
 int AugerCurrentValue = 0; // current level in mA
 enum AugerCurrentLevels { AUGER_OFF = 0, AUGER_ON = 1, AUGER_HIGH = 2} AugerCurrentLevel;
 static char *AugerCurrentLevelName[] = { "Off","On", "High"};
 int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} };
-#endif
 
-#if ANA_OIL_PRESSURE != ABSENT
 int EngineOilPressureValue;
 enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_HIGH = 1} EngineOilPressureLevel;
 int EngineOilPressureLevelBoundary[2][2] = { { 0, 500}, {600, 1024} };  
-#endif
 
 // Loop variables - 0 is longest, 3 is most frequent, place code at different levels in loop() to execute more or less frequently
 //TO DO: move loops to hardware timer and interrupt based control, figure out interrupt prioritization
