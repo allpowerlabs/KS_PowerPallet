@@ -1,4 +1,4 @@
-void DoEngine() {
+void DoEngine() {   //add shutdown, servo wide open, lean system, kill engine.
   switch (engine_state) {
     case ENGINE_OFF:
       if (control_state == CONTROL_START) {

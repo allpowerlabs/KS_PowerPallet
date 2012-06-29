@@ -442,6 +442,9 @@ void DoDisplay() {
     if (config_var == 255){  //if EEPROM in default state, set to default value of 0
       config_var = 0;
     }
+     if (config_var == -1){  //if EEPROM in default state, set to default value of 0
+      config_var = 254;
+    }
     Disp_RC(0,0);
     sprintf(buf, "Config:%s            ", Configuration[cur_item-1]);
     Disp_PutStr(buf);

@@ -29,10 +29,12 @@
 #define ANA_LAMBDA ANA0
 #define ANA_FUEL_SWITCH ANA1
 #define ANA_ENGINE_SWITCH ANA2
-#define ANA_BLOWER_DIAL ABSENT
-#define ANA_AUGER_CURRENT ABSENT  //sense current in auger motor
-#define ANA_BATT_V ABSENT
 #define ANA_OIL_PRESSURE ANA3
+#define ANA_AUGER_CURRENT ANA4  //sense current in auger motor
+#define ANA_THROTTLE_POS ANA5
+#define ANA_COOLANT_TEMP ANA6
+#define ANA_BLOWER_DIAL ANA7
+#define ANA_BATT_V ABSENT
 
 // FET Mapping
 #define FET_AUGER FET0
@@ -42,7 +44,9 @@
 #define FET_FLARE_IGNITOR FET4
 #define FET_O2_RESET FET5
 #define FET_ALARM FET6
+#define FET_AUGER_REV FET7
 #define FET_BLOWER ABSENT
+
 
 //Servo Mapping
 //TODO: Use these define
@@ -164,13 +168,14 @@ static char *TestingStateName[] = { "Off","Auger","Grate","Engine","Starter","Fl
 int lineCount = 0;
 
 //Configuration Variables
-static char *Configuration[] = { "Engine     ", "Relay Board", "Fet Blower "};  //Load from EEPROM??
-static char *Config_Choices[] = {"10k 20k ","YES NO  ", "YES NO  "}; //8 char options for last two buttons, Load from EEPROM??
+static char *Configuration[] = { "Engine     ", "Relay Board", "Fet Blower ", "Aug Rev(.1s)"};  //Load from EEPROM??
+static char *Config_Choices[] = {"10k 20k ","YES NO  ", "YES NO  ", "+    -  "}; //8 char options for last two buttons, Load from EEPROM??
 int config_var;
 byte config_changed = false;
 int engine_type = getConfig(1);
 byte relay_board = getConfig(2);
 byte fet_blower = getConfig(3);
+int Aug_Rev_time = getConfig(4);
 
 
 // Grate turning variables
@@ -226,6 +231,7 @@ int AugerCurrentValue = 0; // current level in mA
 enum AugerCurrentLevels { AUGER_OFF = 0, AUGER_ON = 1, AUGER_HIGH = 2} AugerCurrentLevel;
 static char *AugerCurrentLevelName[] = { "Off","On", "High"};
 int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} };
+unsigned auger_rev = 0;
 
 int EngineOilPressureValue;
 enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_HIGH = 1} EngineOilPressureLevel;

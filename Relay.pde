@@ -1,4 +1,4 @@
-//Individual Relay Control
+//Individual Relay Control using multiplexer
 //void relayOn(int driveNum){
 //  bitSet(shiftRegister, driveNum);
 //  digitalWrite(latchPin, LOW);
@@ -20,6 +20,7 @@
 //FET4     Ignitor Relay4
 //FET5     O2 Reset Relay5
 
+//relay control using direct FET output
 void relayOn(int driveNum){
   switch (driveNum) {
     case 1: 

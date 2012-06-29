@@ -1,14 +1,16 @@
 void DoAlarmUpdate() {
   //TODO: Move these into their respective object control functions, not alarm
   if (P_reactorLevel != OFF) {
-    if (auger_on) {
+    if (auger_on and !auger_rev) {
       // auger on
       auger_on_length++;
       auger_off_length = 0;
     } else {
       // auger off
-      auger_off_length++;
-      auger_on_length = 0;
+      if (!auger_rev){  //don't increase when reversing
+        auger_off_length++;
+        auger_on_length = 0;
+      }
     }
   } else {
     auger_on_length = 0;

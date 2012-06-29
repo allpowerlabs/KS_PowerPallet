@@ -12,7 +12,7 @@ void DoFlare() {
       }
       break;
   }
-  if (fet_blower == 1){
+  if (fet_blower){
     blower_dial = analogRead(ANA_BLOWER_DIAL);
     analogWrite(FET_BLOWER,blower_dial/4);
   }
