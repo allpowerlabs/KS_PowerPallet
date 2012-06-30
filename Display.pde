@@ -493,17 +493,29 @@ void DoDisplay() {
     }
   break;
   case DISPLAY_PHIDGET:
+//    Disp_RC(0,0);
+//    sprintf(buf, "O2%4i Fu%4iKey%4i", analogRead(ANA0),analogRead(ANA1),analogRead(ANA2));
+//    Disp_PutStr(buf);
+//    Disp_RC(1,0);
+//    sprintf(buf, "Oil%4iAug%4iTh%4i", analogRead(ANA3),analogRead(ANA4),analogRead(ANA5));
+//    Disp_PutStr(buf);
+//    Disp_RC(2,0);
+//    sprintf(buf, "CoolT%4i Aux%4i   ", analogRead(ANA6),analogRead(ANA7));
+//    Disp_PutStr(buf);  
+//    Disp_RC(3,0);
+//    Disp_PutStr("NEXT                ");
     Disp_RC(0,0);
-    sprintf(buf, "O2%4i Fu%4iKey%4i", analogRead(ANA0),analogRead(ANA1),analogRead(ANA2));
+    sprintf(buf, "Phidgits:     0:%4i", analogRead(ANA0));
     Disp_PutStr(buf);
     Disp_RC(1,0);
-    sprintf(buf, "Oil%4iAug%4iTh%4i", analogRead(ANA3),analogRead(ANA4),analogRead(ANA5));
+    sprintf(buf, "1:%4i 2:%4i 3:%4i", analogRead(ANA1),analogRead(ANA2),analogRead(ANA3));
     Disp_PutStr(buf);
     Disp_RC(2,0);
-    sprintf(buf, "CoolT%4i Aux%4i   ", analogRead(ANA6),analogRead(ANA7));
+    sprintf(buf, "4:%4i 5:%4i 6:%4i", analogRead(ANA4),analogRead(ANA5),analogRead(ANA6));
     Disp_PutStr(buf);  
     Disp_RC(3,0);
-    Disp_PutStr("NEXT                ");
+    sprintf(buf, "NEXT          7:%4i", analogRead(ANA7));
+    Disp_PutStr(buf);
   break;
     //    case DISPLAY_TEMP2:
     //      break;

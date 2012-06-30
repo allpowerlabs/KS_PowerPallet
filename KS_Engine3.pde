@@ -112,6 +112,7 @@ Servo Servo_Throttle;
 #define ENGINE_ON 1
 #define ENGINE_STARTING 2
 #define ENGINE_GOV_TUNING 3
+#define ENGINE_SHUTDOWN 4
 
 //Lambda
 #define LAMBDA_SIGNAL_CHECK TRUE
@@ -228,7 +229,7 @@ static char *FuelSwitchLevelName[] = { "Off","On"};
 
 //Auger Current Levels
 int AugerCurrentValue = 0; // current level in mA
-enum AugerCurrentLevels { AUGER_OFF = 0, AUGER_ON = 1, AUGER_HIGH = 2} AugerCurrentLevel;
+enum AugerCurrentLevels { AUGER_OFF = 0, AUGER_ON = 1, AUGER_HIGH = 2} AugerCurrentLevel;  //Add AUGER_LOW for low current level when auger is free spinning
 static char *AugerCurrentLevelName[] = { "Off","On", "High"};
 int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} };
 unsigned auger_rev = 0;
