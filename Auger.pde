@@ -38,7 +38,7 @@ void DoAuger() {
   if (auger_on) {
     if (AugerCurrentLevel == AUGER_HIGH){
       digitalWrite(FET_AUGER, LOW);
-      digitalWrite(FET_AUGER_REV, HIGH);
+      digitalWrite(FET_AUGER_REV, HIGH);   //Reversing Auger
       auger_rev = millis();
     }
     digitalWrite(FET_AUGER,HIGH);
@@ -47,7 +47,7 @@ void DoAuger() {
     digitalWrite(FET_AUGER,LOW);
     auger_on = false;
   }
-  if (auger_rev >= Aug_Rev_time){
+  if (millis() - auger_rev >= Aug_Rev_time){
     digitalWrite(FET_AUGER_REV, LOW);
     auger_rev = 0;
     auger_on = false;
