@@ -1,18 +1,5 @@
 void DoAlarmUpdate() {
   //TODO: Move these into their respective object control functions, not alarm
-  if (P_reactorLevel != OFF) {
-    if (auger_state== AUGER_FORWARD) {
-      auger_on_length++;
-      auger_off_length = 0;
-    } 
-    if (auger_state == AUGER_OFF){
-      auger_off_length++;
-      auger_on_length = 0;
-    }
-  } else {
-    auger_on_length = 0;
-    auger_off_length = 0;
-  }
   if ((pRatioReactorLevel == PR_LOW || pRatioReactorLevel == PR_HIGH) && P_reactorLevel != OFF) {
     pressureRatioAccumulator += 1;
   } else {
@@ -25,11 +12,11 @@ void DoAlarmUpdate() {
 void DoAlarm() {
   alarm = ALARM_NONE;
   if (P_reactorLevel != OFF) { //alarm only if reactor is running
-    if (auger_on_length >= auger_on_alarm_point) {
+    if (auger_state == AUGER_FORWARD and (millis() - auger_state_entered > auger_on_alarm_point)){
       Serial.println("# Auger on too long");
       alarm = ALARM_AUGER_ON_LONG;
     }
-    if (auger_off_length >= auger_off_alarm_point) {
+    if (auger_state == AUGER_OFF and (millis() - auger_state_entered > auger_off_alarm_point)){
       Serial.println("# Auger off too long");
       alarm = ALARM_AUGER_OFF_LONG;
     }

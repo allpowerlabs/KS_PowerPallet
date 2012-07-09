@@ -30,12 +30,15 @@ void LoadServo() {
 }
 
 void WriteServo(){
-  if ((servo_min != premix_valve_closed) or (servo_max != premix_valve_open)){
+  if (servo_min != premix_valve_closed) {
     EEPROM.write(22,premix_valve_closed);
-    EEPROM.write(23,premix_valve_open);
     servo_min = premix_valve_closed;
+    Serial.println("#Writing Servo Min position setting to EEPROM");
+  }
+  if (servo_max != premix_valve_open){
+    EEPROM.write(23,premix_valve_open);
     servo_max = premix_valve_open;
-    Serial.println("#Writing Servo positions settings to EEPROM");
+    Serial.println("#Writing Servo Max position setting to EEPROM");
   }
 }
 

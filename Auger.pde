@@ -29,7 +29,7 @@ void DoAuger() {
       }
       break;
     case AUGER_REVERSE:
-      if (millis() - auger_rev >= Aug_Rev_time){
+      if (millis() - auger_state_entered > aug_rev_time){
         TransitionAuger(AUGER_FORWARD);
       }
       break;

@@ -176,7 +176,7 @@ byte config_changed = false;
 int engine_type = getConfig(1);
 byte relay_board = getConfig(2);
 byte fet_blower = getConfig(3);
-int Aug_Rev_time = getConfig(4);
+int aug_rev_time = getConfig(4);
 
 
 // Grate turning variables
@@ -240,7 +240,6 @@ int AugerCurrentValue = 0; // current level in mA
 enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_ON = 1, CURRENT_HIGH = 2} AugerCurrentLevel;  //Add AUGER_LOW for low current level when auger is free spinning
 static char *AugerCurrentLevelName[] = { "Off","On", "High"};
 int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} };
-unsigned auger_rev = 0;
 
 int EngineOilPressureValue;
 enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_HIGH = 1} EngineOilPressureLevel;
@@ -404,10 +403,8 @@ int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left han
 int sec = 1000;
 
 // Alarm
-int auger_on_length = 0;
-int auger_off_length = 0;
-unsigned int auger_on_alarm_point = 300;
-unsigned int auger_off_alarm_point = 900;
+unsigned int auger_on_alarm_point = 240*sec;    //Configurable and saved to EEPROM??
+unsigned int auger_off_alarm_point = 900*sec;   //Configurable and saved to EEPROM??
 int alarm;
 int alarm_interval = 5; // in seconds
 int pressureRatioAccumulator = 0;
