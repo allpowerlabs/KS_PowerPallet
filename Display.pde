@@ -99,11 +99,19 @@ void DoDisplay() {
     } 
     else {
       Disp_RC(3,0);
-      if (auger_on) {
-        sprintf(buf, "Aug On%3i  ", auger_on_length);
-      } 
-      else {  
-        sprintf(buf, "AugOff%3i  ", auger_off_length);                                                                                                                                                                                                                                                                                                                                                                                                                           
+      switch(auger_state){
+      case AUGER_FORWARD:
+        sprintf(buf, "AugFwd%3i  ", auger_on_length);
+        break;
+      case AUGER_OFF:
+        sprintf(buf, "AugOff%3i  ", auger_off_length);    
+        break;
+      case AUGER_REVERSE:
+        sprintf(buf, "AugRev%s  ", "   "); 
+        break;
+      case AUGER_HIGH:
+        sprintf(buf, "AugHigh%s  ", "  "); 
+        break;
       }
       Disp_PutStr(buf);
       sprintf(buf, "         ");

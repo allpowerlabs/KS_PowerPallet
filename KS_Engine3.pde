@@ -227,9 +227,17 @@ static char *FuelSwitchLevelName[] = { "Off","On"};
 //int FuelSwitchLevelBoundary[2][2] = {{ 0, 200 }, {800, 1024}}; //not currently used
 #endif
 
+//Auger states
+#define AUGER_OFF 0
+#define AUGER_FORWARD 1
+#define AUGER_HIGH 2
+#define AUGER_REVERSE 3
+int auger_state = 0;
+unsigned long auger_state_entered;
+
 //Auger Current Levels
 int AugerCurrentValue = 0; // current level in mA
-enum AugerCurrentLevels { AUGER_OFF = 0, AUGER_ON = 1, AUGER_HIGH = 2} AugerCurrentLevel;  //Add AUGER_LOW for low current level when auger is free spinning
+enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_ON = 1, CURRENT_HIGH = 2} AugerCurrentLevel;  //Add AUGER_LOW for low current level when auger is free spinning
 static char *AugerCurrentLevelName[] = { "Off","On", "High"};
 int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} };
 unsigned auger_rev = 0;
@@ -396,7 +404,6 @@ int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left han
 int sec = 1000;
 
 // Alarm
-boolean auger_on = false;
 int auger_on_length = 0;
 int auger_off_length = 0;
 unsigned int auger_on_alarm_point = 300;
