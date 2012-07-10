@@ -160,6 +160,9 @@ Servo Servo_Throttle;
 #define TESTING_ANA_FUEL_SWITCH 10
 #define TESTING_ANA_OIL_PRESSURE 11
 
+//Datalogging Buffer
+String data_buffer = "";
+
 //Test Variables
 int testing_state = TESTING_OFF;
 unsigned long testing_state_entered = 0;

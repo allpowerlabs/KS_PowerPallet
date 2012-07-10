@@ -291,18 +291,26 @@ void LogReactor(boolean header=false) {
 }
 
 void PrintColumn(String str) {
-   Serial.print(str);
-   Serial.print(", ");  
+  data_buffer += str;
+  data_buffer += ", ";
+   //Serial.print(str);
+   //Serial.print(", ");  
 }
 
 void PrintColumn(float str) {
-   Serial.print(str);
-   Serial.print(", ");  
+  char buf[9] = "        ";
+  sprintf(buf, "%5.3f", str);  //Use another formatting ??
+  data_buffer += buf;
+  data_buffer += ", ";
+  //Serial.print(str);
+   //Serial.print(", ");  
 }
 
 void PrintColumnInt(int str) {
-   Serial.print(str);
-   Serial.print(", ");  
+  data_buffer += String(str);
+  data_buffer += ", ";
+   //Serial.print(str);
+   //Serial.print(", ");  
 }
 
 void DoDatalogging() {
@@ -328,7 +336,8 @@ void DoDatalogging() {
   //LogGovernor(header);
   //LogPulseEnergy(header);
   //LogBatteryVoltage(header);
-
+  Serial.print(data_buffer);
+  data_buffer = "";
   Serial.println();
   lineCount++;
 }
