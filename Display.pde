@@ -363,6 +363,7 @@ void DoDisplay() {
     break;
   case DISPLAY_SERVO:   //need to add constraints for min and max?
     item_count = 2;
+    testing_state = TESTING_SERVO;  //necessary so that there isn't any conflicting servo writes
     Disp_RC(0,0);
     sprintf(buf, "ServoMin%3i", int(premix_valve_closed));
     Disp_PutStr(buf);
@@ -609,6 +610,7 @@ void DoKeyInput() {
     case DISPLAY_SERVO:
       WriteServo();
       TransitionDisplay(DISPLAY_CALIBRATE_PRESSURE);  //assume that engine state is off because we are already in DISPLAY_SERVO
+      TransitionTesting(TESTING_OFF);
       break;
     case DISPLAY_CALIBRATE_PRESSURE:                 //assume that engine state is off
       TransitionDisplay(DISPLAY_RELAY);

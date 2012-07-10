@@ -159,6 +159,7 @@ Servo Servo_Throttle;
 #define TESTING_ANA_ENGINE_SWITCH 9
 #define TESTING_ANA_FUEL_SWITCH 10
 #define TESTING_ANA_OIL_PRESSURE 11
+#define TESTING_SERVO 12     //used in Display to defeat any other writes to servo
 
 //Datalogging Buffer
 String data_buffer = "";
@@ -516,23 +517,25 @@ void loop() {
   if (millis() >= nextTime3) {
     nextTime3 += loopPeriod3;
     // first, read all KS's sensors
-    Temp_ReadAll();  // reads into array Temp_Data[], in deg C
-    Press_ReadAll(); // reads into array Press_Data[], in hPa
-    Timer_ReadAll(); // reads pulse timer into Timer_Data, in RPM ??? XXX
-    DoPressure();
-    DoFlow();
-    DoSerialIn();
-    DoLambda();
-    //DoGovernor();
-    DoControlInputs();
-    DoEngine();
-    //DoServos();
-    DoFlare();
-    DoReactor();
-    DoAuger();
-    DoBattery();
+    if (testing_state == TESTING_OFF) {
+      Temp_ReadAll();  // reads into array Temp_Data[], in deg C
+      Press_ReadAll(); // reads into array Press_Data[], in hPa
+      Timer_ReadAll(); // reads pulse timer into Timer_Data, in RPM ??? XXX
+      DoPressure();
+      DoFlow();
+      DoSerialIn();
+      DoLambda();
+      //DoGovernor();
+      DoControlInputs();
+      DoEngine();
+      //DoServos();
+      DoFlare();
+      DoReactor();
+      DoAuger();
+      DoBattery();
+      DoCounterHertz();
+    }
     DoKeyInput();
-    DoCounterHertz();
     DoHeartBeat(); // blink heartbeat LED
     //TODO: Add OpenEnergyMonitor Library
     if (millis() >= nextTime2) {
@@ -540,12 +543,14 @@ void loop() {
       DoDisplay();
       if (millis() >= nextTime1) {
         nextTime1 += loopPeriod1;
-        DoGrate();
-        DoFilter();
-        DoOilPressure();
-        DoDatalogging();
-//      DoDatalogSD();
-        DoAlarmUpdate();
+        if (testing_state == TESTING_OFF) {
+          DoGrate();
+          DoFilter();
+          DoOilPressure();
+          DoDatalogging();
+  //      DoDatalogSD();
+          DoAlarmUpdate();
+        }
         if (millis() >= nextTime0) {
           nextTime0 += loopPeriod0;
           DoAlarm();
