@@ -233,11 +233,16 @@ static char *FuelSwitchLevelName[] = { "Off","On"};
 
 //Auger states
 #define AUGER_OFF 0
-#define AUGER_FORWARD 1
-#define AUGER_HIGH 2
-#define AUGER_REVERSE 3
+#define AUGER_STARTING 1
+#define AUGER_FORWARD 2
+#define AUGER_HIGH 3
+#define AUGER_STARTING_REVERSE 4
+#define AUGER_REVERSE 5
+#define AUGER_REVERSE_HIGH 6
+
 int auger_state = 0;
 unsigned long auger_state_entered;
+unsigned long auger_reverse_entered;
 
 //Auger Current Levels
 int AugerCurrentValue = 0; // current level in mA
@@ -550,10 +555,10 @@ void loop() {
           DoDatalogging();
   //      DoDatalogSD();
           DoAlarmUpdate();
-        }
-        if (millis() >= nextTime0) {
-          nextTime0 += loopPeriod0;
-          DoAlarm();
+          if (millis() >= nextTime0) {
+            nextTime0 += loopPeriod0;
+            DoAlarm();
+          }
         }
       }
     }

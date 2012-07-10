@@ -4,9 +4,14 @@ void DoAuger() {
   switch (auger_state) {
     case AUGER_OFF:
       if (FuelSwitchValue > 600) {
-        TransitionAuger(AUGER_FORWARD);
+        TransitionAuger(AUGER_STARTING);
       }
       break;
+    case AUGER_STARTING:  //disregard all current readings while starting
+      if (millis() > auger_state_entered + 500){
+        TransitionAuger(AUGER_FORWARD);
+      }
+        break;
     case AUGER_FORWARD:
       if (FuelSwitchValue <= 600) {
         TransitionAuger(AUGER_OFF);
@@ -14,7 +19,7 @@ void DoAuger() {
       if (AugerCurrentLevel == CURRENT_HIGH){
         TransitionAuger(AUGER_HIGH);
       } 
-      if (millis()-auger_state_entered >= 360*sec){  //turn engine and auger off if auger runs none stop for 6 minutes.
+      if (millis()-auger_state_entered >= 360*sec){  //turn engine and auger off if auger runs none stop for 6 minutes.  Account for current changes??
         TransitionAuger(AUGER_OFF);
         TransitionEngine(ENGINE_SHUTDOWN);
       }
@@ -23,17 +28,40 @@ void DoAuger() {
       if (FuelSwitchValue < 600) {
         TransitionAuger(AUGER_OFF);
       }
-      if (millis() - auger_state_entered > 500){ //set to variable for threshold??
-        TransitionAuger(AUGER_REVERSE);
-      }
-      break;
-    case AUGER_REVERSE:
-      if (millis() - auger_state_entered > aug_rev_time){
+      if (AugerCurrentLevel != CURRENT_HIGH){
         TransitionAuger(AUGER_FORWARD);
       }
+      if (millis() - auger_state_entered > 500){ //set to variable for threshold??
+        TransitionAuger(AUGER_STARTING_REVERSE);
+      }
       break;
+    case AUGER_STARTING_REVERSE:  //disregard all current readings while starting
+      if (millis() > auger_state_entered + 500){
+        TransitionAuger(AUGER_REVERSE);
+      }
+    case AUGER_REVERSE:
+      if (AugerCurrentLevel == CURRENT_HIGH){
+        TransitionAuger(AUGER_REVERSE_HIGH);
+      }
+      if (millis() - auger_reverse_entered >= aug_rev_time - 500){
+        TransitionAuger(AUGER_OFF);
+      }
+      break;
+    case AUGER_REVERSE_HIGH:
+      if (AugerCurrentLevel != CURRENT_HIGH){
+        TransitionAuger(AUGER_REVERSE);
+      }
+      if (millis() - auger_state_entered > 500){ //set to variable for threshold??
+        if (AugerCurrentLevel == CURRENT_HIGH){
+          TransitionAuger(AUGER_OFF);
+        }  else {
+          TransitionAuger(AUGER_REVERSE);
+        }
+      }
+      break;      
   }
 }
+
 
 void TransitionAuger(int new_state) {
   //can look at auger_state for "old" state before transitioning at the end of this method
@@ -45,9 +73,13 @@ void TransitionAuger(int new_state) {
       Serial.println("# New Auger State: Off");
       TransitionMessage("Auger: Off         ");
       break;
-    case AUGER_FORWARD:
+    case AUGER_STARTING:
       digitalWrite(FET_AUGER,HIGH);
       digitalWrite(FET_AUGER_REV, LOW);
+      Serial.println("# New Auger State: Starting Forward");  //is this necessary??
+      TransitionMessage("Auger: Starting      "); //is this necessary??
+      break;
+    case AUGER_FORWARD:
       Serial.println("# New Auger State: Forward");
       TransitionMessage("Auger: Forward      ");
       break;
@@ -55,13 +87,21 @@ void TransitionAuger(int new_state) {
       Serial.println("# New Auger State: Forward, Current High");
       TransitionMessage("Auger: Current High ");
       break;
-    case AUGER_REVERSE:
+    case AUGER_STARTING_REVERSE:
+      auger_reverse_entered = millis();
       digitalWrite(FET_AUGER,LOW);
       digitalWrite(FET_AUGER_REV, HIGH);
+      Serial.println("# New Auger State: Starting Reverse");  //is this necessary??
+      TransitionMessage("Auger: Starting Reverse "); //is this necessary??
+      break;
+    case AUGER_REVERSE:
       Serial.println("# New Auger State: Reverse");
       TransitionMessage("Auger: Reverse      ");
       break;
-      
+    case AUGER_REVERSE_HIGH:
+      Serial.println("# New Auger State: Reverse High Current"); //is this necessary??
+      TransitionMessage("Auger: Reverse High"); //is this necessary??
+      break;   
   }
   auger_state=new_state;
 }
