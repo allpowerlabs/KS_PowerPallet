@@ -99,7 +99,7 @@ void DoDisplay() {
     } 
     else {
       Disp_RC(3,0);
-      switch(auger_state){
+      switch(auger_state){   //Update to all Auger states??
       case AUGER_FORWARD:
         sprintf(buf, "AugFwd%3i  ", (millis() - auger_state_entered)/1000);
         break;

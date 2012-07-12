@@ -336,8 +336,7 @@ void DoDatalogging() {
   //LogGovernor(header);
   //LogPulseEnergy(header);
   //LogBatteryVoltage(header);
-  Serial.print(data_buffer);
+  Serial.println(data_buffer);
   data_buffer = "";
-  Serial.println();
   lineCount++;
 }
