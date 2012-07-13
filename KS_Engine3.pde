@@ -239,6 +239,7 @@ static char *FuelSwitchLevelName[] = { "Off","On"};
 #define AUGER_STARTING_REVERSE 4
 #define AUGER_REVERSE 5
 #define AUGER_REVERSE_HIGH 6
+#define AUGER_ALARM 7
 
 int auger_state = 0;
 unsigned long auger_state_entered;
@@ -409,11 +410,10 @@ int dataPin = 50;  //To SRIN on Relay Board, Bottom Right Pin on Relay Board whe
 int latchPin = 51; //To RCK on Relay Board, Second Pin from Bottom on Right hand side
 int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left hand side
 
-#define SEC 1000
 
 // Alarm
-unsigned int auger_on_alarm_point = 240*SEC;    //Configurable and saved to EEPROM??
-unsigned int auger_off_alarm_point = 900*SEC;   //Configurable and saved to EEPROM??
+unsigned int auger_on_alarm_point = 240000;    //Configurable and saved to EEPROM??
+unsigned int auger_off_alarm_point = 900000;   //Configurable and saved to EEPROM??
 int alarm;
 int alarm_interval = 5; // in seconds
 int pressureRatioAccumulator = 0;

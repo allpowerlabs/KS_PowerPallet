@@ -65,7 +65,7 @@ void DoLambda() {
         SetPremixServoAngle(lambda_output);
         break;
       case LAMBDA_NO_SIGNAL:
-        if ((lambda_state_name == "Resetting O2 Relay") and (millis() - lambda_state_entered > SEC/2)) {
+        if ((lambda_state_name == "Resetting O2 Relay") and (millis() - lambda_state_entered > 500)) {
           digitalWrite(FET_O2_RESET, LOW);
           TransitionLambda(LAMBDA_CLOSEDLOOP);
         }
@@ -129,7 +129,7 @@ void TransitionLambda(int new_state) {
       lambda_state_name = "O2 signal loss";
       lambda_PID.SetMode(MANUAL);
       lambda_setpoint = smoothedLambda;
-      if (millis() - lambda_state_entered > SEC/4) {
+      if (millis() - lambda_state_entered > 250) {
         digitalWrite(FET_O2_RESET, HIGH);
         lambda_state_name = "Resetting O2 Relay";
       }

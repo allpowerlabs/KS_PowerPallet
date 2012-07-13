@@ -56,46 +56,65 @@ void DoDisplay() {
     }
     //Row 1
     Disp_RC(1, 0);
-    if (disp_alt) {
-      sprintf(buf, "Tbred%4i  ", Temp_Data[T_BRED]);
-    } 
-    else {
-      sprintf(buf, "Tbred%s", T_bredLevel[TempLevelName]);
-    }
-    Disp_PutStr(buf);
-    Disp_RC(1, 11);
-    sprintf(buf, "Preac%4i", Press[P_REACTOR] / 25);
-    Disp_PutStr(buf);
-
-    //Row 2
-    Disp_RC(2,0);
-    if (P_reactorLevel != OFF) {
-      //the value only means anything if the pressures are high enough, otherwise it is just noise
-      sprintf(buf, "Pratio %3i  ", int(pRatioReactor*100)); //pressure ratio
+    if (millis() % 4000 > 2000 & alarm == ALARM_AUGER_ON_LONG) {
+      sprintf(buf, "Engine Shutoff %3i", (360000-(millis()-auger_state_entered))/1000);
       Disp_PutStr(buf);
-    } 
-    else {
-      Disp_PutStr("Pratio --  ");
     }
-    Disp_RC(2, 11);
-    if (true) {
-      sprintf(buf, "Pfilt%4i", Press[P_FILTER] / 25);
-    } 
     else {
-      //TO DO: Implement filter warning
-      if (pRatioFilterHigh) {
-        sprintf(buf, "Pfilt Bad");
+      if (disp_alt) {
+        sprintf(buf, "Tbred%4i  ", Temp_Data[T_BRED]);
       } 
       else {
-        sprintf(buf, "PfiltGood");
+        sprintf(buf, "Tbred%s", T_bredLevel[TempLevelName]);
       }
+      Disp_PutStr(buf);
+      Disp_RC(1, 11);
+      sprintf(buf, "Preac%4i", Press[P_REACTOR] / 25);
+      Disp_PutStr(buf);
     }
-    Disp_PutStr(buf);
-
+    //Row 2
+    if (millis() % 4000 > 2000 & alarm != ALARM_NONE) {
+      Disp_RC(2,0);
+      Disp_PutStr(display_alarm[alarm]);
+    } 
+    else {
+      Disp_RC(2,0);
+      if (P_reactorLevel != OFF) {
+        //the value only means anything if the pressures are high enough, otherwise it is just noise
+        sprintf(buf, "Pratio %3i  ", int(pRatioReactor*100)); //pressure ratio
+        Disp_PutStr(buf);
+      } 
+      else {
+        Disp_PutStr("Pratio --  ");
+      }
+      Disp_RC(2, 11);
+      if (true) {
+        sprintf(buf, "Pfilt%4i", Press[P_FILTER] / 25);
+      } 
+      else {
+        //TO DO: Implement filter warning
+        if (pRatioFilterHigh) {
+          sprintf(buf, "Pfilt Bad");
+        } 
+        else {
+          sprintf(buf, "PfiltGood");
+        }
+      }
+      Disp_PutStr(buf);
+    }
     //Row 3
     if (millis() % 4000 > 2000 & alarm != ALARM_NONE) {
       Disp_RC(3,0);
-      Disp_PutStr(display_alarm[alarm]);
+      Disp_PutStr("NEXT  OK       Reset");
+      if (key == 2) {  
+        alarm = ALARM_NONE;
+      } 
+      if (key == 3) {
+        if (alarm == ALARM_AUGER_ON_LONG){
+          alarm = ALARM_NONE;
+          auger_state = AUGER_OFF;
+        }
+      }
     } 
     else {
       Disp_RC(3,0);

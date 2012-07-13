@@ -19,8 +19,8 @@ void DoAuger() {
       if (AugerCurrentLevel == CURRENT_HIGH){
         TransitionAuger(AUGER_HIGH);
       } 
-      if (millis()-auger_state_entered > 360 * SEC){  //turn engine and auger off if auger runs none stop for 6 minutes.  Account for current changes??
-        TransitionAuger(AUGER_OFF);
+      if ((millis() - auger_state_entered) > 360000){  //turn engine and auger off if auger runs none stop for 6 minutes.  Account for current changes??
+        TransitionAuger(AUGER_ALARM);
         TransitionEngine(ENGINE_SHUTDOWN);
       }
       break;
@@ -59,7 +59,9 @@ void DoAuger() {
           TransitionAuger(AUGER_REVERSE);
         }
       }
-      break;      
+      break; 
+   case AUGER_ALARM:  //Auger will remain off until rebooted
+     break;   
   }
 }
 
@@ -102,6 +104,12 @@ void TransitionAuger(int new_state) {
     case AUGER_REVERSE_HIGH:
       Serial.println("# New Auger State: Reverse High Current"); //is this necessary??
       TransitionMessage("Auger: Reverse High"); //is this necessary??
+      break; 
+    case AUGER_ALARM:
+      digitalWrite(FET_AUGER,LOW);
+      digitalWrite(FET_AUGER_REV, LOW);
+      Serial.println("# New Auger State: On too long, turning Off");
+      TransitionMessage("Auger: Off          ");
       break;   
   }
   auger_state=new_state;
