@@ -427,6 +427,7 @@ void DoDisplay() {
     break;
   case DISPLAY_RELAY:
     item_count = 8;
+    testing_state = TESTING_SERVO;
     Disp_RC(0,0);
     sprintf(buf, "Test Relay: %1i       ", cur_item);
     Disp_PutStr(buf);
@@ -617,6 +618,7 @@ void DoKeyInput() {
       break;
     case DISPLAY_RELAY:
       TransitionDisplay(DISPLAY_CONFIG);
+      TransitionTesting(TESTING_OFF);
       break;
     case DISPLAY_CONFIG:
       TransitionDisplay(DISPLAY_PHIDGET);

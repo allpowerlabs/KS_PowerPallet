@@ -19,7 +19,7 @@ void DoAuger() {
       if (AugerCurrentLevel == CURRENT_HIGH){
         TransitionAuger(AUGER_HIGH);
       } 
-      if (millis()-auger_state_entered >= 360*sec){  //turn engine and auger off if auger runs none stop for 6 minutes.  Account for current changes??
+      if (millis()-auger_state_entered > 360 * sec){  //turn engine and auger off if auger runs none stop for 6 minutes.  Account for current changes??
         TransitionAuger(AUGER_OFF);
         TransitionEngine(ENGINE_SHUTDOWN);
       }

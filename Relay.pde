@@ -25,20 +25,28 @@ void relayOn(int driveNum){
   switch (driveNum) {
     case 1: 
       digitalWrite(FET0,HIGH);
+      break;
     case 2: 
       digitalWrite(FET1,HIGH);
+      break;
     case 3: 
       digitalWrite(FET2,HIGH);
+      break;
     case 4: 
       digitalWrite(FET3,HIGH);
+      break;
     case 5: 
       digitalWrite(FET4,HIGH);
+      break;
     case 6: 
       digitalWrite(FET5,HIGH);
+      break;
     case 7: 
       digitalWrite(FET6,HIGH);
+      break;
     case 8: 
-      digitalWrite(FET7,HIGH);  
+      digitalWrite(FET7,HIGH);
+      break;  
   }     
 }
 
@@ -46,19 +54,27 @@ void relayOff(int driveNum){
   switch (driveNum) {
     case 1: 
       digitalWrite(FET0,LOW);
+      break;
     case 2: 
       digitalWrite(FET1,LOW);
+      break;
     case 3: 
       digitalWrite(FET2,LOW);
+      break;
     case 4: 
       digitalWrite(FET3,LOW);
+      break;
     case 5: 
       digitalWrite(FET4,LOW);
+      break;
     case 6: 
       digitalWrite(FET5,LOW);
+      break;
     case 7: 
       digitalWrite(FET6,LOW);
+      break;
     case 8: 
-      digitalWrite(FET7,LOW);  
+      digitalWrite(FET7,LOW); 
+      break; 
   } 
 }

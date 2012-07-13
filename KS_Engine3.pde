@@ -36,7 +36,7 @@
 #define ANA_BLOWER_DIAL ANA7
 #define ANA_BATT_V ABSENT
 
-// FET Mapping
+// FET Mappings
 #define FET_AUGER FET0
 #define FET_GRATE FET1
 #define FET_IGNITION FET2
