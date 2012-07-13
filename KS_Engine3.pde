@@ -409,11 +409,11 @@ int dataPin = 50;  //To SRIN on Relay Board, Bottom Right Pin on Relay Board whe
 int latchPin = 51; //To RCK on Relay Board, Second Pin from Bottom on Right hand side
 int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left hand side
 
-int sec = 1000;
+#define SEC 1000
 
 // Alarm
-unsigned int auger_on_alarm_point = 240*sec;    //Configurable and saved to EEPROM??
-unsigned int auger_off_alarm_point = 900*sec;   //Configurable and saved to EEPROM??
+unsigned int auger_on_alarm_point = 240*SEC;    //Configurable and saved to EEPROM??
+unsigned int auger_off_alarm_point = 900*SEC;   //Configurable and saved to EEPROM??
 int alarm;
 int alarm_interval = 5; // in seconds
 int pressureRatioAccumulator = 0;

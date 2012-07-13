@@ -8,10 +8,10 @@ void DoAuger() {
       }
       break;
     case AUGER_STARTING:  //disregard all current readings while starting
-      if (millis() > auger_state_entered + 500){
+      if (millis() - auger_state_entered > 500){
         TransitionAuger(AUGER_FORWARD);
       }
-        break;
+      break;
     case AUGER_FORWARD:
       if (FuelSwitchValue <= 600) {
         TransitionAuger(AUGER_OFF);
@@ -19,7 +19,7 @@ void DoAuger() {
       if (AugerCurrentLevel == CURRENT_HIGH){
         TransitionAuger(AUGER_HIGH);
       } 
-      if (millis()-auger_state_entered > 360 * sec){  //turn engine and auger off if auger runs none stop for 6 minutes.  Account for current changes??
+      if (millis()-auger_state_entered > 360 * SEC){  //turn engine and auger off if auger runs none stop for 6 minutes.  Account for current changes??
         TransitionAuger(AUGER_OFF);
         TransitionEngine(ENGINE_SHUTDOWN);
       }
@@ -36,14 +36,15 @@ void DoAuger() {
       }
       break;
     case AUGER_STARTING_REVERSE:  //disregard all current readings while starting
-      if (millis() > auger_state_entered + 500){
+      if (millis() - auger_state_entered > 500){
         TransitionAuger(AUGER_REVERSE);
       }
+      break;
     case AUGER_REVERSE:
       if (AugerCurrentLevel == CURRENT_HIGH){
         TransitionAuger(AUGER_REVERSE_HIGH);
       }
-      if (millis() - auger_reverse_entered >= aug_rev_time - 500){
+      if (millis() - auger_reverse_entered > aug_rev_time - 500){
         TransitionAuger(AUGER_OFF);
       }
       break;
