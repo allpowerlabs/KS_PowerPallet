@@ -415,6 +415,7 @@ int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left han
 unsigned int auger_on_alarm_point = 240000;    //Configurable and saved to EEPROM??
 unsigned int auger_off_alarm_point = 900000;   //Configurable and saved to EEPROM??
 int alarm;
+int silenced_alarm_state;
 int alarm_interval = 5; // in seconds
 int pressureRatioAccumulator = 0;
 #define ALARM_NONE 0 //no alarm
@@ -427,6 +428,8 @@ int pressureRatioAccumulator = 0;
 #define ALARM_HIGH_BRED 7
 #define ALARM_BAD_OIL_PRESSURE 8
 #define ALARM_O2_NO_SIG 9
+#define ALARM_SILENCED 10
+
 char* display_alarm[] = {
   "No alarm           ",
   "Auger on too long  ",

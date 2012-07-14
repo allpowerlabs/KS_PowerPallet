@@ -75,8 +75,13 @@ void DoDisplay() {
     //Row 2
     if (millis() % 4000 > 2000 & alarm != ALARM_NONE) {
       Disp_RC(2,0);
-      Disp_PutStr(display_alarm[alarm]);
-    } 
+      if (alarm != ALARM_SILENCED){
+        Disp_PutStr(display_alarm[alarm]);
+      }
+      else {
+        Disp_PutStr(display_alarm[silenced_alarm_state]);
+      } 
+    }
     else {
       Disp_RC(2,0);
       if (P_reactorLevel != OFF) {
@@ -106,8 +111,9 @@ void DoDisplay() {
     if (millis() % 4000 > 2000 & alarm != ALARM_NONE) {
       Disp_RC(3,0);
       Disp_PutStr("NEXT  OK       Reset");
-      if (key == 2) {  
-        alarm = ALARM_NONE;
+      if (key == 1) {  
+        silenced_alarm_state = alarm;
+        alarm = ALARM_SILENCED;
       } 
       if (key == 3) {
         if (alarm == ALARM_AUGER_ON_LONG){
