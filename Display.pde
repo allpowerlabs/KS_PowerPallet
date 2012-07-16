@@ -464,9 +464,13 @@ void DoDisplay() {
     Disp_PutStr("NEXT  ADV   ON   OFF");
     if (key == 2) {
       relayOn(cur_item);
+      Disp_RC(1,0);
+      Disp_PutStr("           ON       ");
     }
     if (key == 3) {
       relayOff(cur_item);
+      Disp_RC(1,0);
+    Disp_PutStr("           OFF        ");
     }
   break;
   case DISPLAY_CONFIG:
@@ -657,6 +661,7 @@ void DoKeyInput() {
   if (key == 1) {
     if (display_state == DISPLAY_CONFIG){
       saveConfig(cur_item, config_var);
+      update_config_var(cur_item);
       config_changed = false;
     }
     cur_item++;
@@ -690,5 +695,34 @@ void saveConfig(int item, int state){  //EEPROM:  0-499 for internal states, 500
 }
 
 int getConfig(int item){
-  return int(EEPROM.read(500+item));
+  int value;
+  value = int(EEPROM.read(500+item));
+  if (value == 255){  //values hasn't been saved yet to EEPROM, go with default value
+    value = defaults[item];
+    saveConfig(item, value);
+  }
+  return value;
+}
+
+void update_config_var(int var_num){
+  switch (var_num) {
+    case 1:
+      engine_type = getConfig(1);
+      break;
+    case 2:
+      relay_board = getConfig(2);
+      break;
+    case 3:
+      fet_blower = getConfig(3);
+      break;
+    case 4:
+      aug_rev_time = getConfig(4);
+      break;
+    case 5:
+     current_low_boundary = getConfig(5) * 4;  
+     break;
+    case 6:
+      current_high_boundary = getConfig(6) * 4;
+      break;
+  }
 }

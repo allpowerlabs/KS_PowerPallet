@@ -194,18 +194,18 @@ void LogTemps(boolean header = false) {
 
 void LogAuger(boolean header = false) {
   if (header) {
-    #if ANA_AUGER_CURRENT != ABSENT
+     if (relay_board == 0){ 
       PrintColumn("AugerCurrent");
       PrintColumn("AugerLevel");
-    #endif
+     }
     #if ANA_FUEL_SWITCH != ABSENT
       PrintColumn("FuelSwitchLevel");
     #endif
   } else {
-    #if ANA_AUGER_CURRENT != ABSENT
+     if (relay_board == 0){ 
       PrintColumnInt(AugerCurrentValue);
       PrintColumn(AugerCurrentLevel[AugerCurrentLevelName]);
-    #endif
+     }
     #if ANA_FUEL_SWITCH != ABSENT
       PrintColumn(FuelSwitchLevel[FuelSwitchLevelName]);
     #endif

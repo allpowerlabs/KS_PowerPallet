@@ -23,7 +23,7 @@
 //constant definitions
 #define ABSENT -500
 
-#define CODE_VERSION "v1.1b"
+#define CODE_VERSION "v1.1b"  //b as in beta
 
 // Analog Input Mapping
 #define ANA_LAMBDA ANA0
@@ -173,14 +173,18 @@ static char *TestingStateName[] = { "Off","Auger","Grate","Engine","Starter","Fl
 int lineCount = 0;
 
 //Configuration Variables
-static char *Configuration[] = { "Engine     ", "Relay Board", "Fet Blower ", "Aug Rev(.1s)"};  //Load from EEPROM??
-static char *Config_Choices[] = {"10k 20k ","YES NO  ", "YES NO  ", "+    -  "}; //8 char options for last two buttons, Load from EEPROM??
+static char *Configuration[] = { "Engine     ", "Relay Board", "Fet Blower ", "Aug Rev(.1s)", "AugerCurLow", "AugCurHigh "};  //Load from EEPROM??
+static char *Config_Choices[] = {"10k 20k ","YES NO  ", "YES NO  ", "+    -  ", "+    -  ", "+    -  ", }; //8 char options for last two buttons, Load from EEPROM??
 int config_var;
 byte config_changed = false;
+
+int defaults[] = {0, 0, 0, 30, 50, 100};  //default values to be saved to EEPROM for the following getConfig variables
 int engine_type = getConfig(1);
 byte relay_board = getConfig(2);
 byte fet_blower = getConfig(3);
 int aug_rev_time = getConfig(4);
+int current_low_boundary = getConfig(5) * 4;  
+int current_high_boundary = getConfig(6) * 4;
 
 
 // Grate turning variables
@@ -247,9 +251,10 @@ unsigned long auger_reverse_entered;
 
 //Auger Current Levels
 int AugerCurrentValue = 0; // current level in mA
-enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_ON = 1, CURRENT_HIGH = 2} AugerCurrentLevel;  //Add AUGER_LOW for low current level when auger is free spinning
-static char *AugerCurrentLevelName[] = { "Off","On", "High"};
-int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} };
+enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;  //Add AUGER_LOW for low current level when auger is free spinning
+static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
+//int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} }; mA values
+int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 1024} };  //actual sensor readings
 
 int EngineOilPressureValue;
 enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_HIGH = 1} EngineOilPressureLevel;
