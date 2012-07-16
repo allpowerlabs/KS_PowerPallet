@@ -698,7 +698,7 @@ int getConfig(int item){
   int value;
   value = int(EEPROM.read(500+item));
   if (value == 255){  //values hasn't been saved yet to EEPROM, go with default value
-    value = defaults[item];
+    value = defaults[item-1];
     saveConfig(item, value);
   }
   return value;
