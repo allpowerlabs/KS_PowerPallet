@@ -481,14 +481,14 @@ void DoDisplay() {
     if (config_var == 255){  //if EEPROM in default state, set to default value of 0
       config_var = 0;
     }
-     if (config_var == -1){  //if EEPROM in default state, set to default value of 0
+    if (config_var == -1){  //if EEPROM in default state, set to default value of 0
       config_var = 254;
     }
     Disp_RC(0,0);
     sprintf(buf, "Config:%s            ", Configuration[cur_item-1]);
     Disp_PutStr(buf);
     Disp_RC(1,0);
-    if (Config_Choices[cur_item-1] =="+    -  "){
+    if (Config_Choices[cur_item-1] == "+    -  "){
       sprintf(buf, "          %3i       ", config_var);
     }  else {
       if (config_var == 0){
@@ -510,17 +510,16 @@ void DoDisplay() {
     Disp_RC(3,0);
     sprintf(buf, "NEXT  ADV   %s", Config_Choices[cur_item-1]);
     Disp_PutStr(buf);
-    if (Config_Choices[cur_item-1] =="+    -  "){
+    if (Config_Choices[cur_item-1] == "+    -  "){
       if (key == 2) {
         config_var += 1;
         config_changed = true;
-     }
-    if (key == 3) {
+      }
+      if (key == 3) {
         config_var -= 1;
         config_changed = true;
       }
-    }
-    else {
+    } else {
       if (key == 2) {  
         config_var = 0;
         config_changed = true;
@@ -659,7 +658,7 @@ void DoKeyInput() {
     key = -1; //key caught
   }
   if (key == 1) {
-    if (display_state == DISPLAY_CONFIG){
+    if (display_state == DISPLAY_CONFIG and config_changed == true){
       saveConfig(cur_item, config_var);
       update_config_var(cur_item);
       config_changed = false;
@@ -699,7 +698,7 @@ int getConfig(int item){
   value = int(EEPROM.read(500+item));
   if (value == 255){  //values hasn't been saved yet to EEPROM, go with default value
     value = defaults[item-1];
-    saveConfig(item, value);
+    EEPROM.write(500+item, value);
   }
   return value;
 }
