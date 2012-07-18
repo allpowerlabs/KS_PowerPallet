@@ -299,7 +299,7 @@ void PrintColumn(String str) {
 }
 
 void PrintColumn(float str) {
-  char buf[9] = "        ";
+  char buf[10] = "         ";
   sprintf(buf, "%5.3f", str);  //Use another formatting ??
   data_buffer += String(buf);
   data_buffer += ", ";
