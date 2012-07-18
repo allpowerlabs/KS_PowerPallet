@@ -180,8 +180,9 @@ byte config_changed = false;
 
 int defaults[] = {0, 0, 0, 30, 50, 100};  //default values to be saved to EEPROM for the following getConfig variables
 int engine_type = getConfig(1);
-byte relay_board = getConfig(2);
-byte fet_blower = getConfig(3);
+//int relay_board = getConfig(2);
+int relay_board = 0;
+int fet_blower = getConfig(3);
 int aug_rev_time = getConfig(4);
 int current_low_boundary = getConfig(5) * 4;  
 int current_high_boundary = getConfig(6) * 4;
@@ -254,7 +255,8 @@ int AugerCurrentValue = 0; // current level in mA
 enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;  //Add AUGER_LOW for low current level when auger is free spinning
 static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
 //int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} }; mA values
-int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 1024} };  //actual sensor readings
+//int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 1024} };  //actual sensor readings
+int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, 120}, {120, 200}, {200, 1024} };
 
 int EngineOilPressureValue;
 enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_HIGH = 1} EngineOilPressureLevel;

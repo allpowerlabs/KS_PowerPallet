@@ -472,25 +472,29 @@ void DoDisplay() {
       Disp_RC(1,0);
     Disp_PutStr("           OFF        ");
     }
-  break;
+    break;
   case DISPLAY_CONFIG:
     item_count = sizeof(Config_Choices)/sizeof(Config_Choices[0]);
+    //Serial.println(item_count);
     if (config_changed == false){
+      //Serial.println("config_changed == false");
       config_var = getConfig(cur_item);
     }
-    if (config_var == 255){  //if EEPROM in default state, set to default value of 0
+    if (config_var == 255){  //EEPROM default state, not a valid choice.  Loops choice back to zero.
       config_var = 0;
+      //Serial.println("config_var set to 0");
     }
-    if (config_var == -1){  //if EEPROM in default state, set to default value of 0
+    if (config_var == -1){  //keeps values from being negative
       config_var = 254;
+      //Serial.println("config_var set to 254");
     }
     Disp_RC(0,0);
     sprintf(buf, "Config:%s            ", Configuration[cur_item-1]);
     Disp_PutStr(buf);
     Disp_RC(1,0);
-    if (Config_Choices[cur_item-1] == "+    -  "){
+    if (Config_Choices[cur_item - 1] == "+    -  "){
       sprintf(buf, "          %3i       ", config_var);
-    }  else {
+    } else {
       if (config_var == 0){
       choice[0] = Config_Choices[cur_item-1][0];
       choice[1] = Config_Choices[cur_item-1][1];
@@ -510,26 +514,34 @@ void DoDisplay() {
     Disp_RC(3,0);
     sprintf(buf, "NEXT  ADV   %s", Config_Choices[cur_item-1]);
     Disp_PutStr(buf);
-    if (Config_Choices[cur_item-1] == "+    -  "){
+    if (Config_Choices[cur_item - 1] == "+    -  "){
       if (key == 2) {
         config_var += 1;
         config_changed = true;
+        //Serial.print("config_var += 1 --> ");
+        //Serial.println(config_var);
       }
       if (key == 3) {
         config_var -= 1;
         config_changed = true;
+        //Serial.print("config_var -= 1 --> ");
+        //Serial.println(config_var);
       }
     } else {
       if (key == 2) {  
         config_var = 0;
+        //sprintf(buf, "config_var = %3i", config_var);
+        //Serial.println(buf);
         config_changed = true;
       }
       if (key == 3) {
         config_var = 1;
+        //sprintf(buf, "config_var = %3i", config_var);
+        //Serial.println(buf);
         config_changed = true;
       }
     }
-  break;
+    break;
   case DISPLAY_PHIDGET:
 //    Disp_RC(0,0);
 //    sprintf(buf, "O2%4i Fu%4iKey%4i", analogRead(ANA0),analogRead(ANA1),analogRead(ANA2));
@@ -554,7 +566,7 @@ void DoDisplay() {
     Disp_RC(3,0);
     sprintf(buf, "NEXT          7:%4i", analogRead(ANA7));
     Disp_PutStr(buf);
-  break;
+    break;
     //    case DISPLAY_TEMP2:
     //      break;
     //    case DISPLAY_FETS:
@@ -593,6 +605,7 @@ void TransitionDisplay(int new_state) {
     break; 
   case DISPLAY_CONFIG: 
     cur_item = 1;
+    config_changed = false;
     break;
   case DISPLAY_PHIDGET: 
     break;
@@ -664,10 +677,10 @@ void DoKeyInput() {
       config_changed = false;
     }
     cur_item++;
+    //Serial.println("cur_item++");
     if (cur_item>item_count) {
       cur_item = 1;
-    }
-    
+    } 
     key = -1; //key caught
   }
 }
@@ -688,18 +701,24 @@ void TransitionMessage(String t_message) {
 }
 
 void saveConfig(int item, int state){  //EEPROM:  0-499 for internal states, 500-999 for configurable states, 1000-4000 for data logging configurations.
-  if(state != getConfig(500+item)){
-    EEPROM.write(500+item, state);
+  int old_state = EEPROM.read(499+item);
+  if(state != old_state){
+    EEPROM.write(499+item, state);
+    //data_buffer = "Saving "+ String(state) +" to"+ String(499+item)+" old_state:"+ old_state;
+    //Serial.println(data_buffer);
   }
 }
 
 int getConfig(int item){
   int value;
-  value = int(EEPROM.read(500+item));
-  if (value == 255){  //values hasn't been saved yet to EEPROM, go with default value
+  value = int(EEPROM.read(499+item));
+  if (value == 255){  //values hasn't been saved yet to EEPROM, go with default value saved in defaults[]
     value = defaults[item-1];
-    EEPROM.write(500+item, value);
+    EEPROM.write(499+item, value);
   }
+  //data_buffer = "Getting "+ String(499+item) +",value: "+ String(value);
+  //Serial.println(data_buffer);
+  config_changed = true;
   return value;
 }
 
@@ -707,21 +726,27 @@ void update_config_var(int var_num){
   switch (var_num) {
     case 1:
       engine_type = getConfig(1);
+      //Serial.println("Updating engine_type");
       break;
     case 2:
       relay_board = getConfig(2);
+      //Serial.println("Updating relay_board");
       break;
     case 3:
       fet_blower = getConfig(3);
+      //Serial.println("Updating fet_blower");
       break;
     case 4:
       aug_rev_time = getConfig(4);
+      //Serial.println("Updating aug_rev_time");
       break;
     case 5:
-     current_low_boundary = getConfig(5) * 4;  
+     current_low_boundary = getConfig(5) * 4; 
+     //Serial.println("Updating current_low_boundary"); 
      break;
     case 6:
       current_high_boundary = getConfig(6) * 4;
+      //Serial.println("Updating current_high_boundary");
       break;
   }
 }

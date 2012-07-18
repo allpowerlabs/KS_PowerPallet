@@ -3,8 +3,9 @@ void LogTime(boolean header = false) {
   if (header) {
     PrintColumn("Time");
   } else {
-    Serial.print(millis()/100.0); // time since restart in deciseconds
-    Serial.print(", ");   
+    //Serial.print(millis()/100.0); // time since restart in deciseconds
+    //Serial.print(", ");  
+   PrintColumn(millis()/100.0); 
   }
 }
 
@@ -300,7 +301,7 @@ void PrintColumn(String str) {
 void PrintColumn(float str) {
   char buf[9] = "        ";
   sprintf(buf, "%5.3f", str);  //Use another formatting ??
-  data_buffer += buf;
+  data_buffer += String(buf);
   data_buffer += ", ";
   //Serial.print(str);
    //Serial.print(", ");  
@@ -314,6 +315,7 @@ void PrintColumnInt(int str) {
 }
 
 void DoDatalogging() {
+  data_buffer = "";
   boolean header = false;
   Serial.begin(57600); //reset serial?
   if (lineCount == 0) {
@@ -337,6 +339,5 @@ void DoDatalogging() {
   //LogPulseEnergy(header);
   //LogBatteryVoltage(header);
   Serial.println(data_buffer);
-  data_buffer = "";
   lineCount++;
 }

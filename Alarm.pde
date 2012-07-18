@@ -58,7 +58,7 @@ void DoAlarm() {
     #endif
   }
 
-  if (alarm != ALARM_NONE or alarm != ALARM_SILENCED) {
+  if (alarm != ALARM_NONE and alarm != ALARM_SILENCED) {
     digitalWrite(FET_ALARM, HIGH);
   } else { 
     digitalWrite(FET_ALARM,LOW);
