@@ -31,11 +31,11 @@ void DoAuger() {
       if (AugerCurrentLevel != CURRENT_HIGH){
         TransitionAuger(AUGER_FORWARD);
       }
-      if (millis() - auger_state_entered > 500){ //set to variable for threshold??
+      if (millis() - auger_state_entered > 500){ 
         TransitionAuger(AUGER_STARTING_REVERSE);
       }
       break;
-    case AUGER_STARTING_REVERSE:  //disregard all current readings while starting
+    case AUGER_STARTING_REVERSE:  //disregard all current spikes while starting
       if (millis() - auger_state_entered > 500){
         TransitionAuger(AUGER_REVERSE);
       }
@@ -60,7 +60,7 @@ void DoAuger() {
         }
       }
       break; 
-   case AUGER_ALARM:  //Auger will remain off until rebooted
+   case AUGER_ALARM:  //Auger will remain off until rebooted with a reset from front panel display
      break;   
   }
 }
@@ -79,8 +79,8 @@ void TransitionAuger(int new_state) {
     case AUGER_STARTING:
       digitalWrite(FET_AUGER,HIGH);
       digitalWrite(FET_AUGER_REV, LOW);
-      Serial.println("# New Auger State: Starting Forward");  //is this necessary??
-      TransitionMessage("Auger: Starting      "); //is this necessary??
+      Serial.println("# New Auger State: Starting Forward");  
+      TransitionMessage("Auger: Starting      "); 
       break;
     case AUGER_FORWARD:
       Serial.println("# New Auger State: Forward");
@@ -94,16 +94,16 @@ void TransitionAuger(int new_state) {
       auger_reverse_entered = millis();
       digitalWrite(FET_AUGER,LOW);
       digitalWrite(FET_AUGER_REV, HIGH);
-      Serial.println("# New Auger State: Starting Reverse");  //is this necessary??
-      TransitionMessage("Auger: Starting Reverse "); //is this necessary??
+      Serial.println("# New Auger State: Starting Reverse");  
+      TransitionMessage("Auger: Starting Reverse "); 
       break;
     case AUGER_REVERSE:
       Serial.println("# New Auger State: Reverse");
       TransitionMessage("Auger: Reverse      ");
       break;
     case AUGER_REVERSE_HIGH:
-      Serial.println("# New Auger State: Reverse High Current"); //is this necessary??
-      TransitionMessage("Auger: Reverse High"); //is this necessary??
+      Serial.println("# New Auger State: Reverse High Current"); 
+      TransitionMessage("Auger: Reverse High"); 
       break; 
     case AUGER_ALARM:
       digitalWrite(FET_AUGER,LOW);

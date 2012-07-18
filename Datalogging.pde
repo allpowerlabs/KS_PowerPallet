@@ -292,29 +292,39 @@ void LogReactor(boolean header=false) {
 }
 
 void PrintColumn(String str) {
-  data_buffer += str;
-  data_buffer += ", ";
-   //Serial.print(str);
-   //Serial.print(", ");  
+  if (testCount%2 ==1){
+    data_buffer += str;
+    data_buffer += ", ";
+  } else {
+    Serial.print(str);
+    Serial.print(", ");  
+  }
 }
 
 void PrintColumn(float str) {
-  char buf[10] = "         ";
-  sprintf(buf, "%5.3f", str);  //Use another formatting ??
-  data_buffer += String(buf);
-  data_buffer += ", ";
-  //Serial.print(str);
-   //Serial.print(", ");  
+  if (testCount%2 ==1){
+    char buf[15] = "";
+    dtostrf(str, 5, 3, buf);
+    data_buffer += buf;
+    data_buffer += ", ";
+  } else {
+    Serial.print(str);
+    Serial.print(", ");  
+  }
 }
 
 void PrintColumnInt(int str) {
-  data_buffer += String(str);
-  data_buffer += ", ";
-   //Serial.print(str);
-   //Serial.print(", ");  
+  if (testCount%2 ==1){
+    data_buffer += String(str);
+    data_buffer += ", ";
+  } else {
+    Serial.print(str);
+    Serial.print(", ");
+  }
 }
 
 void DoDatalogging() {
+  test_time = millis();
   data_buffer = "";
   boolean header = false;
   Serial.begin(57600); //reset serial?
@@ -338,6 +348,17 @@ void DoDatalogging() {
   //LogGovernor(header);
   //LogPulseEnergy(header);
   //LogBatteryVoltage(header);
-  Serial.println(data_buffer);
+  if (testCount%2 ==1){
+    Serial.println(data_buffer);
+  } else {
+    Serial.println();
+  }
+  if (testCount%2 ==1){
+    Serial.print("Buffered: ");
+  } else { 
+    Serial.print("Unbuffered: ");
+  }
+  Serial.println(millis()-test_time);
   lineCount++;
+  testCount++;
 }
