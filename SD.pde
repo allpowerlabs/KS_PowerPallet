@@ -14,17 +14,17 @@
 //}
 
 //void checkSDconfig(){
-//  char c = 0;
-//  String string;
+//  char c;
+//  String SD_config_entry;
 //  
 //  SD.begin(); //SD.begin(SCK_PIN)??
 //  if (SD.exist("config.txt")){
 //    config = SD.open("config.txt");
 //    while (c!=-1) {
 //    	c = config.read();  
-//        while(string.length() < 11){  //each configurations array is 10 characters long  
-//          string += c;
-//        }
+//      while(string.length() < 15){  //each configurations array is 14 characters long  
+//        SD_config_entry += c;
+//      }
 //    config.close();
 //    }
 //}
