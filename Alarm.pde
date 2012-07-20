@@ -6,12 +6,16 @@ void DoAlarmUpdate() {
     pressureRatioAccumulator -= 5;
   }
   pressureRatioAccumulator = max(0,pressureRatioAccumulator); //keep value above 0
-  pressureRatioAccumulator = min(pressureRatioAccumulator,20); //keep value below 20
+  pressureRatioAccumulator = min(pressureRatioAccumulator,20); //keep value below 20    
 }
 
 void DoAlarm() {
   alarm = ALARM_NONE;
   if (P_reactorLevel != OFF) { //alarm only if reactor is running
+    if (auger_state == AUGER_CURRENT_LOW and (millis() - auger_state_entered > 60000)){
+      Serial.println("# Auger Low Current too long");
+      alarm = ALARM_AUGER_LOW_CURRENT;
+    }
     if (auger_state == AUGER_FORWARD and (millis() - auger_state_entered > auger_on_alarm_point)){
       Serial.println("# Auger on too long");
       alarm = ALARM_AUGER_ON_LONG;

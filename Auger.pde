@@ -7,6 +7,18 @@ void DoAuger() {
         TransitionAuger(AUGER_STARTING);
       }
       break;
+    case AUGER_CURRENT_LOW:
+      if (FuelSwitchValue <= 600) {
+        TransitionAuger(AUGER_OFF);
+      }
+      if (AugerCurrentLevel != CURRENT_LOW){ //switch forward instead?
+        TransitionAuger(AUGER_OFF);
+      } 
+      if ((millis() - auger_state_entered) > 180000){  //turn engine and auger off if auger current low for 3 minutes
+        TransitionAuger(AUGER_ALARM);
+        TransitionEngine(ENGINE_SHUTDOWN);
+      }
+      break;
     case AUGER_STARTING:  //disregard all current readings while starting
       if (millis() - auger_state_entered > 500){
         TransitionAuger(AUGER_FORWARD);
@@ -18,6 +30,9 @@ void DoAuger() {
       }
       if (AugerCurrentLevel == CURRENT_HIGH){
         TransitionAuger(AUGER_HIGH);
+      } 
+      if (AugerCurrentLevel == CURRENT_LOW){
+        TransitionAuger(AUGER_CURRENT_LOW);
       } 
       if ((millis() - auger_state_entered) > 360000){  //turn engine and auger off if auger runs none stop for 6 minutes.  Account for current changes??
         TransitionAuger(AUGER_ALARM);
@@ -105,6 +120,10 @@ void TransitionAuger(int new_state) {
       Serial.println("# New Auger State: Reverse High Current"); 
       TransitionMessage("Auger: Reverse High"); 
       break; 
+    case AUGER_CURRENT_LOW:
+      Serial.println("# New Auger State: Current Low");
+      TransitionMessage("Auger: Low Current");
+      break;
     case AUGER_ALARM:
       digitalWrite(FET_AUGER,LOW);
       digitalWrite(FET_AUGER_REV, LOW);

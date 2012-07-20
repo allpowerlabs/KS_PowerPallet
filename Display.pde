@@ -60,6 +60,11 @@ void DoDisplay() {
       sprintf(buf, "Engine Shutoff %3i", (360000-(millis()-auger_state_entered))/1000);
       Disp_PutStr(buf);
     }
+    if (millis() % 4000 > 2000 & alarm == ALARM_AUGER_LOW_CURRENT) {
+      sprintf(buf, "Engine Shutoff %3i", (180000-(millis()-auger_state_entered))/1000);
+      Disp_PutStr(buf);
+    }
+    
     else {
       if (disp_alt) {
         sprintf(buf, "Tbred%4i  ", Temp_Data[T_BRED]);
@@ -116,9 +121,28 @@ void DoDisplay() {
         alarm = ALARM_SILENCED;
       } 
       if (key == 3) {
+        if (alarm == ALARM_SILENCED){  //return to alarm state and then follow the following logic
+          alarm = silenced_alarm_state;
+        }
         if (alarm == ALARM_AUGER_ON_LONG){
           alarm = ALARM_NONE;
           auger_state = AUGER_OFF;
+        }
+        if (alarm == ALARM_BAD_REACTOR){
+          alarm = ALARM_NONE;
+          pressureRatioAccumulator = 0;
+        }
+        if (alarm == ALARM_BAD_FILTER){
+          alarm = ALARM_NONE;
+          filter_pratio_accumulator = 0;
+        }
+        if (alarm == ALARM_AUGER_OFF_LONG){
+          alarm = ALARM_NONE;
+          auger_state_entered = millis();
+        }
+        if (alarm == ALARM_AUGER_LOW_CURRENT){
+          alarm = ALARM_NONE;
+          auger_state_entered = millis();
         }
       }
     } 
@@ -434,6 +458,7 @@ void DoDisplay() {
     }
     break;
   case DISPLAY_CALIBRATE_PRESSURE:
+    Disp_CursOff();
     item_count = 1;
     Disp_RC(0,0);
     Disp_PutStr("Calibrate Pressure  ");
@@ -450,50 +475,47 @@ void DoDisplay() {
       Disp_PutStr("   CALIBRATED!      ");
     }
     break;
-  case DISPLAY_RELAY:
-    item_count = 8;
-    testing_state = TESTING_SERVO;
-    Disp_RC(0,0);
-    sprintf(buf, "Test Relay: %1i       ", cur_item);
-    Disp_PutStr(buf);
-    Disp_RC(1,0);
-    Disp_PutStr("                    ");
-    Disp_RC(2,0);
-    Disp_PutStr("                    ");
-    Disp_RC(3,0);
-    Disp_PutStr("NEXT  ADV   ON   OFF");
-    if (key == 2) {
-      relayOn(cur_item);
-      Disp_RC(1,0);
-      Disp_PutStr("           ON       ");
-    }
-    if (key == 3) {
-      relayOff(cur_item);
-      Disp_RC(1,0);
-    Disp_PutStr("           OFF        ");
-    }
-    break;
+//  case DISPLAY_RELAY:
+//    Disp_CursOff();
+//    item_count = 8;
+//    testing_state = TESTING_SERVO;
+//    Disp_RC(0,0);
+//    sprintf(buf, "Test Relay: %1i       ", cur_item);
+//    Disp_PutStr(buf);
+//    Disp_RC(1,0);
+//    Disp_PutStr("                    ");
+//    Disp_RC(2,0);
+//    Disp_PutStr("                    ");
+//    Disp_RC(3,0);
+//    Disp_PutStr("NEXT  ADV   ON   OFF");
+//    if (key == 2) {
+//      relayOn(cur_item);
+//      Disp_RC(1,0);
+//      Disp_PutStr("           ON       ");
+//    }
+//    if (key == 3) {
+//      relayOff(cur_item);
+//      Disp_RC(1,0);
+//    Disp_PutStr("           OFF        ");
+//    }
+//    break;
   case DISPLAY_CONFIG:
+    Disp_CursOff();
     item_count = sizeof(Config_Choices)/sizeof(Config_Choices[0]);
-    //Serial.println(item_count);
     if (config_changed == false){
-      //Serial.println("config_changed == false");
       config_var = getConfig(cur_item);
     }
     if (config_var == 255){  //EEPROM default state, not a valid choice.  Loops choice back to zero.
       config_var = 0;
-      //Serial.println("config_var set to 0");
     }
     if (config_var == -1){  //keeps values from being negative
       config_var = 254;
-      //Serial.println("config_var set to 254");
     }
     Disp_RC(0,0);
-    sprintf(buf, "Config:%s            ", Configuration[cur_item-1]);
-    Disp_PutStr(buf);
+    Disp_PutStr("   Configurations   ");
     Disp_RC(1,0);
     if (Config_Choices[cur_item - 1] == "+    -  "){
-      sprintf(buf, "          %3i       ", config_var);
+      sprintf(buf, "%s:%3i",Configuration[cur_item-1], config_var);
     } else {
       if (config_var == 0){
       choice[0] = Config_Choices[cur_item-1][0];
@@ -506,7 +528,7 @@ void DoDisplay() {
         choice[2] = Config_Choices[cur_item-1][6];
         choice[3] = Config_Choices[cur_item-1][7];
       }
-      sprintf(buf, "       %s   ", choice);
+      sprintf(buf, "%s:%s", Configuration[cur_item-1], choice);
     }
     Disp_PutStr(buf);
     Disp_RC(2,0);
@@ -518,55 +540,48 @@ void DoDisplay() {
       if (key == 2) {
         config_var += 1;
         config_changed = true;
-        //Serial.print("config_var += 1 --> ");
-        //Serial.println(config_var);
       }
       if (key == 3) {
         config_var -= 1;
         config_changed = true;
-        //Serial.print("config_var -= 1 --> ");
-        //Serial.println(config_var);
       }
     } else {
       if (key == 2) {  
         config_var = 0;
-        //sprintf(buf, "config_var = %3i", config_var);
-        //Serial.println(buf);
         config_changed = true;
       }
       if (key == 3) {
         config_var = 1;
-        //sprintf(buf, "config_var = %3i", config_var);
-        //Serial.println(buf);
         config_changed = true;
       }
     }
     break;
-  case DISPLAY_PHIDGET:
+//  case DISPLAY_PHIDGET:
+//      Disp_CursOff();
+////    Disp_RC(0,0);
+////    sprintf(buf, "O2%4i Fu%4iKey%4i", analogRead(ANA0),analogRead(ANA1),analogRead(ANA2));
+////    Disp_PutStr(buf);
+////    Disp_RC(1,0);
+////    sprintf(buf, "Oil%4iAug%4iTh%4i", analogRead(ANA3),analogRead(ANA4),analogRead(ANA5));
+////    Disp_PutStr(buf);
+////    Disp_RC(2,0);
+////    sprintf(buf, "CoolT%4i Aux%4i   ", analogRead(ANA6),analogRead(ANA7));
+////    Disp_PutStr(buf);  
+////    Disp_RC(3,0);
+////    Disp_PutStr("NEXT                ");
 //    Disp_RC(0,0);
-//    sprintf(buf, "O2%4i Fu%4iKey%4i", analogRead(ANA0),analogRead(ANA1),analogRead(ANA2));
+//    sprintf(buf, "Phidgits:     0:%4i", analogRead(ANA0));
 //    Disp_PutStr(buf);
 //    Disp_RC(1,0);
-//    sprintf(buf, "Oil%4iAug%4iTh%4i", analogRead(ANA3),analogRead(ANA4),analogRead(ANA5));
+//    sprintf(buf, "1:%4i 2:%4i 3:%4i", analogRead(ANA1),analogRead(ANA2),analogRead(ANA3));
 //    Disp_PutStr(buf);
 //    Disp_RC(2,0);
-//    sprintf(buf, "CoolT%4i Aux%4i   ", analogRead(ANA6),analogRead(ANA7));
+//    sprintf(buf, "4:%4i 5:%4i 6:%4i", analogRead(ANA4),analogRead(ANA5),analogRead(ANA6));
 //    Disp_PutStr(buf);  
 //    Disp_RC(3,0);
-//    Disp_PutStr("NEXT                ");
-    Disp_RC(0,0);
-    sprintf(buf, "Phidgits:     0:%4i", analogRead(ANA0));
-    Disp_PutStr(buf);
-    Disp_RC(1,0);
-    sprintf(buf, "1:%4i 2:%4i 3:%4i", analogRead(ANA1),analogRead(ANA2),analogRead(ANA3));
-    Disp_PutStr(buf);
-    Disp_RC(2,0);
-    sprintf(buf, "4:%4i 5:%4i 6:%4i", analogRead(ANA4),analogRead(ANA5),analogRead(ANA6));
-    Disp_PutStr(buf);  
-    Disp_RC(3,0);
-    sprintf(buf, "NEXT          7:%4i", analogRead(ANA7));
-    Disp_PutStr(buf);
-    break;
+//    sprintf(buf, "NEXT          7:%4i", analogRead(ANA7));
+//    Disp_PutStr(buf);
+//    break;
     //    case DISPLAY_TEMP2:
     //      break;
     //    case DISPLAY_FETS:
@@ -600,15 +615,15 @@ void TransitionDisplay(int new_state) {
   case DISPLAY_CALIBRATE_PRESSURE:
     cur_item = 1;
     break;
-  case DISPLAY_RELAY:
-    cur_item = 1;
-    break; 
+//  case DISPLAY_RELAY:
+//    cur_item = 1;
+//    break; 
   case DISPLAY_CONFIG: 
     cur_item = 1;
     config_changed = false;
     break;
-  case DISPLAY_PHIDGET: 
-    break;
+//  case DISPLAY_PHIDGET: 
+//    break;
   }
   display_state=new_state;
 }
@@ -655,16 +670,16 @@ void DoKeyInput() {
       TransitionTesting(TESTING_OFF);
       break;
     case DISPLAY_CALIBRATE_PRESSURE:                 //assume that engine state is off
-      TransitionDisplay(DISPLAY_RELAY);
-      break;
-    case DISPLAY_RELAY:
+//      TransitionDisplay(DISPLAY_RELAY);
+//      break;
+//    case DISPLAY_RELAY:
       TransitionDisplay(DISPLAY_CONFIG);
       TransitionTesting(TESTING_OFF);
       break;
     case DISPLAY_CONFIG:
-      TransitionDisplay(DISPLAY_PHIDGET);
-      break;
-    case DISPLAY_PHIDGET:
+//      TransitionDisplay(DISPLAY_PHIDGET);
+//      break;
+//    case DISPLAY_PHIDGET:
       TransitionDisplay(DISPLAY_REACTOR);
       break;
     }

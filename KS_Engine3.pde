@@ -142,9 +142,9 @@ Servo Servo_Throttle;
 #define DISPLAY_TESTING 6
 #define DISPLAY_SERVO 7
 #define DISPLAY_CALIBRATE_PRESSURE 8
-#define DISPLAY_RELAY 9
-#define DISPLAY_CONFIG 10
-#define DISPLAY_PHIDGET 11
+//#define DISPLAY_RELAY 9
+#define DISPLAY_CONFIG 9
+//#define DISPLAY_PHIDGET 11
 
 //Testing States
 #define TESTING_OFF 0
@@ -175,8 +175,8 @@ int testCount = 1;
 unsigned long test_time = 0;
 
 //Configuration Variables
-static char *Configuration[] = { "Engine     ", "Relay Board", "Fet Blower ", "Aug Rev(.1s)", "AugerCurLow", "AugCurHigh ", "Save to SD "};  //Load from EEPROM??
-static char *Config_Choices[] = {"10k 20k ","YES NO  ", "YES NO  ", "+    -  ", "+    -  ", "+    -  ", "YES NO  " }; //8 char options for last two buttons, Load from EEPROM??
+static char *Configuration[] = { "Engine Type    ", "Relay Board    ", "Auger Rev (.1s)", "AugerCurrentLow", "AugCurrent High"};  //15 character Display prompt
+static char *Config_Choices[] = {"10k 20k ","YES NO  ",  "+    -  ", "+    -  ", "+    -  "}; //8 char options for last two buttons
 int config_var;
 byte config_changed = false;
 
@@ -246,9 +246,11 @@ static char *FuelSwitchLevelName[] = { "Off","On"};
 #define AUGER_STARTING_REVERSE 4
 #define AUGER_REVERSE 5
 #define AUGER_REVERSE_HIGH 6
-#define AUGER_ALARM 7
+#define AUGER_CURRENT_LOW 7
+#define AUGER_ALARM 8
 
 int auger_state = 0;
+unsigned long auger_current_low = 0;
 unsigned long auger_state_entered;
 unsigned long auger_reverse_entered;
 
@@ -437,7 +439,8 @@ int pressureRatioAccumulator = 0;
 #define ALARM_HIGH_BRED 7
 #define ALARM_BAD_OIL_PRESSURE 8
 #define ALARM_O2_NO_SIG 9
-#define ALARM_SILENCED 10
+#define ALARM_AUGER_LOW_CURRENT 10
+#define ALARM_SILENCED 11
 
 char* display_alarm[] = {
   "No alarm           ",
@@ -449,7 +452,8 @@ char* display_alarm[] = {
   "tred low for eng.  ",
   "bred high for eng. ",
   "Check Oil Pressure ",
-  "No O2 Sensor Signal"
+  "No O2 Sensor Signal",
+  "Auger Low Current  "
 }; //20 char message for 4x20 display
 
 // SD Card
