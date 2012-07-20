@@ -747,20 +747,16 @@ void update_config_var(int var_num){
       relay_board = getConfig(2);
       //Serial.println("Updating relay_board");
       break;
-    case 3:
-      fet_blower = getConfig(3);
-      //Serial.println("Updating fet_blower");
-      break;
     case 4:
-      aug_rev_time = getConfig(4);
+      aug_rev_time = getConfig(3);
       //Serial.println("Updating aug_rev_time");
       break;
     case 5:
-     current_low_boundary = getConfig(5) * 4; 
+     current_low_boundary = getConfig(4) * 4; 
      //Serial.println("Updating current_low_boundary"); 
      break;
     case 6:
-      current_high_boundary = getConfig(6) * 4;
+      current_high_boundary = getConfig(5) * 4;
       //Serial.println("Updating current_high_boundary");
       break;
   }

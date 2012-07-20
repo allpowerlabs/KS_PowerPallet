@@ -175,19 +175,16 @@ int testCount = 1;
 unsigned long test_time = 0;
 
 //Configuration Variables
-static char *Configuration[] = { "Engine Type    ", "Relay Board    ", "Auger Rev (.1s)", "AugerCurrentLow", "AugCurrent High"};  //15 character Display prompt
-static char *Config_Choices[] = {"10k 20k ","YES NO  ",  "+    -  ", "+    -  ", "+    -  "}; //8 char options for last two buttons
 int config_var;
 byte config_changed = false;
-
-int defaults[] = {0, 0, 0, 30, 50, 100, 1};  //default values to be saved to EEPROM for the following getConfig variables
+static char *Configuration[] = { "Engine Type    ", "Relay Board    ", "Auger Rev (.1s)", "AugerCurrentLow", "AugCurrent High"};  //15 character Display prompt
+static char *Config_Choices[] = {"10k 20k ","YES NO  ",  "+    -  ", "+    -  ", "+    -  "}; //8 char options for last two buttons
+int defaults[] = {0, 0, 30, 50, 100};  //default values to be saved to EEPROM for the following getConfig variables
 int engine_type = getConfig(1);
 int relay_board = getConfig(2);
-int fet_blower = getConfig(3);
-int aug_rev_time = getConfig(4);
-int current_low_boundary = getConfig(5) * 4;  
-int current_high_boundary = getConfig(6) * 4;
-int save_to_sd = getConfig(7);
+int aug_rev_time = getConfig(3);
+int current_low_boundary = getConfig(4) * 4;  
+int current_high_boundary = getConfig(5) * 4;
 
 
 // Grate turning variables

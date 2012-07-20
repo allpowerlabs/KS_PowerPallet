@@ -12,10 +12,10 @@ void DoFlare() {
       }
       break;
   }
-  if (fet_blower){
+#if FET_BLOWER != ABSENT
     blower_dial = analogRead(ANA_BLOWER_DIAL);
     analogWrite(FET_BLOWER,blower_dial/4);
-  }
+#endif
 }
 
 void DoReactor() {
