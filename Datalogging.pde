@@ -359,6 +359,9 @@ void DoDatalogging() {
     Serial.print("Unbuffered: ");
   }
   Serial.println(millis()-test_time);
+//  if (save_to_sd = 0) {
+//    DoDatalogSD(data_buffer);
+//  }
   lineCount++;
   testCount++;
 }

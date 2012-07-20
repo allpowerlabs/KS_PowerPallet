@@ -175,18 +175,19 @@ int testCount = 1;
 unsigned long test_time = 0;
 
 //Configuration Variables
-static char *Configuration[] = { "Engine     ", "Relay Board", "Fet Blower ", "Aug Rev(.1s)", "AugerCurLow", "AugCurHigh "};  //Load from EEPROM??
-static char *Config_Choices[] = {"10k 20k ","YES NO  ", "YES NO  ", "+    -  ", "+    -  ", "+    -  ", }; //8 char options for last two buttons, Load from EEPROM??
+static char *Configuration[] = { "Engine     ", "Relay Board", "Fet Blower ", "Aug Rev(.1s)", "AugerCurLow", "AugCurHigh ", "Save to SD "};  //Load from EEPROM??
+static char *Config_Choices[] = {"10k 20k ","YES NO  ", "YES NO  ", "+    -  ", "+    -  ", "+    -  ", "YES NO  " }; //8 char options for last two buttons, Load from EEPROM??
 int config_var;
 byte config_changed = false;
 
-int defaults[] = {0, 0, 0, 30, 50, 100};  //default values to be saved to EEPROM for the following getConfig variables
+int defaults[] = {0, 0, 0, 30, 50, 100, 1};  //default values to be saved to EEPROM for the following getConfig variables
 int engine_type = getConfig(1);
 int relay_board = getConfig(2);
 int fet_blower = getConfig(3);
 int aug_rev_time = getConfig(4);
 int current_low_boundary = getConfig(5) * 4;  
 int current_high_boundary = getConfig(6) * 4;
+int save_to_sd = getConfig(7);
 
 
 // Grate turning variables
@@ -456,6 +457,9 @@ char* display_alarm[] = {
 //SdVolume sd_volume;
 //SdFile sd_root;
 //SdFile sd_file;
+
+#define SCK_PIN 52 //??
+#define SS_PIN 53
 
 char sd_file_name[] = "Test.txt";     //Create an array that contains the name of our file.
 char sd_contents[256];           //This will be a data buffer for writing contents to the file.
