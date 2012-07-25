@@ -256,16 +256,17 @@ unsigned long auger_state_entered;
 unsigned long auger_reverse_entered;
 
 //Auger Current Levels
-int AugerCurrentValue = 0; // current level in mA
+int AugerCurrentValue = 0; // current level in .1A,  ADC Count = (120 * Current) + 1350
 enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;  //Add AUGER_LOW for low current level when auger is free spinning
 static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
 //int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} }; mA values
-int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 1024} };  //actual sensor readings
+//int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 1024} };  //actual sensor readings
 //int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, 120}, {120, 200}, {200, 1024} };
+int AugerCurrentLevelBoundary[4][2] = { { -140, 0}, { 0, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 750} };  //.1A readings
 
 //oil pressure
 int EngineOilPressureValue;
-enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_NORMAL = 1, OIL_P_HIGH = 2} EngineOilPressureLevel;
+enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_NORMAL = 1, OIL_P_HIGH = 2} EngineOilPressureLevel;  
 //int EngineOilPressureLevelBoundary[2][2] = { { 0, low_oil_psi}, {600, 1024} };  
 unsigned long oil_pressure_state = 0;
 
