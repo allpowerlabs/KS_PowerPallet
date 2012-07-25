@@ -49,7 +49,7 @@ void DoAlarm() {
       alarm = ALARM_HIGH_BRED;
     }
     #if ANA_OIL_PRESSURE != ABSENT
-    if (P_reactorLevel == OIL_P_LOW && millis()-engine_state_entered>7000) {
+    if (EngineOilPressureLevel == OIL_P_LOW && millis() - oil_pressure_state > 500) {
       Serial.println("# Bad oil pressure");
       alarm = ALARM_BAD_OIL_PRESSURE;
     }

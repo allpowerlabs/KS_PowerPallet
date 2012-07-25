@@ -113,6 +113,7 @@ Servo Servo_Throttle;
 #define ENGINE_STARTING 2
 #define ENGINE_GOV_TUNING 3
 #define ENGINE_SHUTDOWN 4
+#define ENGINE_PRESSURE_LOW 5
 
 //Lambda
 #define LAMBDA_SIGNAL_CHECK TRUE
@@ -142,9 +143,8 @@ Servo Servo_Throttle;
 #define DISPLAY_TESTING 6
 #define DISPLAY_SERVO 7
 #define DISPLAY_CALIBRATE_PRESSURE 8
-//#define DISPLAY_RELAY 9
 #define DISPLAY_CONFIG 9
-//#define DISPLAY_PHIDGET 11
+
 
 //Testing States
 #define TESTING_OFF 0
@@ -177,14 +177,18 @@ unsigned long test_time = 0;
 //Configuration Variables
 int config_var;
 byte config_changed = false;
-static char *Configuration[] = { "Engine Type    ", "Relay Board    ", "Auger Rev (.1s)", "AugerCurrentLow", "AugCurrent High"};  //15 character Display prompt
-static char *Config_Choices[] = {"10k 20k ","YES NO  ",  "+    -  ", "+    -  ", "+    -  "}; //8 char options for last two buttons
-int defaults[] = {0, 0, 30, 50, 100};  //default values to be saved to EEPROM for the following getConfig variables
-int engine_type = getConfig(1);
+static char *Configuration[] = { "Engine Type    ", "Relay Board    ", "Auger Rev (.1s)", "Auger Low (.1A)", "Auger High(.1A)", "Low Oil (PSI)  "};  //15 character Display prompt
+static char *Config_Choices[] = {"10k 20k ","YES NO  ",  "+    -  ", "+    -  ", "+    -  ", "+    -  "}; //8 char options for last two buttons
+int defaults[] = {0, 0, 30, 50, 100, 10};  //default values to be saved to EEPROM for the following getConfig variables
+int config_min[] = {0, 0, 0, 0, 0, 0, 0};  //minimum values allowed 
+int config_max[] = {254, 254, 254, 40, 135, 10}; //maximum values allowed  
+
+int engine_type = getConfig(1);  //Don't forget to add the following to update_config_var in Display!
 int relay_board = getConfig(2);
 int aug_rev_time = getConfig(3);
-int current_low_boundary = getConfig(4) * 4;  
+int current_low_boundary = getConfig(4) * 4;  //offset of 130  getConfig(4)/3 + 130
 int current_high_boundary = getConfig(5) * 4;
+int low_oil_psi = getConfig(6);
 
 
 // Grate turning variables
@@ -259,9 +263,11 @@ static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
 int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 1024} };  //actual sensor readings
 //int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, 120}, {120, 200}, {200, 1024} };
 
+//oil pressure
 int EngineOilPressureValue;
-enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_HIGH = 1} EngineOilPressureLevel;
-int EngineOilPressureLevelBoundary[2][2] = { { 0, 500}, {600, 1024} };  
+enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_NORMAL = 1, OIL_P_HIGH = 2} EngineOilPressureLevel;
+//int EngineOilPressureLevelBoundary[2][2] = { { 0, low_oil_psi}, {600, 1024} };  
+unsigned long oil_pressure_state = 0;
 
 // Loop variables - 0 is longest, 3 is most frequent, place code at different levels in loop() to execute more or less frequently
 //TO DO: move loops to hardware timer and interrupt based control, figure out interrupt prioritization
@@ -472,6 +478,7 @@ void setup() {
   //
   DDRJ |= 0x80;      
   PORTJ |= 0x80;
+  DIDR0 = 0xFF; //set adc0 to adc7 as analog inputs [removes pullups]
   
   //TODO: Check attached libraries, FET6 seemed to be set to non-OUTPUT mode
   //set all FET pins to output
@@ -484,7 +491,7 @@ void setup() {
   pinMode(FET6,OUTPUT);
   pinMode(FET7,OUTPUT);
   
-  digitalWrite(ANA_AUGER_CURRENT, LOW);  //Set to low impedence mode
+  
   //pinMode(FET_BLOWER,OUTPUT); //TODO: Move into library (set PE0 to output)
   //digitalWrite(FET_BLOWER,HIGH);
   //delay(50);	
@@ -549,6 +556,7 @@ void loop() {
       DoLambda();
       //DoGovernor();
       DoControlInputs();
+      DoOilPressure();
       DoEngine();
       //DoServos();
       DoFlare();
@@ -568,7 +576,6 @@ void loop() {
         if (testing_state == TESTING_OFF) {
           DoGrate();
           DoFilter();
-          DoOilPressure();
           DoDatalogging();
   //      DoDatalogSD();
           DoAlarmUpdate();

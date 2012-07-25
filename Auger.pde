@@ -19,9 +19,13 @@ void DoAuger() {
         TransitionEngine(ENGINE_SHUTDOWN);
       }
       break;
-    case AUGER_STARTING:  //disregard all current readings while starting
+    case AUGER_STARTING:  //disregard all current readings while starting, pulse in reverse for a moment
       if (millis() - auger_state_entered > 500){
-        TransitionAuger(AUGER_FORWARD);
+        digitalWrite(FET_AUGER,HIGH);  
+        digitalWrite(FET_AUGER_REV, LOW);
+      }
+      if (millis() - auger_state_entered > 1000){
+      TransitionAuger(AUGER_FORWARD);
       }
       break;
     case AUGER_FORWARD:
@@ -67,12 +71,8 @@ void DoAuger() {
       if (AugerCurrentLevel != CURRENT_HIGH){
         TransitionAuger(AUGER_REVERSE);
       }
-      if (millis() - auger_state_entered > 500){ //set to variable for threshold??
-        if (AugerCurrentLevel == CURRENT_HIGH){
-          TransitionAuger(AUGER_OFF);
-        }  else {
-          TransitionAuger(AUGER_REVERSE);
-        }
+      if (millis() - auger_state_entered > 500){ 
+        TransitionAuger(AUGER_OFF);
       }
       break; 
    case AUGER_ALARM:  //Auger will remain off until rebooted with a reset from front panel display
@@ -92,8 +92,8 @@ void TransitionAuger(int new_state) {
       TransitionMessage("Auger: Off         ");
       break;
     case AUGER_STARTING:
-      digitalWrite(FET_AUGER,HIGH);
-      digitalWrite(FET_AUGER_REV, LOW);
+      digitalWrite(FET_AUGER,LOW);  //start in reverse for a few moments to reduce bridging 
+      digitalWrite(FET_AUGER_REV, HIGH);
       Serial.println("# New Auger State: Starting Forward");  
       TransitionMessage("Auger: Starting      "); 
       break;
@@ -138,7 +138,7 @@ void checkAuger(){
   FuelSwitchValue = analogRead(ANA_FUEL_SWITCH); // switch voltage, 1024 if on, 0 if off
   if (relay_board == 0){     //when relay board is present auger current sensing is enabled
     //AugerCurrentValue = -195*(analogRead(ANA_AUGER_CURRENT)-518);    //convert current sensor V to mA
-    AugerCurrentValue = analogRead(ANA_AUGER_CURRENT);
+    AugerCurrentValue = (analogRead(ANA_AUGER_CURRENT)-135)/12;
     if (AugerCurrentValue > AugerCurrentLevelBoundary[CURRENT_OFF][0] && AugerCurrentValue < AugerCurrentLevelBoundary[CURRENT_OFF][1]) {
       AugerCurrentLevel = CURRENT_OFF;
     }

@@ -538,12 +538,16 @@ void DoDisplay() {
     Disp_PutStr(buf);
     if (Config_Choices[cur_item - 1] == "+    -  "){
       if (key == 2) {
-        config_var += 1;
-        config_changed = true;
+        if (config_max[cur_item] > config_var + 1){
+          config_var += 1;
+          config_changed = true;
+        }
       }
       if (key == 3) {
-        config_var -= 1;
-        config_changed = true;
+        if (config_min[cur_item] < config_var - 1){
+          config_var -= 1;
+          config_changed = true;
+        }
       }
     } else {
       if (key == 2) {  
@@ -753,11 +757,19 @@ void update_config_var(int var_num){
       break;
     case 5:
      current_low_boundary = getConfig(4) * 4; 
+     AugerCurrentLevelBoundary[CURRENT_LOW][2] = current_low_boundary; 
+     AugerCurrentLevelBoundary[CURRENT_ON][1] = current_low_boundary;
      //Serial.println("Updating current_low_boundary"); 
      break;
     case 6:
       current_high_boundary = getConfig(5) * 4;
-      //Serial.println("Updating current_high_boundary");
+      AugerCurrentLevelBoundary[CURRENT_ON][2] = current_high_boundary; 
+      AugerCurrentLevelBoundary[CURRENT_HIGH][1] = current_high_boundary;
+      //Serial.print("Updating current_high_boundary: ");
+      //Serial.println(current_high_boundary);
+      break;
+    case 7:
+      low_oil_psi = getConfig(6);
       break;
   }
 }

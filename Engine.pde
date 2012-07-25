@@ -13,6 +13,10 @@ void DoEngine() {
       if (control_state == CONTROL_START) {
         TransitionEngine(ENGINE_STARTING);
       }
+      if (EngineOilPressureLevel == OIL_P_LOW  && millis() - oil_pressure_state > 500 && millis() - engine_state_entered > 3000){
+        Serial.println("# Low Oil Pressure, Shutting Down Engine");
+        TransitionEngine(ENGINE_SHUTDOWN);
+      }
       DoGovernor();
       if (P_reactorLevel == OFF & millis()-engine_state_entered > 10000) { //if reactor is at low vacuum after ten seconds, engine did not catch, so turn off
         TransitionEngine(ENGINE_SHUTDOWN);
@@ -57,6 +61,12 @@ void DoEngine() {
         TransitionEngine(ENGINE_OFF);
       }
       break;
+    case ENGINE_PRESSURE_LOW:
+      if (millis() - engine_state_entered > 500){
+        
+        TransitionEngine(ENGINE_SHUTDOWN);
+      }
+      
   }
 }
 
@@ -100,14 +110,22 @@ void TransitionEngine(int new_state) {
 
 void DoOilPressure() {
   if (engine_type == 1){  //20k has analog oil pressure reader
-    EngineOilPressureValue = analogRead(ANA_OIL_PRESSURE);  
-    if (EngineOilPressureValue > EngineOilPressureLevelBoundary[OIL_P_LOW][0] && EngineOilPressureValue < EngineOilPressureLevelBoundary[OIL_P_LOW][1]) {
+    EngineOilPressureValue = get20kPSI(analogRead(ANA_OIL_PRESSURE));  
+    if (EngineOilPressureValue <= low_oil_psi){
       EngineOilPressureLevel = OIL_P_LOW;
+      oil_pressure_state = millis();
+    } else {
+      EngineOilPressureLevel = OIL_P_NORMAL;
+      oil_pressure_state = 0;
     }
-    if (EngineOilPressureValue > EngineOilPressureLevelBoundary[OIL_P_HIGH][0] && EngineOilPressureValue < EngineOilPressureLevelBoundary[OIL_P_HIGH][1]) {
-      EngineOilPressureLevel = OIL_P_HIGH;
+  } else {
+    EngineOilPressureValue = analogRead(ANA_OIL_PRESSURE);
+    if (EngineOilPressureValue < 500){
+      EngineOilPressureLevel = OIL_P_LOW;
+      oil_pressure_state = millis();
     }
   }
+  
 }
 
 void DoGovernor() {
