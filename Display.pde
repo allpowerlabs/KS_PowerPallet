@@ -534,13 +534,13 @@ void DoDisplay() {
     Disp_PutStr(buf);
     if (Config_Choices[cur_item - 1] == "+    -  "){
       if (key == 2) {
-        if (config_max[cur_item] > config_var + 1){
+        if (config_max[cur_item-1] > config_var + 1){
           config_var += 1;
           config_changed = true;
         }
       }
       if (key == 3) {
-        if (config_min[cur_item] < config_var - 1){
+        if (config_min[cur_item-1] < config_var - 1){
           config_var -= 1;
           config_changed = true;
         }
