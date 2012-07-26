@@ -12,6 +12,10 @@ void DoAlarmUpdate() {
 void DoAlarm() {
   alarm = ALARM_NONE;
   if (P_reactorLevel != OFF) { //alarm only if reactor is running
+    if (auger_rev_count > 10){
+      Serial.println("# Auger Bound or broken Fuel Switch");
+      alarm = ALARM_BOUND_AUGER;
+    }
     if (auger_state == AUGER_CURRENT_LOW and (millis() - auger_state_entered > 60000)){
       Serial.println("# Auger Low Current too long");
       alarm = ALARM_AUGER_LOW_CURRENT;
@@ -49,7 +53,7 @@ void DoAlarm() {
       alarm = ALARM_HIGH_BRED;
     }
     #if ANA_OIL_PRESSURE != ABSENT
-    if (EngineOilPressureLevel == OIL_P_LOW && millis() - oil_pressure_state > 500) {
+    if (EngineOilPressureLevel == OIL_P_LOW && millis() - oil_pressure_state > 500  && millis() - engine_state_entered > 3000) {
       Serial.println("# Bad oil pressure");
       alarm = ALARM_BAD_OIL_PRESSURE;
     }

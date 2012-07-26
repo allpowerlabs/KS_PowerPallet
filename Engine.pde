@@ -55,7 +55,8 @@ void DoEngine() {
         TransitionEngine(ENGINE_OFF);
       }
       break;
-    case ENGINE_SHUTDOWN:
+    case ENGINE_SHUTDOWN:  
+      //lambda_PID.SetMode(MANUAL);
       SetThrottleAngle(100); // % open
       if (control_state == CONTROL_OFF & millis()-control_state_entered > 100) {
         TransitionEngine(ENGINE_OFF);
@@ -123,6 +124,9 @@ void DoOilPressure() {
     if (EngineOilPressureValue < 500){
       EngineOilPressureLevel = OIL_P_LOW;
       oil_pressure_state = millis();
+    } else {
+      EngineOilPressureLevel = OIL_P_NORMAL;
+      oil_pressure_state = 0;
     }
   }
   

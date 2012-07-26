@@ -3,12 +3,17 @@ void DoAuger() {
   checkAuger();
   switch (auger_state) {
     case AUGER_OFF:
-      if (FuelSwitchValue > 600) {
+      if (FuelDemand && relay_board == 0) {
         TransitionAuger(AUGER_STARTING);
+      } else {
+        TransitionAuger(AUGER_FORWARD);
+      }
+      if (P_reactorLevel == OFF) {
+        auger_state_entered = millis(); //reset to zero if no vacuum and auger off
       }
       break;
     case AUGER_CURRENT_LOW:
-      if (FuelSwitchValue <= 600) {
+      if (FuelDemand == SWITCH_OFF) {
         TransitionAuger(AUGER_OFF);
       }
       if (AugerCurrentLevel != CURRENT_LOW){ //switch forward instead?
@@ -21,18 +26,14 @@ void DoAuger() {
       break;
     case AUGER_STARTING:  //disregard all current readings while starting, pulse in reverse for a moment
       if (millis() - auger_state_entered > 500){
-        digitalWrite(FET_AUGER,HIGH);  
-        digitalWrite(FET_AUGER_REV, LOW);
-      }
-      if (millis() - auger_state_entered > 1000){
-      TransitionAuger(AUGER_FORWARD);
+        TransitionAuger(AUGER_FORWARD);
       }
       break;
     case AUGER_FORWARD:
-      if (FuelSwitchValue <= 600) {
+      if (FuelDemand == SWITCH_OFF) {
         TransitionAuger(AUGER_OFF);
       }
-      if (AugerCurrentLevel == CURRENT_HIGH){
+      if (AugerCurrentLevel == CURRENT_HIGH  && millis() - auger_state_entered > 500){
         TransitionAuger(AUGER_HIGH);
       } 
       if (AugerCurrentLevel == CURRENT_LOW){
@@ -44,27 +45,28 @@ void DoAuger() {
       }
       break;
     case AUGER_HIGH:
-      if (FuelSwitchValue < 600) {
+      if (FuelDemand == SWITCH_OFF) {
         TransitionAuger(AUGER_OFF);
       }
       if (AugerCurrentLevel != CURRENT_HIGH){
         TransitionAuger(AUGER_FORWARD);
       }
       if (millis() - auger_state_entered > 500){ 
-        TransitionAuger(AUGER_STARTING_REVERSE);
-      }
-      break;
-    case AUGER_STARTING_REVERSE:  //disregard all current spikes while starting
-      if (millis() - auger_state_entered > 500){
         TransitionAuger(AUGER_REVERSE);
       }
       break;
     case AUGER_REVERSE:
-      if (AugerCurrentLevel == CURRENT_HIGH){
+      if (millis() - auger_state_entered > 500  && AugerCurrentLevel == CURRENT_HIGH){
         TransitionAuger(AUGER_REVERSE_HIGH);
       }
-      if (millis() - auger_reverse_entered > aug_rev_time - 500){
-        TransitionAuger(AUGER_OFF);
+      if (millis() - auger_reverse_entered > aug_rev_time){
+        TransitionAuger(AUGER_FORWARD);
+        auger_rev_count = 0;
+      }
+      if (auger_rev_count > 20){  //catch oscillating auger from broken Fuel Switch
+        Serial.println("# Auger Bound or broken Fuel Switch, stopping Auger");
+        TransitionAuger(AUGER_ALARM);
+        TransitionEngine(ENGINE_SHUTDOWN);
       }
       break;
     case AUGER_REVERSE_HIGH:
@@ -72,7 +74,7 @@ void DoAuger() {
         TransitionAuger(AUGER_REVERSE);
       }
       if (millis() - auger_state_entered > 500){ 
-        TransitionAuger(AUGER_OFF);
+        TransitionAuger(AUGER_FORWARD);  //skip Auger starting as it has an initial reverse pulse
       }
       break; 
    case AUGER_ALARM:  //Auger will remain off until rebooted with a reset from front panel display
@@ -86,18 +88,18 @@ void TransitionAuger(int new_state) {
   auger_state_entered = millis();
   switch (new_state) {
     case AUGER_OFF:
-      digitalWrite(FET_AUGER,LOW);
-      digitalWrite(FET_AUGER_REV, LOW);
+      AugerOff();
       Serial.println("# New Auger State: Off");
       TransitionMessage("Auger: Off         ");
+      auger_rev_count = 0;
       break;
     case AUGER_STARTING:
-      digitalWrite(FET_AUGER,LOW);  //start in reverse for a few moments to reduce bridging 
-      digitalWrite(FET_AUGER_REV, HIGH);
+      AugerReverse(); //start in reverse for a few moments to reduce bridging 
       Serial.println("# New Auger State: Starting Forward");  
       TransitionMessage("Auger: Starting      "); 
       break;
     case AUGER_FORWARD:
+      AugerForward();
       Serial.println("# New Auger State: Forward");
       TransitionMessage("Auger: Forward      ");
       break;
@@ -105,28 +107,23 @@ void TransitionAuger(int new_state) {
       Serial.println("# New Auger State: Forward, Current High");
       TransitionMessage("Auger: Current High ");
       break;
-    case AUGER_STARTING_REVERSE:
-      auger_reverse_entered = millis();
-      digitalWrite(FET_AUGER,LOW);
-      digitalWrite(FET_AUGER_REV, HIGH);
-      Serial.println("# New Auger State: Starting Reverse");  
-      TransitionMessage("Auger: Starting Reverse "); 
-      break;
     case AUGER_REVERSE:
+      auger_reverse_entered = millis();
+      AugerReverse();
       Serial.println("# New Auger State: Reverse");
       TransitionMessage("Auger: Reverse      ");
       break;
     case AUGER_REVERSE_HIGH:
       Serial.println("# New Auger State: Reverse High Current"); 
       TransitionMessage("Auger: Reverse High"); 
+      auger_rev_count++;
       break; 
     case AUGER_CURRENT_LOW:
       Serial.println("# New Auger State: Current Low");
       TransitionMessage("Auger: Low Current");
       break;
     case AUGER_ALARM:
-      digitalWrite(FET_AUGER,LOW);
-      digitalWrite(FET_AUGER_REV, LOW);
+      AugerOff();
       Serial.println("# New Auger State: On too long, turning Off");
       TransitionMessage("Auger: Off          ");
       break;   
@@ -136,6 +133,11 @@ void TransitionAuger(int new_state) {
 
 void checkAuger(){
   FuelSwitchValue = analogRead(ANA_FUEL_SWITCH); // switch voltage, 1024 if on, 0 if off
+  if (FuelSwitchValue > 600){
+    FuelDemand = SWITCH_ON;
+  } else {
+    FuelDemand = SWITCH_OFF;
+  }
   if (relay_board == 0){     //when relay board is present auger current sensing is enabled
     AugerCurrentValue = (analogRead(ANA_AUGER_CURRENT)-1350)/120;  //convert from analog values to current (.1A) values
     if (AugerCurrentValue > AugerCurrentLevelBoundary[CURRENT_OFF][0] && AugerCurrentValue < AugerCurrentLevelBoundary[CURRENT_OFF][1]) {
@@ -151,6 +153,27 @@ void checkAuger(){
       AugerCurrentLevel = CURRENT_HIGH;
     }
   }
+}
+
+void AugerReverse(){
+  if (relay_board == 0){ 
+    digitalWrite(FET_AUGER,LOW);
+    digitalWrite(FET_AUGER_REV, HIGH);
+  }
+}
+
+void AugerForward(){
+  digitalWrite(FET_AUGER, HIGH);
+  if (relay_board == 0){ 
+    digitalWrite(FET_AUGER_REV, LOW);
+  }
+}
+  
+void AugerOff(){
+  digitalWrite(FET_AUGER,LOW);
+  if (relay_board == 0){ 
+    digitalWrite(FET_AUGER_REV, LOW);
+   }
 }
 
 

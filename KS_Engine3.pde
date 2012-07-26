@@ -234,7 +234,8 @@ int P_reactorLevelBoundary[4][2] = { { -100, 0 }, {-500, -200}, {-2000,-750}, {-
 //Auger Switch Levels
 #if ANA_FUEL_SWITCH != ABSENT
 int FuelSwitchValue = 0;
-enum FuelSwitchLevels { SWITCH_OFF = 0, SWITCH_ON = 1} FuelSwitchLevel;
+byte FuelDemand = false;
+enum FuelSwitchLevels { SWITCH_OFF = false, SWITCH_ON = true} FuelSwitchLevel;
 static char *FuelSwitchLevelName[] = { "Off","On"};
 //int FuelSwitchLevelBoundary[2][2] = {{ 0, 200 }, {800, 1024}}; //not currently used
 #endif
@@ -244,13 +245,13 @@ static char *FuelSwitchLevelName[] = { "Off","On"};
 #define AUGER_STARTING 1
 #define AUGER_FORWARD 2
 #define AUGER_HIGH 3
-#define AUGER_STARTING_REVERSE 4
-#define AUGER_REVERSE 5
-#define AUGER_REVERSE_HIGH 6
-#define AUGER_CURRENT_LOW 7
-#define AUGER_ALARM 8
+#define AUGER_REVERSE 4
+#define AUGER_REVERSE_HIGH 5
+#define AUGER_CURRENT_LOW 6
+#define AUGER_ALARM 7
 
 int auger_state = 0;
+int auger_rev_count = 0;
 unsigned long auger_current_low = 0;
 unsigned long auger_state_entered;
 unsigned long auger_reverse_entered;
@@ -444,7 +445,8 @@ int pressureRatioAccumulator = 0;
 #define ALARM_BAD_OIL_PRESSURE 8
 #define ALARM_O2_NO_SIG 9
 #define ALARM_AUGER_LOW_CURRENT 10
-#define ALARM_SILENCED 11
+#define ALARM_BOUND_AUGER 11
+#define ALARM_SILENCED 12
 
 char* display_alarm[] = {
   "No alarm           ",

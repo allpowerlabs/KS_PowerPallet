@@ -124,10 +124,6 @@ void DoDisplay() {
         if (alarm == ALARM_SILENCED){  //return to alarm state and then follow the following logic
           alarm = silenced_alarm_state;
         }
-        if (alarm == ALARM_AUGER_ON_LONG){
-          alarm = ALARM_NONE;
-          auger_state = AUGER_OFF;
-        }
         if (alarm == ALARM_BAD_REACTOR){
           alarm = ALARM_NONE;
           pressureRatioAccumulator = 0;
@@ -136,13 +132,9 @@ void DoDisplay() {
           alarm = ALARM_NONE;
           filter_pratio_accumulator = 0;
         }
-        if (alarm == ALARM_AUGER_OFF_LONG){
+        if (alarm == ALARM_AUGER_OFF_LONG or alarm == ALARM_AUGER_LOW_CURRENT or alarm == ALARM_BOUND_AUGER or alarm == ALARM_AUGER_ON_LONG){
           alarm = ALARM_NONE;
-          auger_state_entered = millis();
-        }
-        if (alarm == ALARM_AUGER_LOW_CURRENT){
-          alarm = ALARM_NONE;
-          auger_state_entered = millis();
+          TransitionAuger(AUGER_OFF);
         }
       }
     } 
@@ -153,7 +145,11 @@ void DoDisplay() {
         sprintf(buf, "AugFwd%3i  ", (millis() - auger_state_entered)/1000);
         break;
       case AUGER_OFF:
-        sprintf(buf, "AugOff%3i  ", (millis() - auger_state_entered)/1000);    
+        if (P_reactorLevel == OFF) {
+          sprintf(buf, "AugOff%s  ", " --"); 
+        } else {
+          sprintf(buf, "AugOff%3i  ", (millis() - auger_state_entered)/1000);  
+        }  
         break;
       case AUGER_REVERSE:
         sprintf(buf, "AugRev%3i  ", (millis() - auger_state_entered)/1000); 
