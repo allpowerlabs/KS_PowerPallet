@@ -57,7 +57,7 @@ void DoEngine() {
       break;
     case ENGINE_SHUTDOWN:  
       //lambda_PID.SetMode(MANUAL);
-      SetThrottleAngle(100); // % open
+      //SetThrottleAngle(100); // % open
       if (control_state == CONTROL_OFF & millis()-control_state_entered > 100) {
         TransitionEngine(ENGINE_OFF);
       }

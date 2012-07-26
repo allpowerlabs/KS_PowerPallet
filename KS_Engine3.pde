@@ -163,6 +163,7 @@ Servo Servo_Throttle;
 
 //Datalogging Buffer
 String data_buffer = "";
+char float_buf[15] = "";
 
 //Test Variables
 int testing_state = TESTING_OFF;
@@ -171,8 +172,6 @@ static char *TestingStateName[] = { "Off","Auger","Grate","Engine","Starter","Fl
 
 // Datalogging variables
 int lineCount = 0;
-int testCount = 1;
-unsigned long test_time = 0;
 
 //Configuration Variables
 int config_var;
@@ -508,8 +507,10 @@ void setup() {
   LoadPressureSensorCalibration();
   LoadServo();
   //LoadLambda(); - must save lambda data first?
-  Serial.begin(57600);
-
+ 
+  //Serial.begin(57600); 
+  Serial.begin(115200);
+                     
   Disp_Init();
   Kpd_Init();
   UI_Init();

@@ -3,8 +3,6 @@ void LogTime(boolean header = false) {
   if (header) {
     PrintColumn("Time");
   } else {
-    //Serial.print(millis()/100.0); // time since restart in deciseconds
-    //Serial.print(", ");  
    PrintColumn(millis()/100.0); 
   }
 }
@@ -55,6 +53,8 @@ void LogAnalogInputs(boolean header = false) {
     PrintColumn("ANA3");
     PrintColumn("ANA4");
     PrintColumn("ANA5");
+    PrintColumn("ANA6");
+    PrintColumn("ANA7");
   } else {
     PrintColumnInt(analogRead(ANA0));
     PrintColumnInt(analogRead(ANA1));
@@ -62,6 +62,8 @@ void LogAnalogInputs(boolean header = false) {
     PrintColumnInt(analogRead(ANA3));
     PrintColumnInt(analogRead(ANA4));
     PrintColumnInt(analogRead(ANA5));
+    PrintColumnInt(analogRead(ANA6));
+    PrintColumnInt(analogRead(ANA7));
   }
 }
 
@@ -292,42 +294,32 @@ void LogReactor(boolean header=false) {
 }
 
 void PrintColumn(String str) {
-  if (testCount%2 ==1){
-    data_buffer += str;
-    data_buffer += ", ";
-  } else {
-    Serial.print(str);
-    Serial.print(", ");  
-  }
+  data_buffer += str;
+  data_buffer += ", ";
+//  Serial.print(str);
+//  Serial.print(", ");  
 }
 
 void PrintColumn(float str) {
-  if (testCount%2 ==1){
-    char buf[15] = "";
-    dtostrf(str, 5, 3, buf);
-    data_buffer += buf;
-    data_buffer += ", ";
-  } else {
-    Serial.print(str);
-    Serial.print(", ");  
-  }
+  dtostrf(str, 5, 3, float_buf);
+  data_buffer += float_buf;
+  data_buffer += ", ";
+//  Serial.print(str);
+//  Serial.print(", ");  
 }
 
 void PrintColumnInt(int str) {
-  if (testCount%2 ==1){
-    data_buffer += String(str);
-    data_buffer += ", ";
-  } else {
-    Serial.print(str);
-    Serial.print(", ");
-  }
+  data_buffer += str;
+  data_buffer += ", ";
+//  Serial.print(str);
+//  Serial.print(", ");
 }
 
 void DoDatalogging() {
-  test_time = millis();
   data_buffer = "";
   boolean header = false;
-  Serial.begin(57600); //reset serial?
+  //Serial.begin(57600); //reset serial?
+  Serial.begin(115200);
   if (lineCount == 0) {
     header = true;
   }
@@ -348,20 +340,9 @@ void DoDatalogging() {
   //LogGovernor(header);
   //LogPulseEnergy(header);
   //LogBatteryVoltage(header);
-  if (testCount%2 ==1){
-    Serial.println(data_buffer);
-  } else {
-    Serial.println();
-  }
-  if (testCount%2 ==1){
-    Serial.print("Buffered: ");
-  } else { 
-    Serial.print("Unbuffered: ");
-  }
-  Serial.println(millis()-test_time);
+  Serial.println(data_buffer);
 //  if (save_to_sd = 0) {
 //    DoDatalogSD(data_buffer);
 //  }
   lineCount++;
-  testCount++;
 }
