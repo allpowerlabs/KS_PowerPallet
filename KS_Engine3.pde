@@ -33,7 +33,7 @@
 #define ANA_AUGER_CURRENT ANA4  //sense current in auger motor
 #define ANA_THROTTLE_POS ANA5
 #define ANA_COOLANT_TEMP ANA6
-#define ANA_BLOWER_DIAL ANA7
+#define ANA_DIAL ABSENT
 #define ANA_BATT_V ABSENT
 
 // FET Mappings
