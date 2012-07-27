@@ -512,7 +512,8 @@ void setup() {
  
   //Serial.begin(57600); 
   Serial.begin(115200);
-                     
+ 
+ //Library initializations                    
   Disp_Init();
   Kpd_Init();
   UI_Init();
@@ -533,27 +534,6 @@ void setup() {
   //Servo_Reset();
   Timer_Reset();
   
-//  pinMode(ANA0, INPUT);
-//  pinMode(ANA1, INPUT);
-//  pinMode(ANA2, INPUT);
-//  pinMode(ANA3, INPUT);
-//  pinMode(ANA4, INPUT);
-//  pinMode(ANA5, INPUT);
-//  pinMode(ANA6, INPUT);
-//  pinMode(ANA7, INPUT);
-//  //set all analog inputs to low impedence mode
-//  digitalWrite(ANA0, LOW);
-//  digitalWrite(ANA1, LOW);
-//  digitalWrite(ANA2, LOW);
-//  digitalWrite(ANA3, LOW);
-//  digitalWrite(ANA4, LOW);
-//  digitalWrite(ANA5, LOW);
-//  digitalWrite(ANA6, LOW);
-//  digitalWrite(ANA7, LOW);
-  
-//  DDRF = 0xFF;     // set all of port F to input
-//  DIDR0 = 0xFF;    // disable digital inputs for all of port F (turns off digital input buffer)
-//  PORTF = 0x00;  // disable all port F pullup resistors
   
   //Sketch initializations
   InitFlow();
