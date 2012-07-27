@@ -756,7 +756,7 @@ void update_config_var(int var_num){
       //Serial.println("Updating relay_board");
       break;
     case 4:
-      aug_rev_time = getConfig(3);
+      aug_rev_time = getConfig(3)*100;
       //Serial.println("Updating aug_rev_time");
       break;
     case 5:

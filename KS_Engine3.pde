@@ -184,7 +184,7 @@ int config_max[] = {254, 254, 254, 40, 135, 10}; //maximum values allowed
 
 int engine_type = getConfig(1);  //Don't forget to add the following to update_config_var in Display!
 int relay_board = getConfig(2);
-int aug_rev_time = getConfig(3);
+int aug_rev_time = getConfig(3)*100;
 int current_low_boundary = getConfig(4);  //offset of 130  getConfig(4)/3 + 130
 int current_high_boundary = getConfig(5);
 int low_oil_psi = getConfig(6);
