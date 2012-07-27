@@ -70,12 +70,12 @@ void DoSerialIn() {
       WriteLambda();
       break;
     case 't':
-      loopPeriod1 = min(loopPeriod1+100,loopPeriod2);
+      loopPeriod1 = max(loopPeriod1-100,100);
       Serial.print("#Sample Period now:");
       Serial.println(loopPeriod1);
       break;
     case 'T':
-      loopPeriod1 = max(loopPeriod1-100,loopPeriod0);
+      loopPeriod1 = min(loopPeriod1+100,10000);
       Serial.print("#Sample Period now:");
       Serial.println(loopPeriod1);
       break;

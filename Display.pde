@@ -38,30 +38,33 @@ void DoDisplay() {
     Disp_CursOff();
     //Row 0
     Disp_RC(0, 0);
-    if (millis()-transition_entered<2000) {
-      transition_message.toCharArray(buf,21);
-      Disp_PutStr(buf);
-    } 
-    else {
-      if (disp_alt) {
-        sprintf(buf, "Ttred%4i  ", Temp_Data[T_TRED]);
-      } 
-      else {
-        sprintf(buf, "Ttred%s", T_tredLevel[TempLevelName]);
+    if (millis() % 4000 > 2000 && (alarm == ALARM_AUGER_ON_LONG or alarm == ALARM_AUGER_LOW_CURRENT)) {
+      Disp_PutStr("       ALARM        ");
+    } else {
+        if (millis()-transition_entered<2000) {
+        transition_message.toCharArray(buf,21);
+        Disp_PutStr(buf);
+        } else {
+        if (disp_alt) {
+          sprintf(buf, "Ttred%4i  ", Temp_Data[T_TRED]);
+        } 
+        else {
+          sprintf(buf, "Ttred%s", T_tredLevel[TempLevelName]);
+        }
+        Disp_PutStr(buf);
+        Disp_RC(0, 11);
+        sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
+        Disp_PutStr(buf);
       }
-      Disp_PutStr(buf);
-      Disp_RC(0, 11);
-      sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
-      Disp_PutStr(buf);
     }
     //Row 1
     Disp_RC(1, 0);
-    if (millis() % 4000 > 2000 & alarm == ALARM_AUGER_ON_LONG) {
-      sprintf(buf, "Engine Shutoff %3i", (360000-(millis()-auger_state_entered))/1000);
+    if (millis() % 4000 > 2000 && alarm == ALARM_AUGER_ON_LONG) {
+      sprintf(buf, "Engine Shutoff %3i  ", (360000-(millis()-auger_state_entered))/1000);
       Disp_PutStr(buf);
     }
-    if (millis() % 4000 > 2000 & alarm == ALARM_AUGER_LOW_CURRENT) {
-      sprintf(buf, "Engine Shutoff %3i", (180000-(millis()-auger_state_entered))/1000);
+    if (millis() % 4000 > 2000 && alarm == ALARM_AUGER_LOW_CURRENT) {
+      sprintf(buf, "Engine Shutoff %3i  ", (180000-(millis()-auger_state_entered))/1000);
       Disp_PutStr(buf);
     }
     
@@ -93,8 +96,7 @@ void DoDisplay() {
         //the value only means anything if the pressures are high enough, otherwise it is just noise
         sprintf(buf, "Pratio %3i  ", int(pRatioReactor*100)); //pressure ratio
         Disp_PutStr(buf);
-      } 
-      else {
+      } else {
         Disp_PutStr("Pratio --  ");
       }
       Disp_RC(2, 11);
@@ -115,8 +117,8 @@ void DoDisplay() {
     //Row 3
     if (millis() % 4000 > 2000 & alarm != ALARM_NONE) {
       Disp_RC(3,0);
-      Disp_PutStr("NEXT  OK       Reset");
-      if (key == 1) {  
+      Disp_PutStr("NEXT        OK Reset");
+      if (key == 2) {  
         silenced_alarm_state = alarm;
         alarm = ALARM_SILENCED;
       } 
@@ -146,16 +148,22 @@ void DoDisplay() {
         break;
       case AUGER_OFF:
         if (P_reactorLevel == OFF) {
-          sprintf(buf, "AugOff%s  ", " --"); 
+          sprintf(buf, "AugOff%s ", " --"); 
         } else {
-          sprintf(buf, "AugOff%3i  ", (millis() - auger_state_entered)/1000);  
+          sprintf(buf, "AugOff%3i", (millis() - auger_state_entered)/1000);  
         }  
         break;
       case AUGER_REVERSE:
-        sprintf(buf, "AugRev%3i  ", (millis() - auger_state_entered)/1000); 
+        sprintf(buf, "AugRev%3i ", (millis() - auger_state_entered)/1000); 
         break;
       case AUGER_HIGH:
-        sprintf(buf, "AugHigh%3i ", (millis() - auger_state_entered)/1000); 
+        sprintf(buf, "AugHi %3i ", (millis() - auger_state_entered)/1000); 
+        break;
+      case AUGER_CURRENT_LOW:
+        sprintf(buf, "AugLow%3i ", (millis() - auger_state_entered)/1000);
+        break;
+      default:
+        sprintf(buf, "Aug   %3i ", (millis() - auger_state_entered)/1000);
         break;
       }
       Disp_PutStr(buf);

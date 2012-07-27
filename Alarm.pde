@@ -12,19 +12,19 @@ void DoAlarmUpdate() {
 void DoAlarm() {
   if (alarm != ALARM_SILENCED){
     alarm = ALARM_NONE;
+    if (auger_rev_count > 10){
+      Serial.println("# Auger Bound or broken Fuel Switch");
+      alarm = ALARM_BOUND_AUGER;
+    }
+    if (auger_state == AUGER_CURRENT_LOW and (millis() - auger_state_entered > 60000)){
+      Serial.println("# Auger Low Current too long");
+      alarm = ALARM_AUGER_LOW_CURRENT;
+    }
+    if (auger_state == AUGER_FORWARD and (millis() - auger_state_entered > auger_on_alarm_point)){
+      Serial.println("# Auger on too long");
+      alarm = ALARM_AUGER_ON_LONG;
+    }
     if (P_reactorLevel != OFF) { //alarm only if reactor is running
-      if (auger_rev_count > 10){
-        Serial.println("# Auger Bound or broken Fuel Switch");
-        alarm = ALARM_BOUND_AUGER;
-      }
-      if (auger_state == AUGER_CURRENT_LOW and (millis() - auger_state_entered > 60000)){
-        Serial.println("# Auger Low Current too long");
-        alarm = ALARM_AUGER_LOW_CURRENT;
-      }
-      if (auger_state == AUGER_FORWARD and (millis() - auger_state_entered > auger_on_alarm_point)){
-        Serial.println("# Auger on too long");
-        alarm = ALARM_AUGER_ON_LONG;
-      }
       if (auger_state == AUGER_OFF and (millis() - auger_state_entered > auger_off_alarm_point)){
         Serial.println("# Auger off too long");
         alarm = ALARM_AUGER_OFF_LONG;
