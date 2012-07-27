@@ -3,10 +3,12 @@ void DoAuger() {
   checkAuger();
   switch (auger_state) {
     case AUGER_OFF:
-      if (FuelDemand && relay_board == 0) {
-        TransitionAuger(AUGER_STARTING);
-      } else {
-        TransitionAuger(AUGER_FORWARD);
+      if (FuelDemand) {
+        if (relay_board == 1){
+          TransitionAuger(AUGER_STARTING);
+        } else {
+          TransitionAuger(AUGER_FORWARD);
+        }
       }
       if (P_reactorLevel == OFF) {
         auger_state_entered = millis(); //reset to zero if no vacuum and auger off
@@ -17,7 +19,7 @@ void DoAuger() {
         TransitionAuger(AUGER_OFF);
       }
       if (AugerCurrentLevel != CURRENT_LOW){ //switch forward instead?
-        TransitionAuger(AUGER_OFF);
+        TransitionAuger(AUGER_FORWARD);
       } 
       if ((millis() - auger_state_entered) > 180000){  //turn engine and auger off if auger current low for 3 minutes
         TransitionAuger(AUGER_ALARM);
@@ -142,8 +144,8 @@ void checkAuger(){
   } else {
     FuelDemand = SWITCH_OFF;
   }
-  if (relay_board == 0){     //when relay board is present auger current sensing is enabled
-    AugerCurrentValue = (10*(analogRead(ANA_AUGER_CURRENT)-135))/12;  //convert from analog values to current (.1A) values
+  if (relay_board == 1){     //when relay board is present auger current sensing is enabled
+    AugerCurrentValue = (10*(analogRead(ANA_AUGER_CURRENT)-120))/12;  //convert from analog values to current (.1A) values
     if (AugerCurrentValue > AugerCurrentLevelBoundary[CURRENT_OFF][0] && AugerCurrentValue < AugerCurrentLevelBoundary[CURRENT_OFF][1]) {
       AugerCurrentLevel = CURRENT_OFF;
     }
@@ -160,7 +162,7 @@ void checkAuger(){
 }
 
 void AugerReverse(){
-  if (relay_board == 0){ 
+  if (relay_board == 1){ 
     digitalWrite(FET_AUGER,LOW);
     digitalWrite(FET_AUGER_REV, HIGH);
   }
@@ -168,14 +170,14 @@ void AugerReverse(){
 
 void AugerForward(){
   digitalWrite(FET_AUGER, HIGH);
-  if (relay_board == 0){ 
+  if (relay_board == 1){ 
     digitalWrite(FET_AUGER_REV, LOW);
   }
 }
   
 void AugerOff(){
   digitalWrite(FET_AUGER,LOW);
-  if (relay_board == 0){ 
+  if (relay_board == 1){ 
     digitalWrite(FET_AUGER_REV, LOW);
    }
 }

@@ -197,7 +197,7 @@ void LogTemps(boolean header = false) {
 
 void LogAuger(boolean header = false) {
   if (header) {
-     if (relay_board == 0){ 
+     if (relay_board){ 
       PrintColumn("AugerCurrent");
       PrintColumn("AugerLevel");
      }
@@ -205,7 +205,7 @@ void LogAuger(boolean header = false) {
       PrintColumn("FuelSwitchLevel");
     #endif
   } else {
-     if (relay_board == 0){ 
+     if (relay_board){ 
       PrintColumnInt(AugerCurrentValue);
       PrintColumn(AugerCurrentLevel[AugerCurrentLevelName]);
      }

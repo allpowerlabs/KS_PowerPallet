@@ -177,8 +177,8 @@ int lineCount = 0;
 int config_var;
 byte config_changed = false;
 static char *Configuration[] = { "Engine Type    ", "Relay Board    ", "Auger Rev (.1s)", "Auger Low (.1A)", "Auger High(.1A)", "Low Oil (PSI)  "};  //15 character Display prompt
-static char *Config_Choices[] = {"10k 20k ","YES NO  ",  "+    -  ", "+    -  ", "+    -  ", "+    -  "}; //8 char options for last two buttons
-int defaults[] = {0, 0, 30, 50, 100, 10};  //default values to be saved to EEPROM for the following getConfig variables
+static char *Config_Choices[] = {"10k 20k ","NO  YES ",  "+    -  ", "+    -  ", "+    -  ", "+    -  "}; //8 char options for last two buttons
+int defaults[] = {0, 1, 30, 50, 100, 10};  //default values to be saved to EEPROM for the following getConfig variables
 int config_min[] = {0, 0, 0, 0, 0, 0, 0};  //minimum values allowed 
 int config_max[] = {254, 254, 254, 40, 135, 10}; //maximum values allowed  
 
@@ -493,8 +493,6 @@ void setup() {
   pinMode(FET5,OUTPUT);
   pinMode(FET6,OUTPUT);
   pinMode(FET7,OUTPUT);
-  
-  
 
   
   //pinMode(FET_BLOWER,OUTPUT); //TODO: Move into library (set PE0 to output)
@@ -534,15 +532,27 @@ void setup() {
   //Servo_Reset();
   Timer_Reset();
   
-  //set all analog inputs to low impedence mode
-  digitalWrite(ANA0, LOW);
-  digitalWrite(ANA1, LOW);
-  digitalWrite(ANA2, LOW);
-  digitalWrite(ANA3, LOW);
-  digitalWrite(ANA4, LOW);
-  digitalWrite(ANA5, LOW);
-  digitalWrite(ANA6, LOW);
-  digitalWrite(ANA7, LOW);
+//  pinMode(ANA0, INPUT);
+//  pinMode(ANA1, INPUT);
+//  pinMode(ANA2, INPUT);
+//  pinMode(ANA3, INPUT);
+//  pinMode(ANA4, INPUT);
+//  pinMode(ANA5, INPUT);
+//  pinMode(ANA6, INPUT);
+//  pinMode(ANA7, INPUT);
+//  //set all analog inputs to low impedence mode
+//  digitalWrite(ANA0, LOW);
+//  digitalWrite(ANA1, LOW);
+//  digitalWrite(ANA2, LOW);
+//  digitalWrite(ANA3, LOW);
+//  digitalWrite(ANA4, LOW);
+//  digitalWrite(ANA5, LOW);
+//  digitalWrite(ANA6, LOW);
+//  digitalWrite(ANA7, LOW);
+  
+//  DDRF = 0xFF;     // set all of port F to input
+//  DIDR0 = 0xFF;    // disable digital inputs for all of port F (turns off digital input buffer)
+//  PORTF = 0x00;  // disable all port F pullup resistors
   
   //Sketch initializations
   InitFlow();
