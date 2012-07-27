@@ -752,13 +752,13 @@ void update_config_var(int var_num){
       //Serial.println("Updating aug_rev_time");
       break;
     case 5:
-     current_low_boundary = getConfig(4) * 4; 
+     current_low_boundary = getConfig(4); 
      AugerCurrentLevelBoundary[CURRENT_LOW][2] = current_low_boundary; 
      AugerCurrentLevelBoundary[CURRENT_ON][1] = current_low_boundary;
      //Serial.println("Updating current_low_boundary"); 
      break;
     case 6:
-      current_high_boundary = getConfig(5) * 4;
+      current_high_boundary = getConfig(5);
       AugerCurrentLevelBoundary[CURRENT_ON][2] = current_high_boundary; 
       AugerCurrentLevelBoundary[CURRENT_HIGH][1] = current_high_boundary;
       //Serial.print("Updating current_high_boundary: ");

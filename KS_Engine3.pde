@@ -185,8 +185,8 @@ int config_max[] = {254, 254, 254, 40, 135, 10}; //maximum values allowed
 int engine_type = getConfig(1);  //Don't forget to add the following to update_config_var in Display!
 int relay_board = getConfig(2);
 int aug_rev_time = getConfig(3);
-int current_low_boundary = getConfig(4) * 4;  //offset of 130  getConfig(4)/3 + 130
-int current_high_boundary = getConfig(5) * 4;
+int current_low_boundary = getConfig(4);  //offset of 130  getConfig(4)/3 + 130
+int current_high_boundary = getConfig(5);
 int low_oil_psi = getConfig(6);
 
 
@@ -480,7 +480,8 @@ void setup() {
   //
   DDRJ |= 0x80;      
   PORTJ |= 0x80;
-  DIDR0 = 0xFF; //set adc0 to adc7 as analog inputs [removes pullups]
+  //DIDR0 = 0xFF; //set adc0 to adc7 as analog inputs [removes pullups]
+  
   
   //TODO: Check attached libraries, FET6 seemed to be set to non-OUTPUT mode
   //set all FET pins to output
@@ -493,6 +494,8 @@ void setup() {
   pinMode(FET6,OUTPUT);
   pinMode(FET7,OUTPUT);
   
+  
+
   
   //pinMode(FET_BLOWER,OUTPUT); //TODO: Move into library (set PE0 to output)
   //digitalWrite(FET_BLOWER,HIGH);
@@ -531,6 +534,17 @@ void setup() {
   //Servo_Reset();
   Timer_Reset();
   
+  //set all analog inputs to low impedence mode
+  digitalWrite(ANA0, LOW);
+  digitalWrite(ANA1, LOW);
+  digitalWrite(ANA2, LOW);
+  digitalWrite(ANA3, LOW);
+  digitalWrite(ANA4, LOW);
+  digitalWrite(ANA5, LOW);
+  digitalWrite(ANA6, LOW);
+  digitalWrite(ANA7, LOW);
+  
+  //Sketch initializations
   InitFlow();
   InitLambda();
   InitServos();

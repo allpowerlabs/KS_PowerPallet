@@ -21,7 +21,9 @@ void DoAuger() {
       } 
       if ((millis() - auger_state_entered) > 180000){  //turn engine and auger off if auger current low for 3 minutes
         TransitionAuger(AUGER_ALARM);
-        TransitionEngine(ENGINE_SHUTDOWN);
+        if (engine_state == ENGINE_ON){
+          TransitionEngine(ENGINE_SHUTDOWN);
+        }
       }
       break;
     case AUGER_STARTING:  //disregard all current readings while starting, pulse in reverse for a moment
@@ -41,7 +43,9 @@ void DoAuger() {
       } 
       if ((millis() - auger_state_entered) > 360000){  //turn engine and auger off if auger runs none stop for 6 minutes.  Account for current changes??
         TransitionAuger(AUGER_ALARM);
-        TransitionEngine(ENGINE_SHUTDOWN);
+        if (engine_state == ENGINE_ON){
+          TransitionEngine(ENGINE_SHUTDOWN);
+        }
       }
       break;
     case AUGER_HIGH:
@@ -139,7 +143,7 @@ void checkAuger(){
     FuelDemand = SWITCH_OFF;
   }
   if (relay_board == 0){     //when relay board is present auger current sensing is enabled
-    AugerCurrentValue = (analogRead(ANA_AUGER_CURRENT)-1350)/120;  //convert from analog values to current (.1A) values
+    AugerCurrentValue = (10*(analogRead(ANA_AUGER_CURRENT)-135))/12;  //convert from analog values to current (.1A) values
     if (AugerCurrentValue > AugerCurrentLevelBoundary[CURRENT_OFF][0] && AugerCurrentValue < AugerCurrentLevelBoundary[CURRENT_OFF][1]) {
       AugerCurrentLevel = CURRENT_OFF;
     }
