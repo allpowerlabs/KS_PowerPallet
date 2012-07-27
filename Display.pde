@@ -134,6 +134,10 @@ void DoDisplay() {
           alarm = ALARM_NONE;
           filter_pratio_accumulator = 0;
         }
+        if (alarm == ALARM_O2_NO_SIG){
+          alarm = ALARM_NONE;
+          TransitionLambda(LAMBDA_NO_SIGNAL);
+        }
         if (alarm == ALARM_AUGER_OFF_LONG or alarm == ALARM_AUGER_LOW_CURRENT or alarm == ALARM_BOUND_AUGER or alarm == ALARM_AUGER_ON_LONG){
           alarm = ALARM_NONE;
           TransitionAuger(AUGER_OFF);

@@ -23,9 +23,9 @@ void DoLambda() {
           TransitionLambda(LAMBDA_SPSTEPTEST);
           serial_last_input = '\0';
         }
-        if (lambda_input < 0.52) {
-          TransitionLambda(LAMBDA_NO_SIGNAL);
-        }
+//        if (lambda_input < 0.52 && engine_state != ENGINE_OFF) {
+//          TransitionLambda(LAMBDA_NO_SIGNAL);
+//        }
         break;
       case LAMBDA_SEALED:
         if (engine_state == ENGINE_STARTING) {
@@ -75,6 +75,13 @@ void DoLambda() {
         }
         if (lambda_input > 0.52) {
           TransitionLambda(LAMBDA_CLOSEDLOOP);
+        }
+        if ((lambda_state_name == "Resetting O2 Relay") and (millis() - lambda_state_entered > 30000)) {
+          alarm = ALARM_O2_NO_SIG;
+        }
+        if ((lambda_state_name == "Resetting O2 Relay") and (millis() - lambda_state_entered > 60000)) {
+          Serial.println("No O2 Signal, Shutting down Engine");
+          TransitionEngine(ENGINE_SHUTDOWN);
         }
         break;
      }
@@ -132,7 +139,8 @@ void TransitionLambda(int new_state) {
     case LAMBDA_NO_SIGNAL:
       lambda_state_name = "O2 signal loss";
       lambda_PID.SetMode(MANUAL);
-      lambda_setpoint = smoothedLambda;
+      //lambda_setpoint = smoothedLambda;
+      lambda_output = smoothedLambda;
       break;
     }
   Serial.print(" to ");  
