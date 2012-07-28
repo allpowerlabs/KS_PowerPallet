@@ -8,7 +8,11 @@ void DoLambda() {
     switch(lambda_state) {
       case LAMBDA_CLOSEDLOOP:
         //don't reset changed PID values
-        //lambda_PID.SetTunings(lambda_P[0], lambda_I[0], lambda_D[0]);
+        if (lambda_input < lambda_setpoint - 0.1) {
+          lambda_PID.SetTunings(lambda_P[0]*2, lambda_I[0], lambda_D[0]);
+        } else {
+          lambda_PID.SetTunings(lambda_P[0], lambda_I[0], lambda_D[0]);
+        }
         smoothedLambda = smooth(lambda_input, smooth_filter_Lambda, smoothedLambda);   //Only set this value when in closedloop to keep bad O2 readings out
         lambda_PID.Compute();
         SetPremixServoAngle(lambda_output);
@@ -23,9 +27,9 @@ void DoLambda() {
           TransitionLambda(LAMBDA_SPSTEPTEST);
           serial_last_input = '\0';
         }
-//        if (lambda_input < 0.52 && engine_state != ENGINE_OFF) {
-//          TransitionLambda(LAMBDA_NO_SIGNAL);
-//        }
+        if (lambda_input < 0.52 && engine_state != ENGINE_OFF) {
+          TransitionLambda(LAMBDA_NO_SIGNAL);
+        }
         break;
       case LAMBDA_SEALED:
         if (engine_state == ENGINE_STARTING) {
@@ -190,6 +194,8 @@ void LoadLambda() {
     Serial.println("#Loading lambda from EEPROM");
     lambda_setpoint = val;
     lambda_PID.SetTunings(p,i,0);
+    lambda_P[0] = p;
+    lambda_I[0] = i;
   } else {
     Serial.println("#Saving default lambda setpoint to EEPROM");
     val = lambda_setpoint_mode[0];

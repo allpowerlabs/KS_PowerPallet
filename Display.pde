@@ -768,14 +768,15 @@ void update_config_var(int var_num){
      //{ { -140, 0}, { 0, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 750} };
      AugerCurrentLevelBoundary[CURRENT_LOW][1] = current_low_boundary; 
      AugerCurrentLevelBoundary[CURRENT_ON][0] = current_low_boundary;
-     //Serial.println("Updating current_low_boundary"); 
+     Serial.print("Updating current_low_boundary: "); 
+     Serial.print(current_low_boundary); 
      break;
     case 6:
       current_high_boundary = getConfig(5);
       AugerCurrentLevelBoundary[CURRENT_ON][1] = current_high_boundary; 
       AugerCurrentLevelBoundary[CURRENT_HIGH][0] = current_high_boundary;
-      //Serial.print("Updating current_high_boundary: ");
-      //Serial.println(current_high_boundary);
+      Serial.print("Updating current_high_boundary: ");
+      Serial.println(current_high_boundary);
       break;
     case 7:
       low_oil_psi = getConfig(6);

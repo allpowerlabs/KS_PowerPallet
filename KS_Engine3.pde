@@ -427,8 +427,8 @@ int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left han
 
 
 // Alarm
-unsigned int auger_on_alarm_point = 240000;    //Configurable and saved to EEPROM??
-unsigned int auger_off_alarm_point = 900000;   //Configurable and saved to EEPROM??
+unsigned long auger_on_alarm_point = 240000;    //Configurable and saved to EEPROM??
+unsigned long auger_off_alarm_point = 900000;   //Configurable and saved to EEPROM??
 int alarm;
 int silenced_alarm_state;
 int alarm_interval = 5; // in seconds
