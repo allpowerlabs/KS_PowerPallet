@@ -45,9 +45,9 @@ void DoEngine() {
 //        }
 //      #else
         // Use starter button in the standard manual control configuration (push button to start, release to stop cranking)
-        if (control_state == CONTROL_ON) {
-          TransitionEngine(ENGINE_ON);
-        }
+      if (control_state == CONTROL_ON) {
+        TransitionEngine(ENGINE_ON);
+      }
 //      #endif
       break;
     case ENGINE_GOV_TUNING:
@@ -56,18 +56,22 @@ void DoEngine() {
       }
       break;
     case ENGINE_SHUTDOWN:  
-      //lambda_PID.SetMode(MANUAL);
+      //lambda_PID.SetMode(MANUAL);      //lean out system and then shutdown
       //SetThrottleAngle(100); // % open
-      if (control_state == CONTROL_OFF & millis()-control_state_entered > 100) {
+      
+      //if (millis() - engine_stat > 3000){  //shutdown system wait 3 seconds and then close throttle
+      //  SetThrottleAngle(0);
+      //  TransitionEngine(ENGINE_OFF);
+      //}
+      
+      if (millis()-engine_state > 100) {
         TransitionEngine(ENGINE_OFF);
       }
       break;
     case ENGINE_PRESSURE_LOW:
-      if (millis() - engine_state_entered > 500){
-        
+      if (millis() - engine_state_entered > 500){  
         TransitionEngine(ENGINE_SHUTDOWN);
       }
-      
   }
 }
 
@@ -101,7 +105,10 @@ void TransitionEngine(int new_state) {
       TransitionMessage("Engine: Gov Tuning  ");
       break;
     case ENGINE_SHUTDOWN:
-      //servo wide open, lean system, kill engine.
+//      lambda_PID.SetMode(MANUAL);
+//      SetThrottleAngle(smoothedLambda);
+//      digitalWrite(FET_IGNITION,LOW);
+//      digitalWrite(FET_STARTER,LOW);
       Serial.println("# New Engine State: SHUTDOWN");
       TransitionMessage("Engine: Shutting down");   
       break;
@@ -111,7 +118,7 @@ void TransitionEngine(int new_state) {
 
 void DoOilPressure() {
   if (engine_type == 1){  //20k has analog oil pressure reader
-    EngineOilPressureValue = get20kPSI(analogRead(ANA_OIL_PRESSURE));  
+    EngineOilPressureValue = getPSI(analogRead(ANA_OIL_PRESSURE));  
     if (EngineOilPressureValue <= low_oil_psi){
       EngineOilPressureLevel = OIL_P_LOW;
       oil_pressure_state = millis();
@@ -159,7 +166,7 @@ void DoBattery() {
   #endif
 }
 
-int get20kPSI(int pressure_reading){  //returns oil pressure in PSI for 20k
+int getPSI(int pressure_reading){  //returns oil pressure in PSI for 20k
   return (pressure_reading-512)/-2;  //alternately use : analogRead(ANA_OIL_PRESSURE) instead of passing pressure_reading
 }
 

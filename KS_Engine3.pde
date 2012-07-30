@@ -132,6 +132,7 @@ Servo Servo_Throttle;
 #define LAMBDA_SPSTEPTEST 3
 #define LAMBDA_LAMBDA_NO_SIGNAL 4
 #define LAMBDA_NO_SIGNAL 5
+#define LAMBDA_RESTART 6
 
 //Display States
 #define DISPLAY_SPLASH 0
@@ -182,10 +183,11 @@ int defaults[] = {0, 1, 30, 50, 100, 10};  //default values to be saved to EEPRO
 int config_min[] = {0, 0, 0, 0, 5, 41, 1};  //minimum values allowed 
 int config_max[] = {254, 254, 254, 40, 135, 10}; //maximum values allowed  
 
-int engine_type = getConfig(1);  //Don't forget to add the following to update_config_var in Display!
+//Don't forget to add the following to update_config_var in Display!
+int engine_type = getConfig(1);  
 int relay_board = getConfig(2);
 int aug_rev_time = getConfig(3)*100;
-int current_low_boundary = getConfig(4);  //offset of 130  getConfig(4)/3 + 130
+int current_low_boundary = getConfig(4);  
 int current_high_boundary = getConfig(5);
 int low_oil_psi = getConfig(6);
 

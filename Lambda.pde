@@ -69,21 +69,26 @@ void DoLambda() {
         SetPremixServoAngle(lambda_output);
         break;
       case LAMBDA_NO_SIGNAL:
-        if (millis() - lambda_state_entered > 250 && lambda_state_name != "Resetting O2 Relay") {
+        if (millis() - lambda_state_entered > 250) {
           digitalWrite(FET_O2_RESET, HIGH);
           lambda_state_name = "Resetting O2 Relay";
         }
-        if ((lambda_state_name == "Resetting O2 Relay") and (millis() - lambda_state_entered > 500)) {
-          digitalWrite(FET_O2_RESET, LOW);
-          TransitionLambda(LAMBDA_CLOSEDLOOP);
+        if (millis() - lambda_state_entered > 500) {
+          TransitionLambda(LAMBDA_RESTART);
         }
         if (lambda_input > 0.52) {
           TransitionLambda(LAMBDA_CLOSEDLOOP);
         }
-        if ((lambda_state_name == "Resetting O2 Relay") and (millis() - lambda_state_entered > 30000)) {
+        break;
+      case LAMBDA_RESTART:
+        if (lambda_input > 0.52) {
+          TransitionLambda(LAMBDA_CLOSEDLOOP);
+        }
+        if (millis() - lambda_state_entered > 30000) {
+          Serial.println("No O2 Signal for 30 seconds");
           alarm = ALARM_O2_NO_SIG;
         }
-        if ((lambda_state_name == "Resetting O2 Relay") and (millis() - lambda_state_entered > 60000)) {
+        if (millis() - lambda_state_entered > 60000) {
           Serial.println("No O2 Signal, Shutting down Engine");
           TransitionEngine(ENGINE_SHUTDOWN);
         }
@@ -105,6 +110,8 @@ void TransitionLambda(int new_state) {
        loopPeriod1 = loopPeriod1*4; //return to normal datalogging rate
        break;
      case LAMBDA_NO_SIGNAL:
+       break;
+     case LAMBDA_RESTART:
        break;
    }
   Serial.print("# Lambda switching from ");
@@ -143,8 +150,10 @@ void TransitionLambda(int new_state) {
     case LAMBDA_NO_SIGNAL:
       lambda_state_name = "O2 signal loss";
       lambda_PID.SetMode(MANUAL);
-      //lambda_setpoint = smoothedLambda;
       lambda_output = smoothedLambda;
+      break;
+    case LAMBDA_RESTART:
+      digitalWrite(FET_O2_RESET, LOW);
       break;
     }
   Serial.print(" to ");  
