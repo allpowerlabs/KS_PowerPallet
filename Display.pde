@@ -36,47 +36,57 @@ void DoDisplay() {
     break;
   case DISPLAY_REACTOR:
     Disp_CursOff();
-    //Row 0
-    Disp_RC(0, 0);
-    if (millis() % 4000 > 2000 && (alarm == ALARM_AUGER_ON_LONG or alarm == ALARM_AUGER_LOW_CURRENT)) {
-      Disp_PutStr("       ALARM        ");
-    } else {
-        if (millis()-transition_entered<2000) {
-        transition_message.toCharArray(buf,21);
+    if (millis() % 4000 > 2000 && (alarm == true)) {
+      alarm_shown = alarm_queue[cur_item-1];
+      item_count = alarm_count;
+      //Row 0
+      Disp_RC(0, 0);
+      sprintf(buf, "       ALARM   %2i/%2i", cur_item, alarm_count);
+      Disp_PutStr(buf);
+      //Row 1
+      Disp_RC(1, 0);
+      Disp_PutStr(display_alarm[alarm_shown]);
+      //Row 2
+      Disp_RC(2, 0);
+      Disp_PutStr(display_alarm2[alarm_queue[cur_item-1]]);
+      if (shutdown[alarm_shown] != 0 && engine_state == ENGINE_ON){      
+        Disp_RC(2, 17);
+        sprintf(buf, "%3i", (shutdown[alarm_shown] - (millis() - alarm_on[alarm_shown]))/1000);
         Disp_PutStr(buf);
-        } else {
+      }
+      //Row 3
+      Disp_RC(3, 0);
+      Disp_PutStr("NEXT ADV QUIET      ");
+      if (key == 2) {
+        alarm = false;
+      }
+      if (millis() - alarm_on[alarm_shown] > 3000){
+        Disp_RC(3, 15);
+        Disp_PutStr("RESET");
+        if (key == 3) {
+          removeAlarm(alarm_queue[cur_item-1]);
+          //cur_item = 0; //start at beginning of alarm queue
+        }
+      }
+    } else {
+      //Row 0
+      Disp_RC(0, 0);
+      if (millis()-transition_entered<2000) {
+      transition_message.toCharArray(buf,21);
+      Disp_PutStr(buf);
+      } else {
         if (disp_alt) {
           sprintf(buf, "Ttred%4i  ", Temp_Data[T_TRED]);
-        } 
-        else {
+        } else {
           sprintf(buf, "Ttred%s", T_tredLevel[TempLevelName]);
         }
-        Disp_PutStr(buf);
-        Disp_RC(0, 11);
-        sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
-        Disp_PutStr(buf);
-      }
-    }
-    //Row 1
-    Disp_RC(1, 0);
-    if (millis() % 4000 > 2000 && alarm == ALARM_AUGER_ON_LONG) {
-      if (engine_state == ENGINE_ON){
-        sprintf(buf, "Engine Shutoff %3i  ", (360000-(millis()-auger_state_entered))/1000);
-      } else {
-        sprintf(buf, "%s", "   ");
       }
       Disp_PutStr(buf);
-    }
-    if (millis() % 4000 > 2000 && alarm == ALARM_AUGER_LOW_CURRENT && engine_state == ENGINE_ON) {
-      if (engine_state == ENGINE_ON){
-        sprintf(buf, "Engine Shutoff %3i  ", (180000-(millis()-auger_state_entered))/1000);
-       } else {
-        sprintf(buf, "%s", "   ");
-      }
+      Disp_RC(0, 11);
+      sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
       Disp_PutStr(buf);
-    }
-    
-    else {
+      //Row 1
+      Disp_RC(1, 0);
       if (disp_alt) {
         sprintf(buf, "Tbred%4i  ", Temp_Data[T_BRED]);
       } 
@@ -87,18 +97,7 @@ void DoDisplay() {
       Disp_RC(1, 11);
       sprintf(buf, "Preac%4i", Press[P_REACTOR] / 25);
       Disp_PutStr(buf);
-    }
-    //Row 2
-    if (millis() % 4000 > 2000 & alarm != ALARM_NONE) {
-      Disp_RC(2,0);
-      if (alarm != ALARM_SILENCED){
-        Disp_PutStr(display_alarm[alarm]);
-      }
-      else {
-        Disp_PutStr(display_alarm[silenced_alarm_state]);
-      } 
-    }
-    else {
+      //Row 2
       Disp_RC(2,0);
       if (P_reactorLevel != OFF) {
         //the value only means anything if the pressures are high enough, otherwise it is just noise
@@ -121,40 +120,7 @@ void DoDisplay() {
         }
       }
       Disp_PutStr(buf);
-    }
-    //Row 3
-    if (millis() % 4000 > 2000 & alarm != ALARM_NONE) {
-      Disp_RC(3,0);
-      Disp_PutStr("NEXT        OK Reset");
-      if (key == 2) {  
-        if (alarm != ALARM_SILENCED){
-          silenced_alarm_state = alarm;
-        }
-        alarm = ALARM_SILENCED;
-      } 
-      if (key == 3) {
-        if (alarm == ALARM_SILENCED){  //return to alarm state and then follow the following logic
-          alarm = silenced_alarm_state;
-        }
-        if (alarm == ALARM_BAD_REACTOR){
-          alarm = ALARM_NONE;
-          pressureRatioAccumulator = 0;
-        }
-        if (alarm == ALARM_BAD_FILTER){
-          alarm = ALARM_NONE;
-          filter_pratio_accumulator = 0;
-        }
-        if (alarm == ALARM_O2_NO_SIG){
-          alarm = ALARM_NONE;
-          TransitionLambda(LAMBDA_NO_SIGNAL);
-        }
-        if (alarm == ALARM_AUGER_OFF_LONG or alarm == ALARM_AUGER_LOW_CURRENT or alarm == ALARM_BOUND_AUGER or alarm == ALARM_AUGER_ON_LONG){
-          alarm = ALARM_NONE;
-          TransitionAuger(AUGER_OFF);
-        }
-      }
-    } 
-    else {
+      //Row 3
       Disp_RC(3,0);
       switch(auger_state){   //Update to all Auger states??
       case AUGER_FORWARD:
@@ -176,6 +142,8 @@ void DoDisplay() {
       case AUGER_CURRENT_LOW:
         sprintf(buf, "AugLow%3i ", (millis() - auger_state_entered)/1000);
         break;
+      case AUGER_ALARM:
+        sprintf(buf, "AugALRM%3i", (millis() - auger_state_entered)/1000);
       default:
         sprintf(buf, "Aug   %3i ", (millis() - auger_state_entered)/1000);
         break;
@@ -190,7 +158,7 @@ void DoDisplay() {
       //}
       Disp_RC(3, 11);
       Disp_PutStr(buf);
-    }
+    } 
     break;
   case DISPLAY_ENGINE:
     Disp_CursOff();
@@ -619,6 +587,7 @@ void TransitionDisplay(int new_state) {
   case DISPLAY_SPLASH:
     break;
   case DISPLAY_REACTOR:
+    cur_item = 1;
     break;
   case DISPLAY_ENGINE:
     break;

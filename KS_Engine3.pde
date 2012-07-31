@@ -432,26 +432,30 @@ int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left han
 // Alarm
 unsigned long auger_on_alarm_point = 240000;    //Configurable and saved to EEPROM??
 unsigned long auger_off_alarm_point = 900000;   //Configurable and saved to EEPROM??
-int alarm;
-int silenced_alarm_state;
-int alarm_interval = 5; // in seconds
+byte alarm;
+
+//int alarm_interval = 5; // in seconds
 int pressureRatioAccumulator = 0;
-#define ALARM_NONE 0 //no alarm
-#define ALARM_AUGER_ON_LONG 1
-#define ALARM_AUGER_OFF_LONG 2
-#define ALARM_BAD_REACTOR 3
-#define ALARM_BAD_FILTER 4
-#define ALARM_LOW_FUEL_REACTOR 5
-#define ALARM_LOW_TRED 6
-#define ALARM_HIGH_BRED 7
-#define ALARM_BAD_OIL_PRESSURE 8
-#define ALARM_O2_NO_SIG 9
-#define ALARM_AUGER_LOW_CURRENT 10
-#define ALARM_BOUND_AUGER 11
-#define ALARM_SILENCED 12
+
+unsigned long alarm_on[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int shutdown[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 120000, 0};  //Off time minus alarm time in milliseconds.
+int alarm_count = 0;
+int alarm_queue[10] = {};
+int alarm_shown = 0;
+
+#define ALARM_AUGER_ON_LONG 0
+#define ALARM_AUGER_OFF_LONG 1
+#define ALARM_BAD_REACTOR 2
+#define ALARM_BAD_FILTER 3
+#define ALARM_LOW_FUEL_REACTOR 4
+#define ALARM_LOW_TRED 5
+#define ALARM_HIGH_BRED 6
+#define ALARM_BAD_OIL_PRESSURE 7
+#define ALARM_O2_NO_SIG 8
+#define ALARM_AUGER_LOW_CURRENT 9
+#define ALARM_BOUND_AUGER 10
 
 char* display_alarm[] = {
-  "No alarm            ",
   "Auger on too long   ",
   "Auger off too long  ",
   "Bad Reactor P_ratio ",
@@ -465,6 +469,19 @@ char* display_alarm[] = {
   "FuelSwitch/Auger Jam"
 }; //20 char message for 4x20 display
 
+char* display_alarm2[] = {
+  "Check fuel.  Off:   ",
+  "      Engine Off:   ",
+  "Bad Reactor P_ratio ",
+  "Bad Filter P_ratio  ",
+  "Reactor Fuel Low    ",
+  "tred low for eng.   ",
+  "bred high for eng.  ",
+  "Check Oil Pressure  ",
+  "No O2 Sensor Signal ",
+  "      Engine Off:   ",
+  "Check Fuel & Switch "
+};
 // SD Card
 //Sd2Card sd_card;
 //SdVolume sd_volume;
