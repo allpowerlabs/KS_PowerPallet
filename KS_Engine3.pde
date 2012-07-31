@@ -438,7 +438,7 @@ byte alarm;
 int pressureRatioAccumulator = 0;
 
 unsigned long alarm_on[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int shutdown[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 120000, 0};  //Off time minus alarm time in milliseconds.
+int shutdown[] = {120000, 0, 0, 0, 0, 0, 0, 0, 0, 120000, 0};  //Off time minus alarm time in milliseconds.
 int alarm_count = 0;
 int alarm_queue[10] = {};
 int alarm_shown = 0;
@@ -455,7 +455,7 @@ int alarm_shown = 0;
 #define ALARM_AUGER_LOW_CURRENT 9
 #define ALARM_BOUND_AUGER 10
 
-char* display_alarm[] = {
+char* display_alarm[] = {  //line 1 on display
   "Auger on too long   ",
   "Auger off too long  ",
   "Bad Reactor P_ratio ",
@@ -469,16 +469,16 @@ char* display_alarm[] = {
   "FuelSwitch/Auger Jam"
 }; //20 char message for 4x20 display
 
-char* display_alarm2[] = {
+char* display_alarm2[] = {  //line 2 on display.  If shutdown[] is greater than zero, countdown will be added to last 3 spaces.
   "Check fuel.  Off:   ",
   "      Engine Off:   ",
-  "Bad Reactor P_ratio ",
-  "Bad Filter P_ratio  ",
-  "Reactor Fuel Low    ",
-  "tred low for eng.   ",
-  "bred high for eng.  ",
-  "Check Oil Pressure  ",
-  "No O2 Sensor Signal ",
+  "Adjust Blowers/Load ",
+  "Adjust Blowers/Load ",
+  "Check Auger/Fuel    ",
+  "Adjust Blowers/Load ",
+  "Adjust Blowers/Load ",
+  "                    ",
+  "                    ",
   "      Engine Off:   ",
   "Check Fuel & Switch "
 };
