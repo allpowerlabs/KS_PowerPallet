@@ -132,7 +132,8 @@ Servo Servo_Throttle;
 #define LAMBDA_SPSTEPTEST 3
 #define LAMBDA_LAMBDA_NO_SIGNAL 4
 #define LAMBDA_NO_SIGNAL 5
-#define LAMBDA_RESTART 6
+#define LAMBDA_RESET 6
+#define LAMBDA_RESTART 7
 
 //Display States
 #define DISPLAY_SPLASH 0
@@ -220,7 +221,7 @@ int filter_pratio_accumulator;
 #define TEMP_LEVEL_COUNT 5
 enum TempLevels { COLD = 0,COOL = 1,WARM = 2 ,HOT = 3, EXCESSIVE = 4} TempLevel;
 TempLevels T_tredLevel;
-static char *TempLevelName[] = { "Cold", "Cool", "Warm", "Hot", "Too Hot" };
+static char *TempLevelName[] = { "Cold", "Cool", "Warm", "Hot ", "Too Hot" };
 int T_tredLevelBoundary[TEMP_LEVEL_COUNT][2] = { { 0, 40 }, {50, 80}, {300,790}, {800,950}, {1000,1250} };
 
 TempLevels T_bredLevel;

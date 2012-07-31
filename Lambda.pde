@@ -70,27 +70,25 @@ void DoLambda() {
         break;
       case LAMBDA_NO_SIGNAL:
         if (millis() - lambda_state_entered > 250) {
-          digitalWrite(FET_O2_RESET, HIGH);
-          lambda_state_name = "Resetting O2 Relay";
-        }
-        if (millis() - lambda_state_entered > 500) {
-          TransitionLambda(LAMBDA_RESTART);
+          TransitionLambda(LAMBDA_RESET);
         }
         if (lambda_input > 0.52) {
           TransitionLambda(LAMBDA_CLOSEDLOOP);
         }
         break;
+      case LAMBDA_RESET:
+        if (millis() - lambda_state_entered > 250) {
+          TransitionLambda(LAMBDA_RESTART);
+        }
+        break;
       case LAMBDA_RESTART:
+        if (millis() - lambda_state_entered > 60000) {
+          Serial.println("# No O2 Signal, Shutting down Engine");
+          TransitionEngine(ENGINE_SHUTDOWN);
+          TransitionLambda(LAMBDA_SEALED);
+        }
         if (lambda_input > 0.52) {
           TransitionLambda(LAMBDA_CLOSEDLOOP);
-        }
-        if (millis() - lambda_state_entered > 30000) {
-          Serial.println("No O2 Signal for 30 seconds");
-          alarm = ALARM_O2_NO_SIG;
-        }
-        if (millis() - lambda_state_entered > 60000) {
-          Serial.println("No O2 Signal, Shutting down Engine");
-          TransitionEngine(ENGINE_SHUTDOWN);
         }
         break;
      }
@@ -110,6 +108,8 @@ void TransitionLambda(int new_state) {
        loopPeriod1 = loopPeriod1*4; //return to normal datalogging rate
        break;
      case LAMBDA_NO_SIGNAL:
+       break;
+     case LAMBDA_RESET:
        break;
      case LAMBDA_RESTART:
        break;
@@ -152,8 +152,13 @@ void TransitionLambda(int new_state) {
       lambda_PID.SetMode(MANUAL);
       lambda_output = smoothedLambda;
       break;
+    case LAMBDA_RESET:
+      digitalWrite(FET_O2_RESET, HIGH);
+      lambda_state_name = "Resetting O2 Relay";
+      break;
     case LAMBDA_RESTART:
       digitalWrite(FET_O2_RESET, LOW);
+      lambda_state_name = "Checking for O2 signal";
       break;
     }
   Serial.print(" to ");  

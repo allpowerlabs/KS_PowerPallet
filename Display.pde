@@ -60,11 +60,19 @@ void DoDisplay() {
     //Row 1
     Disp_RC(1, 0);
     if (millis() % 4000 > 2000 && alarm == ALARM_AUGER_ON_LONG) {
-      sprintf(buf, "Engine Shutoff %3i  ", (360000-(millis()-auger_state_entered))/1000);
+      if (engine_state == ENGINE_ON){
+        sprintf(buf, "Engine Shutoff %3i  ", (360000-(millis()-auger_state_entered))/1000);
+      } else {
+        sprintf(buf, "%s", "   ");
+      }
       Disp_PutStr(buf);
     }
-    if (millis() % 4000 > 2000 && alarm == ALARM_AUGER_LOW_CURRENT) {
-      sprintf(buf, "Engine Shutoff %3i  ", (180000-(millis()-auger_state_entered))/1000);
+    if (millis() % 4000 > 2000 && alarm == ALARM_AUGER_LOW_CURRENT && engine_state == ENGINE_ON) {
+      if (engine_state == ENGINE_ON){
+        sprintf(buf, "Engine Shutoff %3i  ", (180000-(millis()-auger_state_entered))/1000);
+       } else {
+        sprintf(buf, "%s", "   ");
+      }
       Disp_PutStr(buf);
     }
     
@@ -119,7 +127,9 @@ void DoDisplay() {
       Disp_RC(3,0);
       Disp_PutStr("NEXT        OK Reset");
       if (key == 2) {  
-        silenced_alarm_state = alarm;
+        if (alarm != ALARM_SILENCED){
+          silenced_alarm_state = alarm;
+        }
         alarm = ALARM_SILENCED;
       } 
       if (key == 3) {

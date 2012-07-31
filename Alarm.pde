@@ -64,6 +64,10 @@ void DoAlarm() {
         Serial.println("# No O2 Sensor Signal");
         alarm = ALARM_O2_NO_SIG;
       }
+      if (millis() - lambda_state_entered > 30000 && lambda_state_entered == LAMBDA_RESTART) {
+        Serial.println("# No O2 Signal for more than 30 seconds");
+        alarm = ALARM_O2_NO_SIG;
+      }
       #endif
     }
   }
