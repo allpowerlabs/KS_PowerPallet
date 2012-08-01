@@ -108,8 +108,8 @@ void setAlarm(int alarm){
 }
 
 void removeAlarm(int alarm){
-  if (alarm_on[alarm] != 0) {
-    alarm_on[alarm] == 0;
+  if (alarm_on[alarm] > 0) {
+    alarm_on[alarm] = 0;
     setAlarmQueue();
     if (alarm_count == 0){
       alarm = false;
@@ -150,7 +150,7 @@ void removeAlarm(int alarm){
 
 void setAlarmQueue(){
   alarm_count = 0;
-  for (int x = 0; x < sizeof(alarm_on); x++){
+  for (int x = 0; x < sizeof(alarm_on)/sizeof(unsigned long); x++){
     if (alarm_on[x] != 0){
       alarm_queue[alarm_count] = alarm_on[x];
       alarm_count++;

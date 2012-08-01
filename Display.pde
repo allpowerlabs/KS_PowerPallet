@@ -36,7 +36,7 @@ void DoDisplay() {
     break;
   case DISPLAY_REACTOR:
     Disp_CursOff();
-    if (millis() % 4000 > 2000 && (alarm == true)) {
+    if (millis() % 4000 > 2000 && (alarm_count > 0)) {
       alarm_shown = alarm_queue[cur_item-1];
       item_count = alarm_count;
       //Row 0
@@ -48,7 +48,7 @@ void DoDisplay() {
       Disp_PutStr(display_alarm[alarm_shown]);
       //Row 2
       Disp_RC(2, 0);
-      Disp_PutStr(display_alarm2[alarm_queue[cur_item-1]]);
+      Disp_PutStr(display_alarm2[alarm_shown]);
       if (shutdown[alarm_shown] != 0 && engine_state == ENGINE_ON){      
         Disp_RC(2, 17);
         sprintf(buf, "%3i", (shutdown[alarm_shown] - (millis() - alarm_on[alarm_shown]))/1000);
@@ -64,8 +64,8 @@ void DoDisplay() {
         Disp_RC(3, 15);
         Disp_PutStr("RESET");
         if (key == 3) {
-          removeAlarm(alarm_queue[cur_item-1]);
-          //cur_item = 0; //start at beginning of alarm queue
+          removeAlarm(alarm_shown);
+          //cur_item = 1; //start at beginning of alarm queue
         }
       }
     } else {
@@ -500,8 +500,8 @@ void DoDisplay() {
     Disp_RC(0,0);
     Disp_PutStr("   Configurations   ");
     Disp_RC(1,0);
-    if (Config_Choices[cur_item - 1] == "+    -  "){
-      sprintf(buf, "%s:%3i",Configuration[cur_item-1], config_var);
+    if (Config_Choices[cur_item-1] == "+    -  "){
+      sprintf(buf, "%s:%3i", choice, config_var);
     } else {
       if (config_var == 0){
       choice[0] = Config_Choices[cur_item-1][0];
@@ -522,7 +522,7 @@ void DoDisplay() {
     Disp_RC(3,0);
     sprintf(buf, "NEXT  ADV   %s", Config_Choices[cur_item-1]);
     Disp_PutStr(buf);
-    if (Config_Choices[cur_item - 1] == "+    -  "){
+    if (Config_Choices[cur_item-1] == "+    -  "){
       if (key == 2) {
         if (config_max[cur_item-1] > config_var + 1){
           config_var += 1;
