@@ -65,6 +65,7 @@ void DoDisplay() {
         Disp_PutStr("RESET");
         if (key == 3) {
           removeAlarm(alarm_shown);
+          resetAlarm(alarm_shown);
           cur_item = 1; //start at beginning of alarm queue
         }
       }

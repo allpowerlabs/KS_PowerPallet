@@ -180,7 +180,7 @@ int config_var;
 byte config_changed = false;
 static char *Configuration[] = { "Engine Type    ", "Relay Board    ", "Auger Rev (.1s)", "Auger Low (.1A)", "Auger High(.1A)", "Low Oil (PSI)  "};  //15 character Display prompt
 static char *Config_Choices[] = {"10k 20k ","NO  YES ",  "+    -  ", "+    -  ", "+    -  ", "+    -  "}; //8 char options for last two buttons
-int defaults[] = {0, 1, 30, 50, 100, 10};  //default values to be saved to EEPROM for the following getConfig variables
+int defaults[] = {0, 1, 30, 20, 100, 10};  //default values to be saved to EEPROM for the following getConfig variables
 int config_min[] = {0, 0, 0, 0, 5, 41, 1};  //minimum values allowed 
 int config_max[] = {254, 254, 254, 40, 135, 10}; //maximum values allowed  
 
@@ -265,7 +265,7 @@ static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
 //int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} }; mA values
 //int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 1024} };  //actual sensor readings
 //int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, 120}, {120, 200}, {200, 1024} };
-int AugerCurrentLevelBoundary[4][2] = { { -140, 5}, { 5, current_low_boundary-1}, {current_low_boundary+1, current_high_boundary-1}, {current_high_boundary+1, 750} };  //.1A readings
+int AugerCurrentLevelBoundary[4][2] = { { -140, 5}, { 10, current_low_boundary}, {current_low_boundary+5, current_high_boundary-5}, {current_high_boundary, 750} };  //.1A readings
 
 //oil pressure
 int EngineOilPressureValue;

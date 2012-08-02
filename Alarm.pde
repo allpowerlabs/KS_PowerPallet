@@ -7,89 +7,82 @@ void DoAlarmUpdate() {
     pressureRatioAccumulator -= 5;
   }
   pressureRatioAccumulator = max(0,pressureRatioAccumulator); //keep value above 0
-  pressureRatioAccumulator = min(pressureRatioAccumulator,20); //keep value below 20    
+  pressureRatioAccumulator = min(pressureRatioAccumulator,60); //keep value below 20    
 }
 
 void DoAlarm() {
   if (auger_rev_count > 10){
-    Serial.println("# Auger Bound or broken Fuel Switch");
     setAlarm(ALARM_BOUND_AUGER);
   } 
   else {
-    removeAlarm(ALARM_BOUND_AUGER);
+    if (auger_state != AUGER_ALARM){
+      removeAlarm(ALARM_BOUND_AUGER);
+    }
   }
   if (auger_state == AUGER_CURRENT_LOW and (millis() - auger_state_entered > 60000)){
-    Serial.println("# Auger Low Current too long");
     setAlarm(ALARM_AUGER_LOW_CURRENT);
   } 
   else {
-    removeAlarm(ALARM_AUGER_LOW_CURRENT);
+    if (auger_state != AUGER_ALARM){
+      removeAlarm(ALARM_AUGER_LOW_CURRENT);
+    }
   }
   if (auger_state == AUGER_FORWARD and (millis() - auger_state_entered > auger_on_alarm_point)){
-    Serial.println("# Auger on too long");
     setAlarm(ALARM_AUGER_ON_LONG);
   } 
   else {
-    removeAlarm(ALARM_AUGER_ON_LONG);
+    if (auger_state != AUGER_ALARM){
+      removeAlarm(ALARM_AUGER_ON_LONG);
+    }
   }
-  if (P_reactorLevel != OFF) { //alarm only if reactor is running
-    if (auger_state == AUGER_OFF and (millis() - auger_state_entered > auger_off_alarm_point)){
-      Serial.println("# Auger off too long");
-      setAlarm(ALARM_AUGER_OFF_LONG);
-    }  
-    else {
-      removeAlarm(ALARM_AUGER_OFF_LONG);
-    }
-    if (pressureRatioAccumulator > 100) {
-      Serial.println("# Pressure Ratio is bad");
-      setAlarm(ALARM_BAD_REACTOR);
-    } 
-    else {
-      removeAlarm(ALARM_BAD_REACTOR);
-    }
-    if (filter_pratio_accumulator > 100) {
-      Serial.println("# Filter or gas flow may be blocked");
-      setAlarm(ALARM_BAD_FILTER);
-    } 
-    else {
-      removeAlarm(ALARM_BAD_FILTER);
-    }
+//Reactor On Alarms:  
+  if (P_reactorLevel != OFF && auger_state == AUGER_OFF and (millis() - auger_state_entered > auger_off_alarm_point)){
+    setAlarm(ALARM_AUGER_OFF_LONG);
+  }  
+  else {
+    removeAlarm(ALARM_AUGER_OFF_LONG);
+  }
+  if (P_reactorLevel != OFF && pressureRatioAccumulator > 100) {
+    setAlarm(ALARM_BAD_REACTOR);
+  } 
+  else {
+    removeAlarm(ALARM_BAD_REACTOR);
+  }
+  if (P_reactorLevel != OFF && filter_pratio_accumulator > 50) {
+    setAlarm(ALARM_BAD_FILTER);
+  } 
+  else {
+    removeAlarm(ALARM_BAD_FILTER);
+  }
 #if T_LOW_FUEL != ABSENT
-    if (Temp_Data[T_LOW_FUEL] > 230) {
-      Serial.println("# Reactor fuel may be low");
-      setAlarm(ALARM_LOW_FUEL_REACTOR);
-    } 
-    else {
-      removeAlarm(ALARM_LOW_FUEL_REACTOR);
-    }
-#endif
+  if (P_reactorLevel != OFF && Temp_Data[T_LOW_FUEL] > 230) {
+    setAlarm(ALARM_LOW_FUEL_REACTOR);
+  } 
+  else {
+    removeAlarm(ALARM_LOW_FUEL_REACTOR);
   }
-  if (engine_state == ENGINE_ON) {
-    if (T_tredLevel != HOT && T_tredLevel != EXCESSIVE) {
-      Serial.println("# T_tred too low for running engine");
-      setAlarm(ALARM_LOW_TRED);
-    }
-    if ((Temp_Data[T_BRED] == EXCESSIVE)) {
-      Serial.println("# T_bred too high for running engine");
-      setAlarm(ALARM_HIGH_BRED);
-    }
+#endif
+
+//Engine On Alarms
+  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && T_tredLevel != HOT && T_tredLevel != EXCESSIVE) {
+    setAlarm(ALARM_LOW_TRED);
+  }
+  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && Temp_Data[T_BRED] == EXCESSIVE) {
+    setAlarm(ALARM_HIGH_BRED);
+  }
 #if ANA_OIL_PRESSURE != ABSENT
-    if (EngineOilPressureLevel == OIL_P_LOW && millis() - oil_pressure_state > 500  && millis() - engine_state_entered > 3000) {
-      Serial.println("# Bad oil pressure");
-      setAlarm(ALARM_BAD_OIL_PRESSURE);
-    }
+  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && EngineOilPressureLevel == OIL_P_LOW && millis() - oil_pressure_state > 500  && millis() - engine_state_entered > 3000) {
+    setAlarm(ALARM_BAD_OIL_PRESSURE);
+  }
 #endif
 #if LAMBDA_SIGNAL_CHECK == TRUE
-    if (lambda_input < 0.52) {
-      Serial.println("# No O2 Sensor Signal");
-      setAlarm(ALARM_O2_NO_SIG);
-    }
-    if (millis() - lambda_state_entered > 30000 && lambda_state_entered == LAMBDA_RESTART) {
-      Serial.println("# No O2 Signal for more than 30 seconds");
-      setAlarm(ALARM_O2_NO_SIG);
-    }
-#endif
+  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && lambda_input < 0.52) {
+    setAlarm(ALARM_O2_NO_SIG);
   }
+  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && millis() - lambda_state_entered > 30000 && lambda_state_entered == LAMBDA_RESTART) {
+    setAlarm(ALARM_O2_NO_SIG);
+  }
+#endif
   
   if (alarm == true) {
     digitalWrite(FET_ALARM, HIGH);
@@ -109,41 +102,12 @@ void setAlarm(int alarm_num){
 
 void removeAlarm(int alarm_num){
   if (alarm_on[alarm_num] > 0) {
+    Serial.print("# ");
+    Serial.println(display_alarm[alarm_num]);
     alarm_on[alarm_num] = 0;
     setAlarmQueue();
     if (alarm_count == 0){
       alarm = false;
-    }
-    switch (alarm_num) {  //reset faults that kicked off alarm state.  Seperate function only for user intervention??
-    case ALARM_AUGER_ON_LONG:
-      TransitionAuger(AUGER_OFF);
-      break;
-    case ALARM_AUGER_OFF_LONG:
-      TransitionAuger(AUGER_OFF);
-      break;
-    case ALARM_BAD_REACTOR:
-      pressureRatioAccumulator = 0;
-      break;
-    case ALARM_BAD_FILTER:
-      filter_pratio_accumulator = 0;
-      break;
-    case ALARM_LOW_FUEL_REACTOR:
-      break;
-    case ALARM_LOW_TRED:
-      break;
-    case ALARM_HIGH_BRED:
-      break;
-    case ALARM_BAD_OIL_PRESSURE:
-      break;
-    case ALARM_O2_NO_SIG:
-      TransitionLambda(LAMBDA_NO_SIGNAL);
-      break;
-    case ALARM_AUGER_LOW_CURRENT:
-      TransitionAuger(AUGER_OFF);
-      break;
-    case ALARM_BOUND_AUGER:
-      TransitionAuger(AUGER_OFF);
-      break;
     }
   }
 }
@@ -158,3 +122,36 @@ void setAlarmQueue(){
   }
 }
 
+void resetAlarm(int alarm_num){
+  switch (alarm_num) {  //reset faults that kicked off alarm state.  Seperate function only for user intervention??
+  case ALARM_AUGER_ON_LONG:
+    TransitionAuger(AUGER_OFF);
+    break;
+  case ALARM_AUGER_OFF_LONG:
+    TransitionAuger(AUGER_OFF);
+    break;
+  case ALARM_BAD_REACTOR:
+    pressureRatioAccumulator = 0;
+    break;
+  case ALARM_BAD_FILTER:
+    filter_pratio_accumulator = 0;
+    break;
+  case ALARM_LOW_FUEL_REACTOR:
+    break;
+  case ALARM_LOW_TRED:
+    break;
+  case ALARM_HIGH_BRED:
+    break;
+  case ALARM_BAD_OIL_PRESSURE:
+    break;
+  case ALARM_O2_NO_SIG:
+    TransitionLambda(LAMBDA_NO_SIGNAL);
+    break;
+  case ALARM_AUGER_LOW_CURRENT:
+    TransitionAuger(AUGER_OFF);
+    break;
+  case ALARM_BOUND_AUGER:
+    TransitionAuger(AUGER_OFF);
+    break;
+  }
+}
