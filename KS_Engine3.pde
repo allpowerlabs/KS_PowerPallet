@@ -265,7 +265,7 @@ static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
 //int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} }; mA values
 //int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 1024} };  //actual sensor readings
 //int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, 120}, {120, 200}, {200, 1024} };
-int AugerCurrentLevelBoundary[4][2] = { { -140, 5}, { 5, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 750} };  //.1A readings
+int AugerCurrentLevelBoundary[4][2] = { { -140, 5}, { 5, current_low_boundary-1}, {current_low_boundary+1, current_high_boundary-1}, {current_high_boundary+1, 750} };  //.1A readings
 
 //oil pressure
 int EngineOilPressureValue;
@@ -432,15 +432,15 @@ int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left han
 // Alarm
 unsigned long auger_on_alarm_point = 240000;    //Configurable and saved to EEPROM??
 unsigned long auger_off_alarm_point = 900000;   //Configurable and saved to EEPROM??
-byte alarm;
+boolean alarm = false;
 
-//int alarm_interval = 5; // in seconds
 int pressureRatioAccumulator = 0;
 
-unsigned long alarm_on[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int shutdown[] = {120000, 0, 0, 0, 0, 0, 0, 0, 0, 120000, 0};  //Off time minus alarm time in milliseconds.
+#define ALARM_NUM 11
+unsigned long alarm_on[ALARM_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int shutdown[ALARM_NUM] = {120000, 0, 0, 0, 0, 0, 0, 0, 0, 120000, 0};  //Off time minus alarm time in milliseconds.
 int alarm_count = 0;
-int alarm_queue[10] = {};
+int alarm_queue[ALARM_NUM] = {};
 int alarm_shown = 0;
 
 #define ALARM_AUGER_ON_LONG 0
@@ -455,7 +455,7 @@ int alarm_shown = 0;
 #define ALARM_AUGER_LOW_CURRENT 9
 #define ALARM_BOUND_AUGER 10
 
-char* display_alarm[] = {  //line 1 on display
+char* display_alarm[ALARM_NUM] = {  //line 1 on display
   "Auger on too long   ",
   "Auger off too long  ",
   "Bad Reactor P_ratio ",
@@ -469,7 +469,7 @@ char* display_alarm[] = {  //line 1 on display
   "FuelSwitch/Auger Jam"
 }; //20 char message for 4x20 display
 
-char* display_alarm2[] = {  //line 2 on display.  If shutdown[] is greater than zero, countdown will be added to last 3 spaces.
+char* display_alarm2[ALARM_NUM] = {  //line 2 on display.  If shutdown[] is greater than zero, countdown will be added to last 3 spaces.
   "Check fuel.  Off:   ",
   "      Engine Off:   ",
   "Adjust Blowers/Load ",

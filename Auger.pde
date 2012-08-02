@@ -109,12 +109,12 @@ void TransitionAuger(int new_state) {
       //TransitionMessage("Auger: Forward      ");
       break;
     case AUGER_HIGH:
-      Serial.print("Current:");
-      Serial.print(AugerCurrentValue);
-      Serial.print(" current_low_boundary:");
-      Serial.print(current_low_boundary);
-      Serial.print(" current_high_boundary:");
-      Serial.println(current_high_boundary);
+      //Serial.print("Current:");
+      //Serial.print(AugerCurrentValue);
+      //Serial.print(" current_low_boundary:");
+      //Serial.print(current_low_boundary);
+      //Serial.print(" current_high_boundary:");
+      //Serial.println(current_high_boundary);
       Serial.println("# New Auger State: Forward, Current High");
       //TransitionMessage("Auger: Current High ");
       break;
@@ -122,7 +122,7 @@ void TransitionAuger(int new_state) {
       auger_reverse_entered = millis();
       AugerReverse();
       Serial.println("# New Auger State: Reverse");
-      TransitionMessage("Auger: Reverse      ");
+      //TransitionMessage("Auger: Reverse      ");
       break;
     case AUGER_REVERSE_HIGH:
       Serial.println("# New Auger State: Reverse High Current"); 
@@ -130,12 +130,12 @@ void TransitionAuger(int new_state) {
       auger_rev_count++;
       break; 
     case AUGER_CURRENT_LOW:
-      Serial.print("Current:");
-      Serial.print(AugerCurrentValue);
-      Serial.print(" current_low_boundary:");
-      Serial.print(current_low_boundary);
-      Serial.print(" current_high_boundary:");
-      Serial.print(current_high_boundary);
+      //Serial.print("Current:");
+      //Serial.print(AugerCurrentValue);
+      //Serial.print(" current_low_boundary:");
+      //Serial.print(current_low_boundary);
+      //Serial.print(" current_high_boundary:");
+      //Serial.println(current_high_boundary);
       Serial.println("# New Auger State: Current Low");
       //TransitionMessage("Auger: Low Current");
       break;

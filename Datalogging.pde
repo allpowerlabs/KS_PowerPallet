@@ -293,6 +293,23 @@ void LogReactor(boolean header=false) {
     }
 }
 
+void DoTests() { //space to log testing of variables.  Normally not logged
+  Serial.print("# ");
+  if (alarm_count > 0){
+    if (alarm == false){
+      Serial.print("alarm = false");
+    } else {
+      Serial.print("alarm = true");
+    }
+    Serial.print("alarm_shown: ");
+    Serial.print(alarm_shown);
+    Serial.print(" display_alarm[alarm_shown]: ");
+    Serial.print(display_alarm[alarm_shown]);
+    Serial.print(" display_alarm2[alarm_shown]: ");
+    Serial.println(display_alarm2[alarm_shown]);
+  }
+}
+
 void PrintColumn(String str) {
   data_buffer += str;
   data_buffer += ", ";
@@ -344,5 +361,8 @@ void DoDatalogging() {
 //  if (save_to_sd = 0) {
 //    DoDatalogSD(data_buffer);
 //  }
+//  DoTests();
   lineCount++;
 }
+
+

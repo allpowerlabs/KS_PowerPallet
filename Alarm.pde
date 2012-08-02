@@ -90,8 +90,8 @@ void DoAlarm() {
     }
 #endif
   }
-
-  if (alarm = true) {
+  
+  if (alarm == true) {
     digitalWrite(FET_ALARM, HIGH);
   } 
   else { 
@@ -99,22 +99,22 @@ void DoAlarm() {
   }
 }
 
-void setAlarm(int alarm){
-  if (alarm_on[alarm] == 0){
-    alarm_on[alarm] = millis();
+void setAlarm(int alarm_num){
+  if (alarm_on[alarm_num] == 0){
+    alarm_on[alarm_num] = millis();
     alarm = true;
     setAlarmQueue();
   }
 }
 
-void removeAlarm(int alarm){
-  if (alarm_on[alarm] > 0) {
-    alarm_on[alarm] = 0;
+void removeAlarm(int alarm_num){
+  if (alarm_on[alarm_num] > 0) {
+    alarm_on[alarm_num] = 0;
     setAlarmQueue();
     if (alarm_count == 0){
       alarm = false;
     }
-    switch (alarm) {  //reset faults that kicked off alarm state.  Seperate function only for user intervention??
+    switch (alarm_num) {  //reset faults that kicked off alarm state.  Seperate function only for user intervention??
     case ALARM_AUGER_ON_LONG:
       TransitionAuger(AUGER_OFF);
       break;
@@ -150,9 +150,9 @@ void removeAlarm(int alarm){
 
 void setAlarmQueue(){
   alarm_count = 0;
-  for (int x = 0; x < sizeof(alarm_on)/sizeof(unsigned long); x++){
-    if (alarm_on[x] != 0){
-      alarm_queue[alarm_count] = alarm_on[x];
+  for (int x = 0; x < ALARM_NUM; x++){  //sizeof(alarm_on)/sizeof(unsigned long)
+    if (alarm_on[x] > 0){
+      alarm_queue[alarm_count] = x;
       alarm_count++;
     }
   }

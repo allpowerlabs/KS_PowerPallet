@@ -23,7 +23,7 @@ void DoDisplay() {
     Disp_PutStr("www.allpowerlabs.org");
     //Row 2
     Disp_RC(2,0);
-    sprintf(buf, "        %s        ", CODE_VERSION);
+    sprintf(buf, "       %s        ", CODE_VERSION);
     Disp_PutStr(buf);
     //Row 3
     Disp_RC(3,0);
@@ -41,7 +41,7 @@ void DoDisplay() {
       item_count = alarm_count;
       //Row 0
       Disp_RC(0, 0);
-      sprintf(buf, "       ALARM   %2i/%2i", cur_item, alarm_count);
+      sprintf(buf, "      ALARM   %2i/%2i ", cur_item, alarm_count);
       Disp_PutStr(buf);
       //Row 1
       Disp_RC(1, 0);
@@ -49,7 +49,7 @@ void DoDisplay() {
       //Row 2
       Disp_RC(2, 0);
       Disp_PutStr(display_alarm2[alarm_shown]);
-      if (shutdown[alarm_shown] != 0 && engine_state == ENGINE_ON){      
+      if (shutdown[alarm_shown] > 0 && engine_state == ENGINE_ON){      
         Disp_RC(2, 17);
         sprintf(buf, "%3i", (shutdown[alarm_shown] - (millis() - alarm_on[alarm_shown]))/1000);
         Disp_PutStr(buf);
@@ -128,27 +128,28 @@ void DoDisplay() {
         break;
       case AUGER_OFF:
         if (P_reactorLevel == OFF) {
-          sprintf(buf, "AugOff%s ", " --"); 
+          sprintf(buf, "AugOff%s  ", " --"); 
         } else {
-          sprintf(buf, "AugOff%3i", (millis() - auger_state_entered)/1000);  
+          sprintf(buf, "AugOff%3i  ", (millis() - auger_state_entered)/1000);  
         }  
         break;
       case AUGER_REVERSE:
-        sprintf(buf, "AugRev%3i ", (millis() - auger_state_entered)/1000); 
+        sprintf(buf, "AugRev%3i  ", (millis() - auger_state_entered)/1000); 
         break;
       case AUGER_HIGH:
-        sprintf(buf, "AugHi %3i ", (millis() - auger_state_entered)/1000); 
+        sprintf(buf, "AugHi %3i  ", (millis() - auger_state_entered)/1000); 
         break;
       case AUGER_CURRENT_LOW:
-        sprintf(buf, "AugLow%3i ", (millis() - auger_state_entered)/1000);
+        sprintf(buf, "AugLow%3i  ", (millis() - auger_state_entered)/1000);
         break;
       case AUGER_ALARM:
-        sprintf(buf, "AugALRM%3i", (millis() - auger_state_entered)/1000);
+        sprintf(buf, "AugALRM%3i ", (millis() - auger_state_entered)/1000);
       default:
-        sprintf(buf, "Aug   %3i ", (millis() - auger_state_entered)/1000);
+        sprintf(buf, "Aug   %3i  ", (millis() - auger_state_entered)/1000);
         break;
       }
       Disp_PutStr(buf);
+      Disp_RC(3, 11);
       sprintf(buf, "         ");
       //if (disp_alt) {
       //  sprintf(buf, "Hz   %4i", int(CalculatePeriodHertz()));
@@ -156,7 +157,6 @@ void DoDisplay() {
       //  sprintf(buf, "Batt%5i", int(battery_voltage*10));
       //  //sprintf(buf, "Pow %5i", int(CalculatePulsePower()));
       //}
-      Disp_RC(3, 11);
       Disp_PutStr(buf);
     } 
     break;
@@ -747,15 +747,15 @@ void update_config_var(int var_num){
      //{ { -140, 0}, { 0, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 750} };
      AugerCurrentLevelBoundary[CURRENT_LOW][1] = current_low_boundary; 
      AugerCurrentLevelBoundary[CURRENT_ON][0] = current_low_boundary;
-     Serial.print("Updating current_low_boundary: "); 
-     Serial.print(current_low_boundary); 
+     //Serial.print("Updating current_low_boundary: "); 
+     //Serial.println(current_low_boundary); 
      break;
     case 6:
       current_high_boundary = getConfig(5);
       AugerCurrentLevelBoundary[CURRENT_ON][1] = current_high_boundary; 
       AugerCurrentLevelBoundary[CURRENT_HIGH][0] = current_high_boundary;
-      Serial.print("Updating current_high_boundary: ");
-      Serial.println(current_high_boundary);
+      //Serial.print("Updating current_high_boundary: ");
+      //Serial.println(current_high_boundary);
       break;
     case 7:
       low_oil_psi = getConfig(6);
