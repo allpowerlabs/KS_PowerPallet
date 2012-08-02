@@ -50,8 +50,8 @@ void DoDisplay() {
       Disp_RC(2, 0);
       Disp_PutStr(display_alarm2[alarm_shown]);
       if (shutdown[alarm_shown] > 0 && engine_state == ENGINE_ON){      
-        Disp_RC(2, 17);
-        sprintf(buf, "%3i", (shutdown[alarm_shown] - (millis() - alarm_on[alarm_shown]))/1000);
+        Disp_RC(2, 13);
+        sprintf(buf, "OFF:%3i", (shutdown[alarm_shown] - (millis() - alarm_on[alarm_shown]))/1000);
         Disp_PutStr(buf);
       }
       //Row 3
@@ -65,7 +65,7 @@ void DoDisplay() {
         Disp_PutStr("RESET");
         if (key == 3) {
           removeAlarm(alarm_shown);
-          //cur_item = 1; //start at beginning of alarm queue
+          cur_item = 1; //start at beginning of alarm queue
         }
       }
     } else {

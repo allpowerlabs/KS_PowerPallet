@@ -4,7 +4,6 @@ void DoEngine() {
       if (control_state == CONTROL_START) {
         TransitionEngine(ENGINE_STARTING);
       }
-      SetThrottleAngle(0);
       break;
     case ENGINE_ON:
       if (control_state == CONTROL_OFF & millis()-control_state_entered > 100) {
@@ -17,38 +16,20 @@ void DoEngine() {
         Serial.println("# Low Oil Pressure, Shutting Down Engine");
         TransitionEngine(ENGINE_SHUTDOWN);
       }
-      DoGovernor();
       if (P_reactorLevel == OFF & millis()-engine_state_entered > 10000) { //if reactor is at low vacuum after ten seconds, engine did not catch, so turn off
         TransitionEngine(ENGINE_SHUTDOWN);
       }
       if (P_reactorLevel == OIL_P_LOW && millis()-engine_state_entered>10000) {  //if reactor is at low oil pressure for more than 10 seconds (3 seconds past low oil alarm), turn off engine.
         TransitionEngine(ENGINE_SHUTDOWN);
       }
-//      #ifdef INT_HERTZ
-//      if (CalculatePeriodHertz() < 20) { // Engine is not on
-//        TransitionEngine(ENGINE_OFF);
-//      }
-//      #endif
       break;
     case ENGINE_STARTING:
       if (control_state == CONTROL_OFF & millis()-control_state_entered > 100) {
         TransitionEngine(ENGINE_SHUTDOWN);
       }
-      SetThrottleAngle(100); // % open
-//      #ifdef INT_HERTZ
-//        // Use RPM detection to stop cranking automatically
-//        if (CalculatePeriodHertz() > 40) { //if engine is caught, stop cranking
-//          TransitionEngine(ENGINE_ON);
-//        }
-//        if (engine_end_cranking < millis()) { //if engine still has not caught, stop cranking
-//          TransitionEngine(ENGINE_OFF);
-//        }
-//      #else
-        // Use starter button in the standard manual control configuration (push button to start, release to stop cranking)
-      if (control_state == CONTROL_ON) {
+      if (control_state == CONTROL_ON) { // Use starter button in the standard manual control configuration (push button to start, release to stop cranking)
         TransitionEngine(ENGINE_ON);
       }
-//      #endif
       break;
     case ENGINE_GOV_TUNING:
       if (control_state == CONTROL_OFF) {
@@ -63,7 +44,6 @@ void DoEngine() {
       //  SetThrottleAngle(0);
       //  TransitionEngine(ENGINE_OFF);
       //}
-      
       if (millis()-engine_state > 100) {
         TransitionEngine(ENGINE_OFF);
       }
@@ -94,7 +74,6 @@ void TransitionEngine(int new_state) {
     case ENGINE_STARTING:
       digitalWrite(FET_IGNITION,HIGH);
       digitalWrite(FET_STARTER,HIGH);
-      engine_end_cranking = millis() + engine_crank_period;
       Serial.println("# New Engine State: Starting");
       TransitionMessage("Engine: Starting    ");
       break;
@@ -139,27 +118,6 @@ void DoOilPressure() {
     }
   }
   
-}
-
-void DoGovernor() {
-  governor_input = CalculatePeriodHertz();
-  governor_PID.SetTunings(governor_P[0], governor_I[0], governor_D[0]);
-  governor_PID.Compute();
-  SetThrottleAngle(governor_output);
-}
-
-void InitGovernor() {
-  governor_setpoint = 1.0;
-  governor_PID.SetMode(AUTO);
-  governor_PID.SetSampleTime(20);
-  governor_PID.SetInputLimits(0,60);
-  governor_PID.SetOutputLimits(0,100);
-  governor_output = 0;
-}
-
-void SetThrottleAngle(double percent) {
- Servo_Throttle.write(throttle_valve_closed + percent*(throttle_valve_open-throttle_valve_closed));
- //servo2_pos = percent;
 }
 
 void DoBattery() {
