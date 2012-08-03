@@ -367,7 +367,7 @@ PID lambda_PID(&lambda_input, &lambda_output, &lambda_setpoint,lambda_P[0],lambd
 unsigned long lamba_updated_time;
 boolean write_lambda = false;
 String lambda_state_name;
-int lambda_state;
+int lambda_state = LAMBDA_SEALED;
 unsigned long lambda_state_entered;
 float smooth_filter_Lambda = .75;
 int smoothedLambda;
@@ -546,7 +546,8 @@ void setup() {
 //  InitSD();
   
   TransitionEngine(ENGINE_ON); //default to engine on. if PCU resets, don't shut a running engine off. in the ENGINE_ON state, should detect and transition out of engine on.
-  TransitionLambda(LAMBDA_CLOSEDLOOP);
+  TransitionLambda(LAMBDA_RESTART);
+  TransitionAuger(AUGER_OFF);
   TransitionDisplay(DISPLAY_SPLASH);
 }
 

@@ -84,11 +84,17 @@ void DoLambda() {
       case LAMBDA_RESTART:
         if (millis() - lambda_state_entered > 60000) {
           Serial.println("# No O2 Signal, Shutting down Engine");
-          TransitionEngine(ENGINE_SHUTDOWN);
+          if (engine_state == ENGINE_ON){
+            TransitionEngine(ENGINE_SHUTDOWN);
+          }
           TransitionLambda(LAMBDA_SEALED);
         }
         if (lambda_input > 0.52 && lambda_state_entered > 1000) {
-          TransitionLambda(LAMBDA_CLOSEDLOOP);
+          if (engine_state == ENGINE_ON){
+            TransitionLambda(LAMBDA_CLOSEDLOOP);
+          }  else {
+            TransitionLambda(LAMBDA_SEALED);
+          }
         }
         break;
      }
