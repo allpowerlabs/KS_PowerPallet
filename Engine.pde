@@ -46,11 +46,6 @@ void DoEngine() {
         TransitionEngine(ENGINE_OFF);
       }
       break;
-    case ENGINE_PRESSURE_LOW:
-      if (millis() - engine_state_entered > 500){  
-        TransitionEngine(ENGINE_SHUTDOWN);
-      }
-      break;
   }
 }
 

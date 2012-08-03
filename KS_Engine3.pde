@@ -113,7 +113,7 @@ Servo Servo_Throttle;
 #define ENGINE_STARTING 2
 #define ENGINE_GOV_TUNING 3
 #define ENGINE_SHUTDOWN 4
-#define ENGINE_PRESSURE_LOW 5
+
 
 //Lambda
 #define LAMBDA_SIGNAL_CHECK TRUE
