@@ -335,7 +335,7 @@ void DoDatalogging() {
 //  if (save_to_sd = 0) {
 //    DoDatalogSD(data_buffer);
 //  }
-  DoTests();
+//  DoTests();
   lineCount++;
 }
 

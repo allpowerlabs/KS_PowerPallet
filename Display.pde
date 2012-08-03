@@ -509,7 +509,7 @@ void DoDisplay() {
     Disp_PutStr("   Configurations   ");
     Disp_RC(1,0);
     if (Config_Choices[cur_item-1] == "+    -  "){
-      sprintf(buf, "%s:%3i", choice, config_var);
+      sprintf(buf, "%s:%3i", Configuration[cur_item-1], config_var);
     } else {
       if (config_var == 0){
       choice[0] = Config_Choices[cur_item-1][0];

@@ -13,7 +13,7 @@ void DoLambda() {
         } else {
           lambda_PID.SetTunings(lambda_P[0], lambda_I[0], lambda_D[0]);
         }
-        smoothedLambda = smooth(lambda_input, smooth_filter_Lambda, smoothedLambda);   //Only set this value when in closedloop to keep bad O2 readings out
+        //smoothedLambda = smooth(lambda_input, smooth_filter_Lambda, smoothedLambda);   //Only set this value when in closedloop to keep bad O2 readings out
         lambda_PID.Compute();
         SetPremixServoAngle(lambda_output);
         if (engine_state == ENGINE_OFF) {
@@ -87,7 +87,7 @@ void DoLambda() {
           TransitionEngine(ENGINE_SHUTDOWN);
           TransitionLambda(LAMBDA_SEALED);
         }
-        if (lambda_input > 0.52) {
+        if (lambda_input > 0.52 && lambda_state_entered > 1000) {
           TransitionLambda(LAMBDA_CLOSEDLOOP);
         }
         break;
@@ -124,7 +124,9 @@ void TransitionLambda(int new_state) {
     case LAMBDA_CLOSEDLOOP:
       lambda_state_name = "Closed Loop";
       lambda_setpoint = lambda_setpoint_mode[0];
-      lambda_output = premix_valve_center;
+      if (engine_state == ENGINE_STARTING){
+        lambda_output = premix_valve_center;
+      }
       lambda_PID.SetMode(AUTO);
       lambda_PID.SetSampleTime(20);
       lambda_PID.SetInputLimits(0.5,1.5);
@@ -150,7 +152,7 @@ void TransitionLambda(int new_state) {
     case LAMBDA_NO_SIGNAL:
       lambda_state_name = "O2 signal loss";
       lambda_PID.SetMode(MANUAL);
-      lambda_output = smoothedLambda;
+      //lambda_output = smoothedLambda;
       break;
     case LAMBDA_RESET:
       digitalWrite(FET_O2_RESET, HIGH);
@@ -219,13 +221,13 @@ void LoadLambda() {
   lambda_setpoint_mode[0] = val;
 }
 
-int smooth(int data, float filterVal, float smoothedVal){
-  if (filterVal > 1){      // check to make sure param's are within range
-    filterVal = .99;
-  }
-  else if (filterVal <= 0){
-    filterVal = 0;
-  }
-  smoothedVal = (data * (1 - filterVal)) + (smoothedVal  *  filterVal);
-  return (int)smoothedVal;
- }
+//int smooth(int data, float filterVal, float smoothedVal){
+//  if (filterVal > 1){      // check to make sure param's are within range
+//    filterVal = .99;
+//  }
+//  else if (filterVal <= 0){
+//    filterVal = 0;
+//  }
+//  smoothedVal = (data * (1 - filterVal)) + (smoothedVal  *  filterVal);
+//  return (int)smoothedVal;
+// }
