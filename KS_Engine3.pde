@@ -414,7 +414,7 @@ int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left han
 
 // Alarm
 unsigned long auger_on_alarm_point = 240000;    //Configurable and saved to EEPROM??
-unsigned long auger_off_alarm_point = 900000;   //Configurable and saved to EEPROM??
+unsigned long auger_off_alarm_point = 600000;   //Configurable and saved to EEPROM??
 boolean alarm = false;
 
 int pressureRatioAccumulator = 0;

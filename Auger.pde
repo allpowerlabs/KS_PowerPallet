@@ -66,12 +66,13 @@ void DoAuger() {
       }
       if (millis() - auger_reverse_entered > aug_rev_time){
         TransitionAuger(AUGER_FORWARD);
-        auger_rev_count = 0;
       }
       if (auger_rev_count > 20){  //catch oscillating auger from broken Fuel Switch
         Serial.println("# Auger Bound or broken Fuel Switch, stopping Auger");
         TransitionAuger(AUGER_ALARM);
-        TransitionEngine(ENGINE_SHUTDOWN);
+        if (engine_state == ENGINE_ON){
+          TransitionEngine(ENGINE_SHUTDOWN);
+        }
       }
       break;
     case AUGER_REVERSE_HIGH:

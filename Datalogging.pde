@@ -280,8 +280,8 @@ void LogReactor(boolean header=false) {
 
 void DoTests() { //space to log testing of variables.  Normally not logged
   Serial.print("# ");
-  Serial.print("pressureRatioAccumulator: ");
-  Serial.println(pressureRatioAccumulator);
+  Serial.print("filter_pratio_accumulator: ");
+  Serial.println(filter_pratio_accumulator);
 }
 
 void PrintColumn(String str) {

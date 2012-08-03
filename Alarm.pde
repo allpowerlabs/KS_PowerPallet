@@ -42,18 +42,18 @@ void DoAlarm() {
   else {
     removeAlarm(ALARM_AUGER_OFF_LONG);
   }
-  if (P_reactorLevel != OFF && pressureRatioAccumulator > 100) {
+  if (P_reactorLevel != OFF && pressureRatioAccumulator > 50) {
     setAlarm(ALARM_BAD_REACTOR);
   } 
   else {
     removeAlarm(ALARM_BAD_REACTOR);
   }
-  if (P_reactorLevel != OFF && filter_pratio_accumulator > 50) {
-    setAlarm(ALARM_BAD_FILTER);
-  } 
-  else {
-    removeAlarm(ALARM_BAD_FILTER);
-  }
+//  if (P_reactorLevel != OFF && filter_pratio_accumulator > 50) {
+//    setAlarm(ALARM_BAD_FILTER);
+//  } 
+//  else {
+//    removeAlarm(ALARM_BAD_FILTER);
+//  }
 #if T_LOW_FUEL != ABSENT
   if (P_reactorLevel != OFF && Temp_Data[T_LOW_FUEL] > 230) {
     setAlarm(ALARM_LOW_FUEL_REACTOR);
@@ -66,18 +66,25 @@ void DoAlarm() {
 //Engine On Alarms
   if (engine_state == ENGINE_ON && P_reactorLevel != OFF && T_tredLevel != HOT && T_tredLevel != EXCESSIVE) {
     setAlarm(ALARM_LOW_TRED);
+  } else { 
+    removeAlarm(ALARM_LOW_TRED);
   }
-  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && Temp_Data[T_BRED] == EXCESSIVE) {
+  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && T_bredLevel == EXCESSIVE) {
     setAlarm(ALARM_HIGH_BRED);
+  } else { 
+    removeAlarm(ALARM_HIGH_BRED);
   }
-#if ANA_OIL_PRESSURE != ABSENT
-  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && EngineOilPressureLevel == OIL_P_LOW && millis() - oil_pressure_state > 500  && millis() - engine_state_entered > 3000) {
-    setAlarm(ALARM_BAD_OIL_PRESSURE);
-  }
-#endif
+//Low Oil Pressure alarm set in Engine state machine due to quick transition times.
+//#if ANA_OIL_PRESSURE != ABSENT
+//  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && EngineOilPressureLevel == OIL_P_LOW && millis() - oil_pressure_state > 500  && millis() - engine_state_entered > 3000) {
+//    setAlarm(ALARM_BAD_OIL_PRESSURE);
+//  }  //No else statement because user needs to acknowledge and remove with a RESET button.
+//#endif
 #if LAMBDA_SIGNAL_CHECK == TRUE
   if (engine_state == ENGINE_ON && P_reactorLevel != OFF && lambda_input < 0.52) {
     setAlarm(ALARM_O2_NO_SIG);
+  } else { 
+    removeAlarm(ALARM_O2_NO_SIG);
   }
   if (engine_state == ENGINE_ON && P_reactorLevel != OFF && millis() - lambda_state_entered > 30000 && lambda_state_entered == LAMBDA_RESTART) {
     setAlarm(ALARM_O2_NO_SIG);
