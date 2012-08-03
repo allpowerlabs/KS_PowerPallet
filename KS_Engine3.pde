@@ -265,7 +265,7 @@ static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
 //int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} }; mA values
 //int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 1024} };  //actual sensor readings
 //int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, 120}, {120, 200}, {200, 1024} };
-int AugerCurrentLevelBoundary[4][2] = { { -140, 5}, { 10, current_low_boundary}, {current_low_boundary+5, current_high_boundary-5}, {current_high_boundary, 750} };  //.1A readings
+int AugerCurrentLevelBoundary[4][2] = { { -140, 5}, { 5, current_low_boundary}, {current_low_boundary+5, current_high_boundary-5}, {current_high_boundary, 750} };  //.1A readings
 
 //oil pressure
 int EngineOilPressureValue;
@@ -413,20 +413,18 @@ int clockPin = 52; //To SRCLK on Relay Board, Second Pin from Bottom on Left han
 
 
 // Alarm
-unsigned long auger_on_alarm_point = 240000;    //Configurable and saved to EEPROM??
-unsigned long auger_off_alarm_point = 600000;   //Configurable and saved to EEPROM??
 boolean alarm = false;
-
 int pressureRatioAccumulator = 0;
 
 #define ALARM_NUM 11
 unsigned long alarm_on[ALARM_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int shutdown[ALARM_NUM] = {120000, 0, 0, 0, 0, 0, 0, 0, 0, 120000, 0};  //Off time minus alarm time in milliseconds.
+unsigned long alarm_start[ALARM_NUM] = {240000, 480000, 50, 50, 230, 0, 0, 0, 30000, 60000, 10};  //time in milliseconds when alarm goes off
+unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 0, 0, 0, 180000, 0};  //time when engine will be shutdown
 int alarm_count = 0;
 int alarm_queue[ALARM_NUM] = {};
 int alarm_shown = 0;
 
-#define ALARM_AUGER_ON_LONG 0
+#define ALARM_AUGER_ON_LONG 0  
 #define ALARM_AUGER_OFF_LONG 1
 #define ALARM_BAD_REACTOR 2
 #define ALARM_BAD_FILTER 3
@@ -458,7 +456,7 @@ char* display_alarm2[ALARM_NUM] = {  //line 2 on display.  If shutdown[] is grea
   "Reactor Fuel Issue  ",
   "Check Filter        ",
   "Check Auger/Fuel    ",  //Not implemented!!
-  "Increase Fan or Load",
+  "Increase Load       ",
   "Low Fuel in Reactor?",
   "                    ",
   "                    ",

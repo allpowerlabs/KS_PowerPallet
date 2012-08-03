@@ -39,6 +39,9 @@ void DoDisplay() {
     if (millis() % 4000 > 2000 && (alarm_count > 0)) {
       alarm_shown = alarm_queue[cur_item-1];
       item_count = alarm_count;
+      if (cur_item>item_count) {  //if an alarm is removed while displaying start over at beginning
+        cur_item = 1;
+      } 
       //Row 0
       Disp_RC(0, 0);
       sprintf(buf, "      ALARM   %2i/%2i ", cur_item, alarm_count);
@@ -51,23 +54,15 @@ void DoDisplay() {
       Disp_PutStr(display_alarm2[alarm_shown]);
       if (shutdown[alarm_shown] > 0 && engine_state == ENGINE_ON){      
         Disp_RC(2, 13);
-        sprintf(buf, "OFF:%3i", (shutdown[alarm_shown] - (millis() - alarm_on[alarm_shown]))/1000);
+        sprintf(buf, "OFF:%3i", (shutdown[alarm_shown] - alarm_start[alarm_shown] - (millis() - alarm_on[alarm_shown]))/1000);
         Disp_PutStr(buf);
       }
       //Row 3
       Disp_RC(3, 0);
       Disp_PutStr("NEXT ADV QUIET      ");
-      if (key == 2) {
-        alarm = false;
-      }
-      if (millis() - alarm_on[alarm_shown] > 3000){
+      if (millis() - alarm_on[alarm_shown] > 4000){ //Wait to show RESET button in case new alarm state has taken over screen.
         Disp_RC(3, 15);
         Disp_PutStr("RESET");
-        if (key == 3) {
-          removeAlarm(alarm_shown);
-          resetAlarm(alarm_shown);
-          cur_item = 1; //start at beginning of alarm queue
-        }
       }
     } else {
       //Row 0
@@ -102,7 +97,7 @@ void DoDisplay() {
       Disp_RC(2,0);
       if (P_reactorLevel != OFF) {
         //the value only means anything if the pressures are high enough, otherwise it is just noise
-        sprintf(buf, "Pratio %3i  ", int(pRatioReactor*100)); //pressure ratio
+        sprintf(buf, "Pratio%3i ", int(pRatioReactor*100)); //pressure ratio
         Disp_PutStr(buf);
       } else {
         Disp_PutStr("Pratio --  ");
@@ -160,6 +155,18 @@ void DoDisplay() {
       //}
       Disp_PutStr(buf);
     } 
+    if (alarm_count > 0){ //keypresses for alarms only
+      if (key == 2) {
+        alarm = false;
+      }
+      if (millis() - alarm_on[alarm_shown] > 4000){ //wait until RESET button shows up, a wait of 4 seconds is given so that 
+       if (key == 3) {
+          removeAlarm(alarm_shown);
+          resetAlarm(alarm_shown);
+          cur_item = 1; //start at beginning of alarm queue
+        }
+      }
+    }
     break;
   case DISPLAY_ENGINE:
     Disp_CursOff();
@@ -711,8 +718,7 @@ void saveConfig(int item, int state){  //EEPROM:  0-499 for internal states, 500
   int old_state = EEPROM.read(499+item);
   if(state != old_state){
     EEPROM.write(499+item, state);
-    //data_buffer = "Saving "+ String(state) +" to"+ String(499+item)+" old_state:"+ old_state;
-    //Serial.println(data_buffer);
+    delay(5); //ensure that value is not read until EERPROM has been fully written (~3.3ms)
   }
 }
 
@@ -723,8 +729,6 @@ int getConfig(int item){
     value = defaults[item-1];
     EEPROM.write(499+item, value);
   }
-  //data_buffer = "Getting "+ String(499+item) +",value: "+ String(value);
-  //Serial.println(data_buffer);
   config_changed = true;
   return value;
 }
@@ -744,19 +748,19 @@ void update_config_var(int var_num){
       //Serial.println("Updating aug_rev_time");
       break;
     case 5:
-     current_low_boundary = getConfig(4); 
-     //{ { -140, 0}, { 0, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 750} };
-     AugerCurrentLevelBoundary[CURRENT_LOW][1] = current_low_boundary; 
-     AugerCurrentLevelBoundary[CURRENT_ON][0] = current_low_boundary;
-     //Serial.print("Updating current_low_boundary: "); 
-     //Serial.println(current_low_boundary); 
-     break;
+      current_low_boundary = getConfig(4); 
+      //{ { -140, 0}, { 0, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 750} };
+      AugerCurrentLevelBoundary[CURRENT_LOW][1] = current_low_boundary; 
+      AugerCurrentLevelBoundary[CURRENT_ON][0] = current_low_boundary;
+      Serial.print("Updating current_low_boundary: "); 
+      Serial.println(current_low_boundary); 
+      break;
     case 6:
       current_high_boundary = getConfig(5);
       AugerCurrentLevelBoundary[CURRENT_ON][1] = current_high_boundary; 
       AugerCurrentLevelBoundary[CURRENT_HIGH][0] = current_high_boundary;
-      //Serial.print("Updating current_high_boundary: ");
-      //Serial.println(current_high_boundary);
+      Serial.print("Updating current_high_boundary: ");
+      Serial.println(current_high_boundary);
       break;
     case 7:
       low_oil_psi = getConfig(6);

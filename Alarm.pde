@@ -11,7 +11,7 @@ void DoAlarmUpdate() {
 }
 
 void DoAlarm() {
-  if (auger_rev_count > 10){
+  if (auger_rev_count > alarm_start[ALARM_BOUND_AUGER]){
     setAlarm(ALARM_BOUND_AUGER);
   } 
   else {
@@ -19,7 +19,7 @@ void DoAlarm() {
       removeAlarm(ALARM_BOUND_AUGER);
     }
   }
-  if (auger_state == AUGER_CURRENT_LOW and (millis() - auger_state_entered > 60000)){
+  if (auger_state == AUGER_CURRENT_LOW and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_LOW_CURRENT])){
     setAlarm(ALARM_AUGER_LOW_CURRENT);
   } 
   else {
@@ -27,7 +27,7 @@ void DoAlarm() {
       removeAlarm(ALARM_AUGER_LOW_CURRENT);
     }
   }
-  if (auger_state == AUGER_FORWARD and (millis() - auger_state_entered > auger_on_alarm_point)){
+  if (auger_state == AUGER_FORWARD and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_ON_LONG])){
     setAlarm(ALARM_AUGER_ON_LONG);
   } 
   else {
@@ -36,26 +36,26 @@ void DoAlarm() {
     }
   }
 //Reactor On Alarms:  
-  if (P_reactorLevel != OFF && auger_state == AUGER_OFF and (millis() - auger_state_entered > auger_off_alarm_point)){
+  if (P_reactorLevel != OFF && auger_state == AUGER_OFF and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_OFF_LONG])){
     setAlarm(ALARM_AUGER_OFF_LONG);
   }  
   else {
     removeAlarm(ALARM_AUGER_OFF_LONG);
   }
-  if (P_reactorLevel != OFF && pressureRatioAccumulator > 50) {
+  if (P_reactorLevel != OFF && pressureRatioAccumulator > alarm_start[ALARM_BAD_REACTOR]) {
     setAlarm(ALARM_BAD_REACTOR);
   } 
   else {
     removeAlarm(ALARM_BAD_REACTOR);
   }
-//  if (P_reactorLevel != OFF && filter_pratio_accumulator > 50) {
+//  if (P_reactorLevel != OFF && filter_pratio_accumulator > alarm_start[ALARM_BAD_FILTER]) {
 //    setAlarm(ALARM_BAD_FILTER);
 //  } 
 //  else {
 //    removeAlarm(ALARM_BAD_FILTER);
 //  }
 #if T_LOW_FUEL != ABSENT
-  if (P_reactorLevel != OFF && Temp_Data[T_LOW_FUEL] > 230) {
+  if (P_reactorLevel != OFF && Temp_Data[T_LOW_FUEL] > alarm_start[ALARM_LOW_FUEL_REACTOR]) {
     setAlarm(ALARM_LOW_FUEL_REACTOR);
   } 
   else {
@@ -86,7 +86,7 @@ void DoAlarm() {
   } else { 
     removeAlarm(ALARM_O2_NO_SIG);
   }
-  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && millis() - lambda_state_entered > 30000 && lambda_state_entered == LAMBDA_RESTART) {
+  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && millis() - lambda_state_entered > alarm_start[ALARM_O2_NO_SIG] && lambda_state_entered == LAMBDA_RESTART) {
     setAlarm(ALARM_O2_NO_SIG);
   }
 #endif

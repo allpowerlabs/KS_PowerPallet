@@ -12,6 +12,9 @@ void DoAuger() {
       if (P_reactorLevel == OFF) {
         auger_state_entered = millis(); //reset to zero if no vacuum and auger off
       }
+      if (auger_state_entered > shutdown[ALARM_AUGER_OFF_LONG] && engine_state == ENGINE_ON){
+        TransitionEngine(ENGINE_SHUTDOWN);
+      } 
       break;
     case AUGER_CURRENT_LOW:
       if (FuelDemand == SWITCH_OFF) {
@@ -20,7 +23,7 @@ void DoAuger() {
       if (AugerCurrentLevel != CURRENT_LOW && AugerCurrentLevel != CURRENT_OFF){ //switch forward instead?
         TransitionAuger(AUGER_FORWARD);
       } 
-      if ((millis() - auger_state_entered) > 180000){  //turn engine and auger off if auger current low for 3 minutes
+      if ((millis() - auger_state_entered) > shutdown[ALARM_AUGER_LOW_CURRENT]){  //turn engine and auger off if auger current low for 3 minutes
         TransitionAuger(AUGER_ALARM);
         if (engine_state == ENGINE_ON){
           TransitionEngine(ENGINE_SHUTDOWN);
@@ -39,10 +42,10 @@ void DoAuger() {
       if (AugerCurrentLevel == CURRENT_HIGH  && millis() - auger_state_entered > 500){
         TransitionAuger(AUGER_HIGH);
       } 
-      if (AugerCurrentLevel == CURRENT_LOW){
+      if (AugerCurrentLevel == CURRENT_LOW or AugerCurrentLevel == CURRENT_OFF){
         TransitionAuger(AUGER_CURRENT_LOW);
       } 
-      if ((millis() - auger_state_entered) > 360000){  //turn engine and auger off if auger runs none stop for 6 minutes.  Account for current changes??
+      if ((millis() - auger_state_entered) > shutdown[ALARM_AUGER_ON_LONG]){  //turn engine and auger off if auger runs none stop for too long
         TransitionAuger(AUGER_ALARM);
         if (engine_state == ENGINE_ON){
           TransitionEngine(ENGINE_SHUTDOWN);
