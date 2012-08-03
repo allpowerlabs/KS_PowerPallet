@@ -260,11 +260,9 @@ unsigned long auger_reverse_entered;
 
 //Auger Current Levels
 int AugerCurrentValue = 0; // current level in .1A,  ADC Count = (120 * Current) + 1350
-enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;  //Add AUGER_LOW for low current level when auger is free spinning
+enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;  
 static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
-//int AugerCurrentLevelBoundary[3][2] = { { 0, 1200}, {1200, 5000}, {5000,20000} }; mA values
-//int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 1024} };  //actual sensor readings
-//int AugerCurrentLevelBoundary[4][2] = { { 0, 125}, { 125, 120}, {120, 200}, {200, 1024} };
+//Any changes to the following needs to be updated to update_config_var!!!
 int AugerCurrentLevelBoundary[4][2] = { { -140, 5}, { 5, current_low_boundary}, {current_low_boundary+5, current_high_boundary-5}, {current_high_boundary, 750} };  //.1A readings
 
 //oil pressure
