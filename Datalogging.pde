@@ -280,14 +280,14 @@ void LogReactor(boolean header=false) {
 
 void DoTests() { //space to log testing of variables.  Normally not logged
   Serial.print("#");
-  Serial.print("current: ");
-  Serial.print(AugerCurrentValue);
-  Serial.print("Auger Current Level: ");
-  Serial.print(AugerCurrentLevelName[AugerCurrentLevel]);
-  Serial.print(" current_low_boundary: "); 
-  Serial.println(current_low_boundary); 
-  Serial.print(" current_high_boundary: ");
-  Serial.println(current_high_boundary);
+//  Serial.print("current: ");
+//  Serial.print(AugerCurrentValue);
+//  Serial.print(" Auger Current Level: ");
+//  Serial.print(AugerCurrentLevel[AugerCurrentLevelName]);
+//  Serial.print(" current_low_boundary: "); 
+//  Serial.println(current_low_boundary); 
+//  Serial.print(" current_high_boundary: ");
+//  Serial.println(current_high_boundary);
   
 }
 
@@ -342,7 +342,7 @@ void DoDatalogging() {
 //  if (save_to_sd = 0) {
 //    DoDatalogSD(data_buffer);
 //  }
-  DoTests();
+//  DoTests();
   lineCount++;
 }
 
