@@ -50,6 +50,7 @@ void DoEngine() {
       if (millis() - engine_state_entered > 500){  
         TransitionEngine(ENGINE_SHUTDOWN);
       }
+      break;
   }
 }
 
