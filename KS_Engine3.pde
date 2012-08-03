@@ -180,7 +180,7 @@ int config_var;
 byte config_changed = false;
 static char *Configuration[] = { "Engine Type    ", "Relay Board    ", "Auger Rev (.1s)", "Auger Low (.1A)", "Auger High(.1A)", "Low Oil (PSI)  "};  //15 character Display prompt
 static char *Config_Choices[] = {"10k 20k ","NO  YES ",  "+    -  ", "+    -  ", "+    -  ", "+    -  "}; //8 char options for last two buttons
-int defaults[] = {0, 1, 30, 20, 100, 10};  //default values to be saved to EEPROM for the following getConfig variables
+int defaults[] = {0, 1, 30, 35, 100, 10};  //default values to be saved to EEPROM for the following getConfig variables
 int config_min[] = {0, 0, 0, 0, 5, 41, 1};  //minimum values allowed 
 int config_max[] = {254, 254, 254, 40, 135, 10}; //maximum values allowed  
 
@@ -273,8 +273,7 @@ unsigned long oil_pressure_state = 0;
 
 // Loop variables - 0 is longest, 3 is most frequent, place code at different levels in loop() to execute more or less frequently
 //TO DO: move loops to hardware timer and interrupt based control, figure out interrupt prioritization
-int loopPeriod0 = 5000;
-unsigned long nextTime0;
+
 int loopPeriod1 = 1000;
 unsigned long nextTime1;
 int loopPeriod2 = 100;
@@ -500,7 +499,6 @@ void setup() {
   //delay(50);	
   
   // timer initialization
-  nextTime0 = millis() + loopPeriod0;
   nextTime1 = millis() + loopPeriod1;
   nextTime2 = millis() + loopPeriod2;
   nextTime3 = millis() + loopPeriod3;
@@ -588,10 +586,7 @@ void loop() {
           DoDatalogging();
   //      DoDatalogSD();
           DoAlarmUpdate();
-          if (millis() >= nextTime0) {
-            nextTime0 += loopPeriod0;
-            DoAlarm();
-          }
+          DoAlarm();
         }
       }
     }
