@@ -265,7 +265,19 @@ void LogBatteryVoltage(boolean header=false) {
       PrintColumn(battery_voltage);
     }
 }
-
+void LogOilPressure(boolean header=false){
+  if (header){
+    PrintColumn("OilPressureLevel");
+    if (engine_type == 1){ //20k
+      PrintColumn("OilPressurePSI");
+    } else {
+      PrintColumn("OilPressureValue");
+    }
+  } else {
+      PrintColumn(EngineOilPressureLevel[EngineOilPressureName]);
+      PrintColumn(EngineOilPressureValue);
+    }
+}
 void LogReactor(boolean header=false) {
     if (header) {
       PrintColumn("P_reactorLevel");

@@ -268,6 +268,7 @@ int AugerCurrentLevelBoundary[4][2] = { { -140, 5}, { 5, current_low_boundary}, 
 //oil pressure
 int EngineOilPressureValue;
 enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_NORMAL = 1, OIL_P_HIGH = 2} EngineOilPressureLevel;  
+static char *EngineOilPressureName[] = { "Low", "Normal", "High"};
 //int EngineOilPressureLevelBoundary[2][2] = { { 0, low_oil_psi}, {600, 1024} };  
 unsigned long oil_pressure_state = 0;
 
