@@ -344,6 +344,7 @@ void DoDatalogging() {
   LogEngine(header);
   //LogEnergy(header);
   LogAuger(header);
+  LogOilPressure(header);
   //LogFlows(header);
   //LogHertz(header);
   //LogCounterHertz(header);
