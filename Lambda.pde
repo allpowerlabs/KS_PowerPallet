@@ -228,14 +228,3 @@ void LoadLambda() {
 }
 
 
-void smoothAnalog(int data,  int filterval){  //data is the analog channel,  filterval is the number of past datavalues to average over.
-  int ana_signal = analogRead(data);
-  float smoothed_value = smoothed[data];
-  if (ana_signal > smoothed_value){
-        smoothed_value = smoothed_value + (ana_signal - smoothed_value)/float(filterval);
-  } else {
-        smoothed_value = smoothed_value - (smoothed_value - ana_signal)/float(filterval);
-  }
-  smoothed[data] = int(smoothed_value);
-}
-

@@ -36,8 +36,8 @@
 #define ANA_DIAL ABSENT
 #define ANA_BATT_V ABSENT
 
-int smoothed[7];  //array of smoothed analog signals.
-int smoothed_filters[7] = {0, 0, 0, 0, 0, 0, 0};  //filter values for each analog channel
+int smoothed[8];  //array of smoothed analog signals.
+int smoothed_filters[8] = {0, 0, 0, 8, 0, 0, 0, 0};  //filter values for each analog channel
 
 // FET Mappings
 #define FET_AUGER FET0
@@ -183,7 +183,7 @@ int config_var;
 byte config_changed = false;
 static char *Configuration[] = { "Engine Type    ", "Relay Board    ", "Auger Rev (.1s)", "Auger Low (.1A)", "Auger High(.1A)", "Low Oil (PSI)  "};  //15 character Display prompt
 static char *Config_Choices[] = {"10k 20k ","NO  YES ",  "+    -  ", "+    -  ", "+    -  ", "+    -  "}; //8 char options for last two buttons
-int defaults[] = {0, 1, 30, 35, 100, 10};  //default values to be saved to EEPROM for the following getConfig variables
+int defaults[] = {0, 1, 30, 35, 100, 6};  //default values to be saved to EEPROM for the following getConfig variables
 int config_min[] = {0, 0, 0, 0, 5, 41, 1};  //minimum values allowed 
 int config_max[] = {254, 254, 254, 40, 135, 10}; //maximum values allowed  
 
@@ -274,8 +274,7 @@ enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_NORMAL = 1, OIL_P_HIGH = 2} 
 static char *EngineOilPressureName[] = { "Low", "Normal", "High"};
 //int EngineOilPressureLevelBoundary[2][2] = { { 0, low_oil_psi}, {600, 1024} };  
 unsigned long oil_pressure_state = 0;
-int smoothed_psi = 0;
-float smoothed_psi_f = 0;
+
 
 // Loop variables - 0 is longest, 3 is most frequent, place code at different levels in loop() to execute more or less frequently
 //TO DO: move loops to hardware timer and interrupt based control, figure out interrupt prioritization

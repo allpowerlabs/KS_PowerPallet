@@ -92,7 +92,7 @@ void TransitionEngine(int new_state) {
 void DoOilPressure() {
   if (engine_type == 1){  //20k has analog oil pressure reader
     //EngineOilPressureValue = getPSI(analogRead(ANA_OIL_PRESSURE)); 
-    smoothAnalog(ANA_OIL_PRESSURE, 4);
+    smoothAnalog(ANA_OIL_PRESSURE);
     EngineOilPressureValue = getPSI(smoothed[ANA_OIL_PRESSURE]); 
     if (EngineOilPressureValue <= low_oil_psi && EngineOilPressureLevel != OIL_P_LOW){
       EngineOilPressureLevel = OIL_P_LOW;
