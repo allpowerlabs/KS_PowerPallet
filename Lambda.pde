@@ -89,7 +89,7 @@ void DoLambda() {
           }
           TransitionLambda(LAMBDA_SEALED);
         }
-        if (lambda_input > 0.52 && lambda_state_entered > 1000) {
+        if (lambda_input > 0.52 && millis() - lambda_state_entered > 1000) {
           if (engine_state == ENGINE_ON){
             TransitionLambda(LAMBDA_CLOSEDLOOP);
           }  else {
