@@ -27,14 +27,14 @@ void DoControlInputs() {
 }
 
 void smoothAnalog(int channel){  //channel is the analog channel,  filterval is the number of past channelvalues to average over.
-  int ana_signal = analogRead(channel);
+  float ana_signal = analogRead(channel);
   float smoothed_value = smoothed[channel];
-  int filterval = smoothed_filters[channel];
+  float filterval = smoothed_filters[channel];
   if (filterval > 0){
     if (ana_signal > smoothed_value){
-          smoothed_value = smoothed_value + (ana_signal - smoothed_value)/float(filterval);
+          smoothed_value = smoothed_value + (ana_signal - smoothed_value)/filterval;
     } else {
-          smoothed_value = smoothed_value - (smoothed_value - ana_signal)/float(filterval);
+          smoothed_value = smoothed_value - (smoothed_value - ana_signal)/filterval;
     }
   } else {
     smoothed_value = ana_signal;
