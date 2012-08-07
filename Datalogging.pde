@@ -295,9 +295,9 @@ void DoTests() { //space to log testing of variables.  Normally not logged
   //smooth(int data, int smoothed, int filterval)
 
   Serial.print("Smoothed Signal: ");
-  Serial.print(smoothed[ANA_OIL_PRESSURE]);
+  Serial.print(smoothed[getAnaArray(ANA_OIL_PRESSURE)]);
   Serial.print(" Smoothed PSI: ");
-  Serial.println(getPSI(smoothed[ANA_OIL_PRESSURE])); 
+  Serial.println(getPSI(smoothed[getAnaArray(ANA_OIL_PRESSURE)])); 
 }
 
 void PrintColumn(String str) {
