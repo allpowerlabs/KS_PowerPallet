@@ -36,8 +36,8 @@ void DoDisplay() {
     break;
   case DISPLAY_REACTOR:
     Disp_CursOff();
+    alarm_shown = alarm_queue[cur_item - 1];
     if (millis() % 4000 > 2000 && (alarm_count > 0)) {
-      alarm_shown = alarm_queue[cur_item-1];
       item_count = alarm_count;
       if (cur_item>item_count) {  //if an alarm is removed while displaying start over at beginning
         cur_item = 1;
@@ -76,11 +76,12 @@ void DoDisplay() {
         } else {
           sprintf(buf, "Ttred%s", T_tredLevel[TempLevelName]);
         }
+        Disp_PutStr(buf);
+        Disp_RC(0, 11);
+        sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
+        Disp_PutStr(buf);
       }
-      Disp_PutStr(buf);
-      Disp_RC(0, 11);
-      sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
-      Disp_PutStr(buf);
+
       //Row 1
       Disp_RC(1, 0);
       if (disp_alt) {
@@ -138,8 +139,12 @@ void DoDisplay() {
       case AUGER_CURRENT_LOW:
         sprintf(buf, "AugLow%3i  ", (millis() - auger_state_entered)/1000);
         break;
+      case AUGER_REVERSE_HIGH:
+        sprintf(buf, "AugRHi%3i  ", (millis() - auger_state_entered)/1000); 
+        break;
       case AUGER_ALARM:
         sprintf(buf, "AugALRM%3i ", (millis() - auger_state_entered)/1000);
+        break;
       default:
         sprintf(buf, "Aug   %3i  ", (millis() - auger_state_entered)/1000);
         break;
@@ -752,15 +757,15 @@ void update_config_var(int var_num){
       //{ { -140, 5}, { 5, current_low_boundary}, {current_low_boundary+5, current_high_boundary-5}, {current_high_boundary, 750} }
       AugerCurrentLevelBoundary[CURRENT_LOW][1] = current_low_boundary; 
       AugerCurrentLevelBoundary[CURRENT_ON][0] = current_low_boundary+5;
-      Serial.print("Updating current_low_boundary: "); 
-      Serial.println(current_low_boundary); 
+      //Serial.print("#Updating current_low_boundary: "); 
+      //Serial.println(current_low_boundary); 
       break;
     case 6:
       current_high_boundary = getConfig(5);
       AugerCurrentLevelBoundary[CURRENT_ON][1] = current_high_boundary - 5; 
       AugerCurrentLevelBoundary[CURRENT_HIGH][0] = current_high_boundary;
-      Serial.print("Updating current_high_boundary: ");
-      Serial.println(current_high_boundary);
+      //Serial.print("# Updating current_high_boundary: ");
+      //Serial.println(current_high_boundary);
       break;
     case 7:
       low_oil_psi = getConfig(6);

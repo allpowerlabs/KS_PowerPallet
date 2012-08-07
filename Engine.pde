@@ -17,7 +17,7 @@ void DoEngine() {
         setAlarm(ALARM_BAD_OIL_PRESSURE);
         TransitionEngine(ENGINE_SHUTDOWN);
       }
-      if (P_reactorLevel == OFF & millis()-engine_state_entered > 10000) { //if reactor is at low vacuum after ten seconds, engine did not catch, so turn off
+      if (P_reactorLevel == OFF & millis()-engine_state_entered > 2500) { //if reactor is at low vacuum after ten seconds, engine did not catch, so turn off
         TransitionEngine(ENGINE_SHUTDOWN);
       }
       break;
@@ -91,7 +91,9 @@ void TransitionEngine(int new_state) {
 
 void DoOilPressure() {
   if (engine_type == 1){  //20k has analog oil pressure reader
-    EngineOilPressureValue = getPSI(analogRead(ANA_OIL_PRESSURE));  
+    //EngineOilPressureValue = getPSI(analogRead(ANA_OIL_PRESSURE)); 
+    smoothAnalog(ANA_OIL_PRESSURE, 4);
+    EngineOilPressureValue = getPSI(smoothed[ANA_OIL_PRESSURE]); 
     if (EngineOilPressureValue <= low_oil_psi && EngineOilPressureLevel != OIL_P_LOW){
       EngineOilPressureLevel = OIL_P_LOW;
       oil_pressure_state = millis();

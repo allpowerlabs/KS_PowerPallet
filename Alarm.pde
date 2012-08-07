@@ -111,7 +111,7 @@ void setAlarm(int alarm_num){
 
 void removeAlarm(int alarm_num){
   if (alarm_on[alarm_num] > 0) {
-    Serial.print("#Removing: ");
+    Serial.print("# Removing: ");
     Serial.println(display_alarm[alarm_num]);
     alarm_on[alarm_num] = 0;
     setAlarmQueue();
@@ -132,7 +132,7 @@ void setAlarmQueue(){
 }
 
 void resetAlarm(int alarm_num){
-  Serial.println("Alarm Reset by User");
+  Serial.println("# Alarm Reset by User");
   switch (alarm_num) {  //reset faults that kicked off alarm state.  Seperate function only for user intervention??
   case ALARM_AUGER_ON_LONG:
     TransitionAuger(AUGER_OFF);

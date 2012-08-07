@@ -36,6 +36,9 @@
 #define ANA_DIAL ABSENT
 #define ANA_BATT_V ABSENT
 
+int smoothed[7];  //array of smoothed analog signals.
+int smoothed_filters[7] = {0, 0, 0, 0, 0, 0, 0};  //filter values for each analog channel
+
 // FET Mappings
 #define FET_AUGER FET0
 #define FET_GRATE FET1
@@ -271,6 +274,8 @@ enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_NORMAL = 1, OIL_P_HIGH = 2} 
 static char *EngineOilPressureName[] = { "Low", "Normal", "High"};
 //int EngineOilPressureLevelBoundary[2][2] = { { 0, low_oil_psi}, {600, 1024} };  
 unsigned long oil_pressure_state = 0;
+int smoothed_psi = 0;
+float smoothed_psi_f = 0;
 
 // Loop variables - 0 is longest, 3 is most frequent, place code at different levels in loop() to execute more or less frequently
 //TO DO: move loops to hardware timer and interrupt based control, figure out interrupt prioritization

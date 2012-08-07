@@ -13,7 +13,7 @@ void DoLambda() {
         } else {
           lambda_PID.SetTunings(lambda_P[0], lambda_I[0], lambda_D[0]);
         }
-        //smoothedLambda = smooth(lambda_input, smooth_filter_Lambda, smoothedLambda);   //Only set this value when in closedloop to keep bad O2 readings out
+        //smooth(lambda_input, smooth_filter_Lambda, smoothedLambda);   //Only set this value when in closedloop to keep bad O2 readings out
         lambda_PID.Compute();
         SetPremixServoAngle(lambda_output);
         if (engine_state == ENGINE_OFF) {
@@ -227,13 +227,15 @@ void LoadLambda() {
   lambda_setpoint_mode[0] = val;
 }
 
-//int smooth(int data, float filterVal, float smoothedVal){
-//  if (filterVal > 1){      // check to make sure param's are within range
-//    filterVal = .99;
-//  }
-//  else if (filterVal <= 0){
-//    filterVal = 0;
-//  }
-//  smoothedVal = (data * (1 - filterVal)) + (smoothedVal  *  filterVal);
-//  return (int)smoothedVal;
-// }
+
+void smoothAnalog(int data,  int filterval){  //data is the analog channel,  filterval is the number of past datavalues to average over.
+  int ana_signal = analogRead(data);
+  float smoothed_value = smoothed[data];
+  if (ana_signal > smoothed_value){
+        smoothed_value = smoothed_value + (ana_signal - smoothed_value)/float(filterval);
+  } else {
+        smoothed_value = smoothed_value - (smoothed_value - ana_signal)/float(filterval);
+  }
+  smoothed[data] = int(smoothed_value);
+}
+
