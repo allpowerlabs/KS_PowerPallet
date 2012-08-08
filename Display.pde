@@ -44,7 +44,11 @@ void DoDisplay() {
       } 
       //Row 0
       Disp_RC(0, 0);
-      sprintf(buf, "      ALARM   %2i/%2i ", cur_item, alarm_count);
+      if (shutdown[alarm_shown]> 0){
+        sprintf(buf, "SHUTDOWN ALARM %2i/%2i", cur_item, alarm_count); 
+      } else {
+        sprintf(buf, "      ALARM   %2i/%2i ", cur_item, alarm_count); 
+      }
       Disp_PutStr(buf);
       //Row 1
       Disp_RC(1, 0);
@@ -758,7 +762,7 @@ void update_config_var(int var_num){
       break;
     case 5:
       current_low_boundary = getConfig(4); 
-      //{ { -140, 5}, { 5, current_low_boundary}, {current_low_boundary+5, current_high_boundary-5}, {current_high_boundary, 750} }
+      //{ { -140, 10}, {10, current_low_boundary}, {current_low_boundary+5, current_high_boundary-5}, {current_high_boundary, 750} }
       AugerCurrentLevelBoundary[CURRENT_LOW][1] = current_low_boundary; 
       AugerCurrentLevelBoundary[CURRENT_ON][0] = current_low_boundary+5;
       //Serial.print("#Updating current_low_boundary: "); 

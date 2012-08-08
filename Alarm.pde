@@ -86,7 +86,9 @@ void DoAlarm() {
   if (engine_state == ENGINE_ON && P_reactorLevel != OFF && lambda_input < 0.52) {
     setAlarm(ALARM_O2_NO_SIG);
   } else { 
-    removeAlarm(ALARM_O2_NO_SIG);
+    if (engine_state == ENGINE_ON && lambda_input > 0.52){
+      removeAlarm(ALARM_O2_NO_SIG);
+    }
   }
   if (engine_state == ENGINE_ON && P_reactorLevel != OFF && millis() - lambda_state_entered > alarm_start[ALARM_O2_NO_SIG] && lambda_state_entered == LAMBDA_RESTART) {
     setAlarm(ALARM_O2_NO_SIG);

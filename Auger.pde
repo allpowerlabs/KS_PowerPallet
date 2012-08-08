@@ -104,6 +104,13 @@ void DoAuger() {
       } else {
         TransitionAuger(AUGER_OFF);
       }
+    }
+    if (AugerCurrentLevel == CURRENT_HIGH){
+      if (auger_pulse_state == 1){  //if in reverse...try going forward
+        TransitionAuger(AUGER_PULSE);
+      } else {
+      TransitionAuger(AUGER_OFF);
+      }
     }  
     break;
   }
