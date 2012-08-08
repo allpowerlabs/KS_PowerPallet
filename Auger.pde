@@ -17,7 +17,7 @@ void DoAuger() {
       Serial.println("# Auger off too long, Engine Shutdown.");
       TransitionEngine(ENGINE_SHUTDOWN);
     } 
-    if (millis() - auger_state_entered > 240000 and auger_pulse_state == 0){
+    if (millis() - auger_state_entered > 60000 and auger_pulse_state == 0){
       Serial.println("# Pulsing Auger");
       TransitionAuger(AUGER_PULSE);
     } 
@@ -99,7 +99,7 @@ void DoAuger() {
     break; 
   case AUGER_PULSE:
     if (millis() - auger_pulse_entered > auger_pulse_time){
-      if (auger_pulse_state = 1){
+      if (auger_pulse_state == 1){
         TransitionAuger(AUGER_PULSE);
       } else {
         TransitionAuger(AUGER_OFF);

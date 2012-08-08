@@ -98,7 +98,7 @@ void DoDisplay() {
       Disp_RC(2,0);
       if (P_reactorLevel != OFF) {
         //the value only means anything if the pressures are high enough, otherwise it is just noise
-        sprintf(buf, "Pratio%3i ", int(pRatioReactor*100)); //pressure ratio
+        sprintf(buf, "Pratio%3i  ", int(pRatioReactor*100)); //pressure ratio
         Disp_PutStr(buf);
       } else {
         Disp_PutStr("Pratio --  ");
