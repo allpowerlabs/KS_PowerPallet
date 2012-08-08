@@ -254,12 +254,17 @@ static char *FuelSwitchLevelName[] = { "Off","On"};
 #define AUGER_REVERSE_HIGH 5
 #define AUGER_CURRENT_LOW 6
 #define AUGER_ALARM 7
+#define AUGER_PULSE 8
+#define AUGER_PULSE_FORWORD 9
 
 int auger_state = 0;
 int auger_rev_count = 0;
 unsigned long auger_current_low = 0;
 unsigned long auger_state_entered;
 unsigned long auger_reverse_entered;
+unsigned long auger_pulse_entered;
+unsigned long auger_pulse_time = 1000;
+int auger_pulse_state = 0;
 
 //Auger Current Levels
 int AugerCurrentValue = 0; // current level in .1A,  ADC Count = (120 * Current) + 1350
@@ -549,7 +554,8 @@ void setup() {
 //  InitSD();
   
   TransitionEngine(ENGINE_ON); //default to engine on. if PCU resets, don't shut a running engine off. in the ENGINE_ON state, should detect and transition out of engine on.
-  TransitionLambda(LAMBDA_RESTART);
+  //TransitionLambda(LAMBDA_RESTART);
+  TransitionLambda(LAMBDA_NO_SIGNAL);
   TransitionAuger(AUGER_OFF);
   TransitionDisplay(DISPLAY_SPLASH);
 }

@@ -282,10 +282,12 @@ void DoDisplay() {
     case 3: //Lambda P
       if (key == 2) {
         P += 0.01;
+        lambda_P[0] = P;
         WriteLambda();
       }
       if (key == 3) {
         P -= 0.01;
+        lambda_P[0] = P;
         WriteLambda();
       }
       lambda_PID.SetTunings(P,I,0);
@@ -297,10 +299,12 @@ void DoDisplay() {
     case 4: //Lambda I
       if (key == 2) {
         I += 0.1;
+        lambda_I[0] = I;
         WriteLambda();
       }
       if (key == 3) {
         I -= 0.1;
+        lambda_I[0] = I;
         WriteLambda();
       }
       lambda_PID.SetTunings(P,I,0);

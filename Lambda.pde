@@ -8,12 +8,14 @@ void DoLambda() {
     switch(lambda_state) {
       case LAMBDA_CLOSEDLOOP:
         //don't reset changed PID values
-        if (lambda_input < lambda_setpoint - 0.1) {
-          lambda_PID.SetTunings(lambda_P[0]*2, lambda_I[0], lambda_D[0]);
-        } else {
-          lambda_PID.SetTunings(lambda_P[0], lambda_I[0], lambda_D[0]);
-        }
-        //smooth(lambda_input, smooth_filter_Lambda, smoothedLambda);   //Only set this value when in closedloop to keep bad O2 readings out
+//        if (display_state != DISPLAY_LAMBDA) {
+//          if (lambda_input < lambda_setpoint - 0.1) {
+//            lambda_PID.SetTunings(lambda_P[0]*1.5, lambda_I[0], lambda_D[0]);
+//          } else {
+//            lambda_PID.SetTunings(lambda_P[0], lambda_I[0], lambda_D[0]);
+//          }
+//        }
+        lambda_PID.SetTunings(lambda_P[0], lambda_I[0], lambda_D[0]);
         lambda_PID.Compute();
         SetPremixServoAngle(lambda_output);
         if (engine_state == ENGINE_OFF) {
@@ -69,7 +71,7 @@ void DoLambda() {
         SetPremixServoAngle(lambda_output);
         break;
       case LAMBDA_NO_SIGNAL:
-        if (millis() - lambda_state_entered > 250) {
+        if (millis() - lambda_state_entered > 1000) {
           TransitionLambda(LAMBDA_RESET);
         }
         if (lambda_input > 0.52) {
@@ -83,8 +85,8 @@ void DoLambda() {
         break;
       case LAMBDA_RESTART:
         if (millis() - lambda_state_entered > 60000) {
-          Serial.println("# No O2 Signal, Shutting down Engine");
           if (engine_state == ENGINE_ON){
+            Serial.println("# No O2 Signal, Shutting down Engine");
             TransitionEngine(ENGINE_SHUTDOWN);
           }
           TransitionLambda(LAMBDA_SEALED);
@@ -146,7 +148,7 @@ void TransitionLambda(int new_state) {
     case LAMBDA_STEPTEST:
       lambda_state_name = "Step Test";
       lambda_PID.SetMode(AUTO);
-      lambda_output = (random(2,4)/10.0)*(lambda_PID.GetOUTMax()-lambda_PID.GetOUTMin()); //steps in random 10% increments of control output limits
+      lambda_output = (random(3,8)/10.0)*(lambda_PID.GetOUTMax()-lambda_PID.GetOUTMin()); //steps in random 10% increments of control output limits
       loopPeriod1 = loopPeriod1/4; //fast datalogging
       break;
     case LAMBDA_SPSTEPTEST:

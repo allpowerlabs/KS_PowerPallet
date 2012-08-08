@@ -7,6 +7,7 @@ void DoEngine() {
       break;
     case ENGINE_ON:
       if (control_state == CONTROL_OFF & millis()-control_state_entered > 100) {
+        Serial.println("# Key switch turned off, Engine Shutdown.");
         TransitionEngine(ENGINE_SHUTDOWN);
       }
       if (control_state == CONTROL_START) {
@@ -18,11 +19,13 @@ void DoEngine() {
         TransitionEngine(ENGINE_SHUTDOWN);
       }
       if (P_reactorLevel == OFF & millis()-engine_state_entered > 2500) { //if reactor is at low vacuum after ten seconds, engine did not catch, so turn off
+        Serial.println("# Reactor Pressure Too Low, Engine Shutdown.");
         TransitionEngine(ENGINE_SHUTDOWN);
       }
       break;
     case ENGINE_STARTING:
       if (control_state == CONTROL_OFF & millis()-control_state_entered > 100) {
+        Serial.println("# Key switch turned off, Engine Shutdown.");
         TransitionEngine(ENGINE_SHUTDOWN);
       }
       if (control_state == CONTROL_ON) { // Use starter button in the standard manual control configuration (push button to start, release to stop cranking)
