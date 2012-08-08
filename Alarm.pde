@@ -39,8 +39,10 @@ void DoAlarm() {
   if (P_reactorLevel != OFF && auger_state == AUGER_OFF and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_OFF_LONG])){
     setAlarm(ALARM_AUGER_OFF_LONG);
   }  
-  else {
-    removeAlarm(ALARM_AUGER_OFF_LONG);
+  else { 
+    if (auger_state != AUGER_ALARM){
+      removeAlarm(ALARM_AUGER_OFF_LONG);
+    }
   }
   if (P_reactorLevel != OFF && pressureRatioAccumulator > alarm_start[ALARM_BAD_REACTOR]) {
     setAlarm(ALARM_BAD_REACTOR);

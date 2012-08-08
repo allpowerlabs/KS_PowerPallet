@@ -52,7 +52,7 @@ void DoDisplay() {
       //Row 2
       Disp_RC(2, 0);
       Disp_PutStr(display_alarm2[alarm_shown]);
-      if (shutdown[alarm_shown] > 0 && engine_state == ENGINE_ON){      
+      if (shutdown[alarm_shown] > 999 && engine_state == ENGINE_ON){     //anything less than 999 is probably a count and not a shutdown time in millisecond so don't show. 
         Disp_RC(2, 13);
         sprintf(buf, "OFF:%3i", (shutdown[alarm_shown] - alarm_start[alarm_shown] - (millis() - alarm_on[alarm_shown]))/1000);
         Disp_PutStr(buf);
@@ -119,7 +119,7 @@ void DoDisplay() {
       Disp_PutStr(buf);
       //Row 3
       Disp_RC(3,0);
-      switch(auger_state){   //Update to all Auger states??
+      switch(auger_state){ 
       case AUGER_FORWARD:
         sprintf(buf, "AugFwd%3i  ", (millis() - auger_state_entered)/1000);
         break;
