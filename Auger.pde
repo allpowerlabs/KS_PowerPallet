@@ -5,8 +5,7 @@ void DoAuger() {
     if (FuelDemand == SWITCH_ON) {
       if (relay_board == 1){
         TransitionAuger(AUGER_STARTING);
-      } 
-      else {
+      } else {
         TransitionAuger(AUGER_FORWARD);
       }
     }
@@ -28,7 +27,7 @@ void DoAuger() {
     if (FuelDemand == SWITCH_OFF) {
       TransitionAuger(AUGER_OFF);
     }
-    if (AugerCurrentLevel != CURRENT_LOW && AugerCurrentLevel != CURRENT_OFF){ //switch forward instead?
+    if (AugerCurrentLevel != CURRENT_LOW && AugerCurrentLevel != CURRENT_OFF && millis() - auger_state_entered > 500){ //switch forward instead?
       TransitionAuger(AUGER_FORWARD);
     } 
     if ((millis() - auger_state_entered) > shutdown[ALARM_AUGER_LOW_CURRENT]){  //turn engine and auger off if auger current low for 3 minutes
@@ -52,7 +51,7 @@ void DoAuger() {
     if (AugerCurrentLevel == CURRENT_HIGH  && millis() - auger_state_entered > 500){
       TransitionAuger(AUGER_HIGH);
     } 
-    if (AugerCurrentLevel == CURRENT_LOW or AugerCurrentLevel == CURRENT_OFF){
+    if (AugerCurrentLevel == CURRENT_LOW or AugerCurrentLevel == CURRENT_OFF && millis() - auger_state_entered > 500){
       TransitionAuger(AUGER_CURRENT_LOW);
     } 
     if ((millis() - auger_state_entered) > shutdown[ALARM_AUGER_ON_LONG]){  //turn engine and auger off if auger runs none stop for too long
@@ -76,6 +75,9 @@ void DoAuger() {
     }
     break;
   case AUGER_REVERSE:
+    if (FuelDemand == SWITCH_OFF) {
+       TransitionAuger(AUGER_OFF);
+     }
     if (millis() - auger_state_entered > 500  && AugerCurrentLevel == CURRENT_HIGH){
       TransitionAuger(AUGER_REVERSE_HIGH);
     }
@@ -93,6 +95,9 @@ void DoAuger() {
     }
     break;
   case AUGER_REVERSE_HIGH:
+    if (FuelDemand == SWITCH_OFF) {
+       TransitionAuger(AUGER_OFF);
+     }
     if (AugerCurrentLevel != CURRENT_HIGH){
       TransitionAuger(AUGER_REVERSE);
     }
@@ -110,7 +115,7 @@ void DoAuger() {
         TransitionAuger(AUGER_OFF);
       }
     }
-    if (AugerCurrentLevel == CURRENT_HIGH){
+    if (AugerCurrentLevel == CURRENT_HIGH && millis() - auger_pulse_entered > 500){
       if (auger_pulse_state == 1){  //if in reverse...try going forward
         TransitionAuger(AUGER_PULSE);
       } else {
@@ -124,7 +129,7 @@ void DoAuger() {
 
 void TransitionAuger(int new_state) {
   //can look at auger_state for "old" state before transitioning at the end of this method
-  if (new_state != AUGER_PULSE) {
+  if (new_state != AUGER_PULSE && auger_state != AUGER_PULSE) {
     auger_state_entered = millis();
   }
   switch (new_state) {
@@ -157,14 +162,16 @@ void TransitionAuger(int new_state) {
     break;
   case AUGER_REVERSE:
     auger_reverse_entered = millis();
-    AugerReverse();
     Serial.println("# New Auger State: Reverse");
+    AugerReverse();
+    auger_rev_count++;
+    Serial.print("# Auger Rev Count Incremented to ");
+    Serial.println(auger_rev_count);
     //TransitionMessage("Auger: Reverse      ");
     break;
   case AUGER_REVERSE_HIGH:
     Serial.println("# New Auger State: Reverse High Current"); 
     //TransitionMessage("Auger: Reverse High"); 
-    auger_rev_count++;
     break; 
   case AUGER_CURRENT_LOW:
     //Serial.print("Current:");

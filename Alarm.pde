@@ -1,6 +1,6 @@
 void DoAlarmUpdate() {
   //TODO: Move these into their respective object control functions, not alarm
-  if ((pRatioReactorLevel == PR_LOW || pRatioReactorLevel == PR_HIGH) && P_reactorLevel != OFF) {
+  if ((pRatioReactorLevel == PR_LOW || pRatioReactorLevel == PR_HIGH) && P_reactorLevel != OFF && T_tredLevel != COLD) {
     pressureRatioAccumulator += 1;
   } 
   else {
