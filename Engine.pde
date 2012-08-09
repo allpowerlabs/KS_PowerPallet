@@ -14,12 +14,14 @@ void DoEngine() {
         TransitionEngine(ENGINE_STARTING);
       }
       if (EngineOilPressureLevel == OIL_P_LOW  && millis() - oil_pressure_state > 500 && millis() - engine_state_entered > 3000){
-        Serial.println("# Low Oil Pressure, Shutting Down Engine");
+        Serial.print("# Low Oil Pressure, Shutting Down Engine at: ");
+        Serial.println(millis() - oil_pressure_state);
         setAlarm(ALARM_BAD_OIL_PRESSURE);
         TransitionEngine(ENGINE_SHUTDOWN);
       }
       if (P_reactorLevel == OFF & millis()-engine_state_entered > 2500) { //if reactor is at low vacuum after ten seconds, engine did not catch, so turn off
-        Serial.println("# Reactor Pressure Too Low, Engine Shutdown.");
+        Serial.print("# Reactor Pressure Too Low, Engine Shutdown at :");
+        Serial.println(millis()-engine_state_entered);
         TransitionEngine(ENGINE_SHUTDOWN);
       }
       break;

@@ -14,8 +14,10 @@ void DoAuger() {
       auger_state_entered = millis(); //reset to zero if no vacuum and auger off
     }
     if (millis() - auger_state_entered > shutdown[ALARM_AUGER_OFF_LONG] && engine_state == ENGINE_ON){
-      Serial.println("# Auger off too long, Engine Shutdown.");
+      Serial.print("# Auger off too long, Engine Shutdown at: ");
+      Serial.println((millis() - auger_state_entered));
       TransitionEngine(ENGINE_SHUTDOWN);
+      TransitionAuger(AUGER_ALARM);
     } 
     if ((millis() - auger_state_entered) % 60000 > 59000) {  //pulse every minute of auger off
       Serial.println("# Pulsing Auger");
@@ -32,7 +34,8 @@ void DoAuger() {
     if ((millis() - auger_state_entered) > shutdown[ALARM_AUGER_LOW_CURRENT]){  //turn engine and auger off if auger current low for 3 minutes
       TransitionAuger(AUGER_ALARM);
       if (engine_state == ENGINE_ON){
-        Serial.println("# Low Auger Current for too long, Engine Shutdown.");
+        Serial.print("# Low Auger Current for too long, Engine Shutdown at");
+        Serial.println((millis() - auger_state_entered));
         TransitionEngine(ENGINE_SHUTDOWN);
       }
     }
@@ -55,7 +58,8 @@ void DoAuger() {
     if ((millis() - auger_state_entered) > shutdown[ALARM_AUGER_ON_LONG]){  //turn engine and auger off if auger runs none stop for too long
       TransitionAuger(AUGER_ALARM);
       if (engine_state == ENGINE_ON){
-        Serial.println("# Auger on too long, Engine Shutdown");
+        Serial.print("# Auger on too long, Engine Shutdown at:");
+        Serial.println((millis() - auger_state_entered));
         TransitionEngine(ENGINE_SHUTDOWN);
       }
     }
@@ -82,7 +86,8 @@ void DoAuger() {
       Serial.println("# Auger Bound or broken Fuel Switch, stopping Auger");
       TransitionAuger(AUGER_ALARM);
       if (engine_state == ENGINE_ON){
-        Serial.println("# Auger Oscillations, Engine Shutdown");
+        Serial.print("# Auger Oscillations, Engine Shutdown at: ");
+        Serial.println((millis() - auger_state_entered));
         TransitionEngine(ENGINE_SHUTDOWN);
       }
     }
