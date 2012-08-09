@@ -29,13 +29,16 @@ void DoLambda() {
           TransitionLambda(LAMBDA_SPSTEPTEST);
           serial_last_input = '\0';
         }
-        if (lambda_input < 0.52 && engine_state != ENGINE_OFF) {
+        if (lambda_input < 0.52) {
           TransitionLambda(LAMBDA_NO_SIGNAL);
         }
         break;
       case LAMBDA_SEALED:
         if (engine_state == ENGINE_STARTING) {
           TransitionLambda(LAMBDA_CLOSEDLOOP);
+        }
+        if (lambda_input < 0.52) {
+          TransitionLambda(LAMBDA_NO_SIGNAL);
         }
         if (serial_last_input == 'o') {
           TransitionLambda(LAMBDA_STEPTEST);
