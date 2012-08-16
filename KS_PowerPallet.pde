@@ -425,7 +425,7 @@ int pressureRatioAccumulator = 0;
 
 #define ALARM_NUM 11
 unsigned long alarm_on[ALARM_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-unsigned long alarm_start[ALARM_NUM] = {240000, 480000, 50, 50, 230, 0, 0, 0, 30000, 60000, 10};  //count or time in milliseconds when alarm goes off
+unsigned long alarm_start[ALARM_NUM] = {240000, 480000, 160, 50, 230, 0, 0, 0, 30000, 60000, 10};  //count or time in milliseconds when alarm goes off
 unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 0, 0, 0, 180000, 0};  //time when engine will be shutdown
 int alarm_count = 0;
 int alarm_queue[ALARM_NUM] = {};

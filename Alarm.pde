@@ -7,7 +7,7 @@ void DoAlarmUpdate() {
     pressureRatioAccumulator -= 5;
   }
   pressureRatioAccumulator = max(0,pressureRatioAccumulator); //keep value above 0
-  pressureRatioAccumulator = min(pressureRatioAccumulator,60); //keep value below 20    
+  pressureRatioAccumulator = min(pressureRatioAccumulator,180); //keep value below...
 }
 
 void DoAlarm() {
