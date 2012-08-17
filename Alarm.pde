@@ -14,7 +14,7 @@ void DoAlarm() {
   if (auger_rev_count > alarm_start[ALARM_BOUND_AUGER]){
     setAlarm(ALARM_BOUND_AUGER);
   } 
-  else {
+  else { 
     if (auger_state != AUGER_ALARM){
       removeAlarm(ALARM_BOUND_AUGER);
     }

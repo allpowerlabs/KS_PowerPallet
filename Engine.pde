@@ -40,7 +40,7 @@ void DoEngine() {
       }
       break;
     case ENGINE_SHUTDOWN:  
-      if (millis()-engine_state > 3500) {
+      if (millis()-engine_state_entered > 4000) {
         TransitionEngine(ENGINE_OFF);
       }
       break;
@@ -78,8 +78,8 @@ void TransitionEngine(int new_state) {
     case ENGINE_SHUTDOWN:
 //      lambda_PID.SetMode(MANUAL);
 //      SetThrottleAngle(smoothedLambda);
-//      digitalWrite(FET_IGNITION,LOW);
-//      digitalWrite(FET_STARTER,LOW);
+      digitalWrite(FET_IGNITION,LOW);
+      digitalWrite(FET_STARTER,LOW);
       Serial.println("# New Engine State: SHUTDOWN");
       TransitionMessage("Engine: Shutting down");   
       break;
