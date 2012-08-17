@@ -7,7 +7,7 @@ void DoLambda() {
     lambda_input = GetLambda();
     switch(lambda_state) {
       case LAMBDA_CLOSEDLOOP:
-        //don't reset changed PID values
+//don't reset changed PID values
 //        if (display_state != DISPLAY_LAMBDA) {
 //          if (lambda_input < lambda_setpoint - 0.1) {
 //            lambda_PID.SetTunings(lambda_P[0]*1.5, lambda_I[0], lambda_D[0]);
@@ -78,7 +78,11 @@ void DoLambda() {
           TransitionLambda(LAMBDA_RESET);
         }
         if (lambda_input > 0.52) {
-          TransitionLambda(LAMBDA_CLOSEDLOOP);
+          if (engine_state == ENGINE_ON){
+            TransitionLambda(LAMBDA_CLOSEDLOOP);
+          }  else {
+            TransitionLambda(LAMBDA_SEALED);
+          }
         }
         break;
       case LAMBDA_RESET:
