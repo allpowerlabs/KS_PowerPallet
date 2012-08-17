@@ -110,6 +110,10 @@ void DoLambda() {
           }  else {
             TransitionLambda(LAMBDA_SEALED);
           }
+        } else {
+          if (millis() -  lambda_state_entered > 10){
+            TransitionLambda(LAMBDA_RESTART);
+          }
         }
         break;
      }
@@ -186,6 +190,7 @@ void TransitionLambda(int new_state) {
       lambda_state_name = "Checking for O2 signal";
       break;
     case LAMBDA_UNKNOWN:
+       lambda_state_name = "Lambda state unknown, checking for O2 signal";
        break;
     }
   Serial.print(" to ");  
