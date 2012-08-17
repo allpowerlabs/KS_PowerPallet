@@ -32,6 +32,9 @@ void DoLambda() {
         if (lambda_input < 0.52) {
           TransitionLambda(LAMBDA_NO_SIGNAL);
         }
+        if (engine_state == ENGINE_SHUTDOWN){
+          TransitionLambda(LAMBDA_SHUTDOWN);
+        }
         break;
       case LAMBDA_SEALED:
         if (engine_state == ENGINE_STARTING) {
@@ -84,6 +87,9 @@ void DoLambda() {
             TransitionLambda(LAMBDA_SEALED);
           }
         }
+        if (engine_state == ENGINE_SHUTDOWN){
+          TransitionLambda(LAMBDA_SHUTDOWN);
+        }
         break;
       case LAMBDA_RESET:
         if (millis() - lambda_state_entered > 250) {
@@ -115,9 +121,17 @@ void DoLambda() {
             TransitionLambda(LAMBDA_SEALED);
           }
         } else {
-          if (millis() -  lambda_state_entered > 100){
+          if (millis() -  lambda_state_entered > 100) {
             TransitionLambda(LAMBDA_RESTART);
           }
+        }
+        break;
+      case LAMBDA_SHUTDOWN:
+        if (millis()-lambda_state_entered > 2000) {
+          SetPremixServoAngle(1);
+        }
+        if (engine_state == ENGINE_OFF) {
+          TransitionLambda(LAMBDA_SEALED);
         }
         break;
      }
@@ -143,6 +157,8 @@ void TransitionLambda(int new_state) {
      case LAMBDA_RESTART:
        break;
      case LAMBDA_UNKNOWN:
+       break;
+     case LAMBDA_SHUTDOWN:
        break;
    }
   Serial.print("# Lambda switching from ");
@@ -195,6 +211,10 @@ void TransitionLambda(int new_state) {
       break;
     case LAMBDA_UNKNOWN:
        lambda_state_name = "Lambda state unknown, checking for O2 signal";
+       break;
+    case LAMBDA_SHUTDOWN:
+       lambda_state_name = "Lambda locked, engine shutting down";
+       lambda_PID.SetMode(MANUAL);
        break;
     }
   Serial.print(" to ");  
