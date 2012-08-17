@@ -137,6 +137,7 @@ Servo Servo_Throttle;
 #define LAMBDA_NO_SIGNAL 5
 #define LAMBDA_RESET 6
 #define LAMBDA_RESTART 7
+#define LAMBDA_UNKNOWN 8
 
 //Display States
 #define DISPLAY_SPLASH 0
@@ -554,7 +555,7 @@ void setup() {
 //  InitSD();
   
   TransitionEngine(ENGINE_ON); //default to engine on. if PCU resets, don't shut a running engine off. in the ENGINE_ON state, should detect and transition out of engine on.
-  TransitionLambda(LAMBDA_RESTART);
+  TransitionLambda(LAMBDA_UNKNOWN);
   TransitionAuger(AUGER_OFF);
   TransitionDisplay(DISPLAY_SPLASH);
 }
