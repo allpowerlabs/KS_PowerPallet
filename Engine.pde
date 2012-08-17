@@ -40,14 +40,7 @@ void DoEngine() {
       }
       break;
     case ENGINE_SHUTDOWN:  
-      //lambda_PID.SetMode(MANUAL);      //lean out system and then shutdown
-      //SetThrottleAngle(100); // % open
-      
-      //if (millis() - engine_stat > 3000){  //shutdown system wait 3 seconds and then close throttle
-      //  SetThrottleAngle(0);
-      //  TransitionEngine(ENGINE_OFF);
-      //}
-      if (millis()-engine_state > 100) {
+      if (millis()-engine_state > 3500) {
         TransitionEngine(ENGINE_OFF);
       }
       break;
