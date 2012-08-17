@@ -23,7 +23,7 @@
 //constant definitions
 #define ABSENT -500
 
-#define CODE_VERSION "v1.1b"  //b as in beta
+#define CODE_VERSION "v1.10"
 
 // Analog Input Mapping
 #define ANA_LAMBDA ANA0
