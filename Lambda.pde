@@ -103,6 +103,15 @@ void DoLambda() {
           }
         }
         break;
+      case LAMBDA_UNKNOWN:
+        if (lambda_input > 0.52) {
+          if (engine_state == ENGINE_ON){
+            TransitionLambda(LAMBDA_CLOSEDLOOP);
+          }  else {
+            TransitionLambda(LAMBDA_SEALED);
+          }
+        }
+        break;
      }
 }
 
@@ -124,6 +133,8 @@ void TransitionLambda(int new_state) {
      case LAMBDA_RESET:
        break;
      case LAMBDA_RESTART:
+       break;
+     case LAMBDA_UNKNOWN:
        break;
    }
   Serial.print("# Lambda switching from ");
@@ -174,6 +185,8 @@ void TransitionLambda(int new_state) {
       digitalWrite(FET_O2_RESET, LOW);
       lambda_state_name = "Checking for O2 signal";
       break;
+    case LAMBDA_UNKNOWN:
+       break;
     }
   Serial.print(" to ");  
   Serial.println(lambda_state_name);

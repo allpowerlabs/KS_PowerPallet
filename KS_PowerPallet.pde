@@ -137,6 +137,7 @@ Servo Servo_Throttle;
 #define LAMBDA_NO_SIGNAL 5
 #define LAMBDA_RESET 6
 #define LAMBDA_RESTART 7
+#define LAMBDA_UNKNOWN 8
 
 //Display States
 #define DISPLAY_SPLASH 0
