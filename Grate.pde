@@ -1,6 +1,6 @@
 void InitGrate() {
   //setup grate slopes
-  LoadGrate();
+  //LoadGrate();
   CalculateGrate();
 }
 
@@ -53,41 +53,44 @@ void DoGrate() { // call once per second
         grate_motor_state = GRATE_MOTOR_OFF;
       }
     }
-    if (grate_val >= 0 & grate_val <= GRATE_SHAKE_CROSS) { //time to shake or reset
+    if (grate_val >= 0 && grate_val <= GRATE_SHAKE_CROSS) { //time to shake or reset
       grate_motor_state = GRATE_MOTOR_LOW;
       digitalWrite(FET_GRATE,HIGH); 
       grate_val -= m_grate_on;
-    }
-    if (grate_val <= 0) {
+    } else if (grate_val <= 0) {
       grate_val = GRATE_SHAKE_INIT;
       grate_motor_state = GRATE_MOTOR_OFF;
       digitalWrite(FET_GRATE,LOW);
+    } else {
+      digitalWrite(FET_GRATE, LOW);
+      grate_motor_state = GRATE_MOTOR_OFF;
     }
     break;
   }
 }
 
-void LoadGrate() {
-  byte check;
-  double ming,maxg,gon;
-  check = EEPROM.read(16); 
-  ming = EEPROM.read(17)*3;
-  maxg = EEPROM.read(19)*3;
-  gon= EEPROM.read(21);
-  if (check == 128) { //check to see if grate has been set
-    Serial.println("#Loading grate from EEPROM");
-    grate_min_interval = ming;
-    grate_max_interval = maxg;
-    grate_on_interval = gon;
-  } else {
-    WriteGrate();
-  }
-}
-
-void WriteGrate() {
-  Serial.println("#Writing grate to EEPROM");
-  EEPROM.write(16,128);
-  EEPROM.write(17,constrain(grate_min_interval/3,0,255));
-  EEPROM.write(19,constrain(grate_max_interval/3,0,255));
-  EEPROM.write(21,constrain(grate_on_interval,0,255));
-}
+//
+//void LoadGrate() {
+//  byte check;
+//  double ming,maxg,gon;
+//  check = EEPROM.read(16); 
+//  ming = EEPROM.read(17)*3;
+//  maxg = EEPROM.read(19)*3;
+//  gon= EEPROM.read(21);
+//  if (check == 128) { //check to see if grate has been set
+//    Logln_p("Loading grate from EEPROM");
+//    grate_min_interval = ming;
+//    grate_max_interval = maxg;
+//    grate_on_interval = gon;
+//  } else {
+//    WriteGrate();
+//  }
+//}
+//
+//void WriteGrate() {
+//  Logln_p("Writing grate to EEPROM");
+//  EEPROM.write(16,128);
+//  EEPROM.write(17,constrain(grate_min_interval/3,0,255));
+//  EEPROM.write(19,constrain(grate_max_interval/3,0,255));
+//  EEPROM.write(21,constrain(grate_on_interval,0,255));
+//}

@@ -1,20 +1,20 @@
 void DoAlarmUpdate() {
   //TODO: Move these into their respective object control functions, not alarm
-  if ((pRatioReactorLevel == PR_LOW || pRatioReactorLevel == PR_HIGH) && P_reactorLevel != OFF && T_tredLevel != COLD) {
+  if ((pRatioReactorLevel == PR_LOW || pRatioReactorLevel == PR_HIGH) && P_reactorLevel != OFF && T_tredLevel != COLD) {  
     pressureRatioAccumulator += 1;
   } 
   else {
     pressureRatioAccumulator -= 5;
   }
   pressureRatioAccumulator = max(0,pressureRatioAccumulator); //keep value above 0
-  pressureRatioAccumulator = min(pressureRatioAccumulator,180); //keep value below...
+  pressureRatioAccumulator = min(pressureRatioAccumulator,60); //keep value below 20    
 }
 
 void DoAlarm() {
   if (auger_rev_count > alarm_start[ALARM_BOUND_AUGER]){
     setAlarm(ALARM_BOUND_AUGER);
   } 
-  else { 
+  else {
     if (auger_state != AUGER_ALARM){
       removeAlarm(ALARM_BOUND_AUGER);
     }
@@ -27,7 +27,10 @@ void DoAlarm() {
       removeAlarm(ALARM_AUGER_LOW_CURRENT);
     }
   }
-  if (auger_state == AUGER_FORWARD and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_ON_LONG])){
+//  if (auger_state == AUGER_FORWARD and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_ON_LONG])){
+//    setAlarm(ALARM_AUGER_ON_LONG);
+//  } 
+  if ((FuelDemand == SWITCH_ON) and (millis() - fuel_state_entered > alarm_start[ALARM_AUGER_ON_LONG])){
     setAlarm(ALARM_AUGER_ON_LONG);
   } 
   else {
@@ -50,12 +53,12 @@ void DoAlarm() {
   else {
     removeAlarm(ALARM_BAD_REACTOR);
   }
-//  if (P_reactorLevel != OFF && filter_pratio_accumulator > alarm_start[ALARM_BAD_FILTER]) {
-//    setAlarm(ALARM_BAD_FILTER);
-//  } 
-//  else {
-//    removeAlarm(ALARM_BAD_FILTER);
-//  }
+  if (P_reactorLevel != OFF && filter_pratio_accumulator > alarm_start[ALARM_BAD_FILTER]) {
+    setAlarm(ALARM_BAD_FILTER);
+  } 
+  else {
+    removeAlarm(ALARM_BAD_FILTER);
+  }
 #if T_LOW_FUEL != ABSENT
   if (P_reactorLevel != OFF && Temp_Data[T_LOW_FUEL] > alarm_start[ALARM_LOW_FUEL_REACTOR]) {
     setAlarm(ALARM_LOW_FUEL_REACTOR);
@@ -66,15 +69,46 @@ void DoAlarm() {
 #endif
 
 //Engine On Alarms
-  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && T_tredLevel != HOT && T_tredLevel != EXCESSIVE) {
+  //if (engine_state == ENGINE_ON && P_reactorLevel != OFF && T_tredLevel != HOT && T_tredLevel != EXCESSIVE) {
+  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && Temp_Data[T_TRED] < ttred_warn - 10) {
     setAlarm(ALARM_LOW_TRED);
   } else { 
-    removeAlarm(ALARM_LOW_TRED);
+    if (Temp_Data[T_TRED] > ttred_warn) {
+      removeAlarm(ALARM_LOW_TRED);
+    }
   }
   if (engine_state == ENGINE_ON && P_reactorLevel != OFF && T_bredLevel == EXCESSIVE) {
     setAlarm(ALARM_HIGH_BRED);
   } else { 
     removeAlarm(ALARM_HIGH_BRED);
+  }
+  if (engine_state == ENGINE_ON && Temp_Data[T_ENG_COOLANT] > high_coolant_temp){
+    setAlarm(ALARM_HIGH_COOLANT_TEMP);
+  }  else {
+    if (alarm_on[ALARM_HIGH_COOLANT_TEMP] <= shutdown[ALARM_HIGH_COOLANT_TEMP]){
+      removeAlarm(ALARM_HIGH_COOLANT_TEMP);
+    }
+  }
+  if (engine_state == ENGINE_ON && Temp_Data[T_TRED] < tred_low_temp){
+    setAlarm(ALARM_TRED_LOW);
+  }  else {
+    if (alarm_on[ALARM_TRED_LOW] <= shutdown[ALARM_TRED_LOW]){
+      removeAlarm(ALARM_TRED_LOW);
+    }
+  }
+  if (engine_state == ENGINE_ON && Temp_Data[T_TRED] > ttred_high){
+    setAlarm(ALARM_TTRED_HIGH);
+  }  else {
+    if (alarm_on[ALARM_TTRED_HIGH] <= shutdown[ALARM_TTRED_HIGH]){
+      removeAlarm(ALARM_TTRED_HIGH);
+    }
+  }
+  if (engine_state == ENGINE_ON && Temp_Data[T_BRED] > tbred_high){
+    setAlarm(ALARM_TTRED_HIGH);
+  }  else {
+    if (alarm_on[ALARM_TBRED_HIGH] <= shutdown[ALARM_TBRED_HIGH]){
+      removeAlarm(ALARM_TBRED_HIGH);
+    }
   }
 //Low Oil Pressure alarm set in Engine state machine due to quick transition times.
 //#if ANA_OIL_PRESSURE != ABSENT
@@ -105,8 +139,8 @@ void DoAlarm() {
 
 void setAlarm(int alarm_num){
   if (alarm_on[alarm_num] == 0){
-    Serial.print("# ");
-    Serial.println(display_alarm[alarm_num]);
+    strcpy_P(p_buffer, (char*)pgm_read_word(&(display_alarm[alarm_num])));
+    Logln(p_buffer);
     alarm_on[alarm_num] = millis();
     alarm = true;
     setAlarmQueue();
@@ -115,8 +149,9 @@ void setAlarm(int alarm_num){
 
 void removeAlarm(int alarm_num){
   if (alarm_on[alarm_num] > 0) {
-    Serial.print("# Removing: ");
-    Serial.println(display_alarm[alarm_num]);
+    Log_p("Removing: ");
+    strcpy_P(p_buffer, (char*)pgm_read_word(&(display_alarm[alarm_num])));
+    Logln(p_buffer);
     alarm_on[alarm_num] = 0;
     setAlarmQueue();
     if (alarm_count == 0){
@@ -136,9 +171,10 @@ void setAlarmQueue(){
 }
 
 void resetAlarm(int alarm_num){
-  Serial.println("# Alarm Reset by User");
+  Log_p("Alarm Reset by User");
   switch (alarm_num) {  //reset faults that kicked off alarm state.  Seperate function only for user intervention??
   case ALARM_AUGER_ON_LONG:
+    fuel_state_entered = millis();
     TransitionAuger(AUGER_OFF);
     break;
   case ALARM_AUGER_OFF_LONG:
@@ -167,5 +203,21 @@ void resetAlarm(int alarm_num){
   case ALARM_BOUND_AUGER:
     TransitionAuger(AUGER_OFF);
     break;
+  case ALARM_HIGH_PCOMB:
+    break;
+  case ALARM_HIGH_COOLANT_TEMP:
+    break;
+  case ALARM_TRED_LOW:
+    break;
   }
+}
+
+int getAlarmBin(){
+  int bin = 0;
+  if (alarm_count>0){
+    for(int i=0; i<alarm_count; i++){
+      bitSet(bin, alarm_queue[i]);
+    }
+  }
+  return bin;
 }

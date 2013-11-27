@@ -3,7 +3,7 @@ void DoFlare() {
     case FLARE_OFF:
       break;
     case FLARE_USER_SET:
-      if (P_reactorLevel != OFF && engine_state != ENGINE_ON) {
+      if (P_reactorLevel != OFF && engine_state != ENGINE_ON && engine_state != ENGINE_STARTING) {
         ignitor_on = true;
         digitalWrite(FET_FLARE_IGNITOR,HIGH);
       } else {
