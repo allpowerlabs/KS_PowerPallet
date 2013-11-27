@@ -123,9 +123,9 @@ void TransitionEngine(int new_state) {
         Log(p_buffer); Logln_p("Off");
         digitalWrite(FET_STARTER,LOW);
         if (EngineShutdownFromAlarm()){
-          digitalWrite(FET_IGNITION,HIGH);
+          digitalWrite(FET_STARTER,HIGH);
         } else {
-          digitalWrite(FET_IGNITION,LOW);
+          digitalWrite(FET_STARTER,LOW);
         }
         break;
       case ENGINE_ON:
