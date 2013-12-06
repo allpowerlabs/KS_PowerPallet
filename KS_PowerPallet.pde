@@ -22,6 +22,7 @@
 #include <ModbusSlave.h>
 //#include <MCP2515.h> 
 //#include <SPI.h>
+#include "AshAuger.h"		// Ash auger typedefs.
 
 
 /*
@@ -34,7 +35,7 @@ EEPROM bytes used of 4k space:
 //constant definitions
 #define ABSENT -500
 
-#define CODE_VERSION "v1.22-rc1" 
+#define CODE_VERSION "v1.3-20131205" 
 
 //PROGMEM string buffer
 char p_buffer[41] = ""; 
@@ -720,7 +721,8 @@ void setup() {
   DoDatalogging();
   InitLambda();
   InitServos();
-  InitGrate();  
+  InitGrate();
+  AshAugerInit();  
   if (use_modbus == 1){
     InitModbusSlave();
   }
@@ -747,6 +749,7 @@ void loop() {
     DoFlare();
     DoReactor();
     DoAuger();
+	DoAshAuger();	// New!
     if (use_modbus == 1){
       DoModbus();
     }

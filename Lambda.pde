@@ -231,14 +231,15 @@ void TransitionLambda(int new_state) {
     lambda_PID.SetMode(MANUAL);
     //lambda_output = smoothedLambda;
     break;
-  case LAMBDA_RESET:
+// Removed lambda reset
+/*   case LAMBDA_RESET:
     digitalWrite(FET_O2_RESET, HIGH);
     strcpy(lambda_state_name, P("Resetting O2 Relay"));
     break;
   case LAMBDA_RESTART:
     digitalWrite(FET_O2_RESET, LOW);
     strcpy(lambda_state_name, P("Checking for O2 signal"));
-    break;
+    break; */
   case LAMBDA_UNKNOWN:
     strcpy(lambda_state_name, P("Unknown (Checking)"));
     break;
