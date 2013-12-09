@@ -6,8 +6,10 @@ TODO:
 	Hack manual control mode into UI
 	Add configuration settings
 */
-// Stupid Arduino doesn't know how to use real C >:(
-//#include "AshAuger.h"
+
+#ifndef ARDUINO
+#include "AshAuger.h"
+#endif
 
 // Ash auger time variables are in milliseconds
 unsigned int ashAugerLastTime;	// This stores the last time the control logic was executed
@@ -104,9 +106,9 @@ void DoAshAuger() {
 			}
 			break;
 		default:
+		// MANUAL and DISABLED modes don't require any internal control logic
 			break;
 	}
-	// MANUAL and DISABLED modes don't require any internal control logic
 	// Handle run state transitions at the end.
 	if (ashAugerRunStateRequested != ashAugerRunStateCurrent) {
 		// A new run state has been requested.
