@@ -339,59 +339,7 @@ void DoDisplay() {
     }
     break;
   case DISPLAY_GRATE: 
-    Disp_CursOff();
-    Disp_RC(0,0);
-    Disp_PutStr(P("   Manual Control   ")); 
-    Disp_RC(1,0);
-    Disp_PutStr(P("Auger:              "));
-    Disp_RC(1,11);
-    if (auger_state == AUGER_ALARM){
-      Disp_PutStr(P("OFF"));
-    } 
-    else {
-      Disp_PutStr(P("AUTO"));
-    }
-    Disp_RC(2,0);
-    Disp_PutStr(P("Grate:              "));
-    Disp_RC(2,11);
-    if (grateMode == GRATE_SHAKE_OFF){
-      Disp_PutStr(P("OFF"));
-    } 
-    else if (grateMode == GRATE_SHAKE_PRATIO){
-      Disp_PutStr(P("AUTO"));
-    } 
-    else {
-      Disp_PutStr(P("ON"));
-    }
-    Disp_RC(3,0);
-    Disp_PutStr(P("Next     Aug   Grate")); 
-    if (key == 2) {
-      config_changed = true;
-      Disp_RC(1,11);
-      if (auger_state == AUGER_ALARM){
-        TransitionAuger(AUGER_OFF);
-      } 
-      else {
-        TransitionAuger(AUGER_ALARM);
-      }
-    }
-    if (key == 3) {
-      config_changed = true;
-      switch (grateMode) {
-      case GRATE_SHAKE_OFF:
-        grateMode = GRATE_SHAKE_ON;
-        Logln("Grate Mode: On");
-        break;
-      case GRATE_SHAKE_ON:
-        grateMode = GRATE_SHAKE_PRATIO;
-        Logln("Grate Mode: Pressure Ratio");
-        break;
-      case GRATE_SHAKE_PRATIO:
-        grateMode = GRATE_SHAKE_OFF;
-        Logln("Grate Mode: Off");
-        break;
-      }
-    }
+	displayManualMode();
     break;
   case DISPLAY_INFO:
     Disp_CursOff();
@@ -1002,5 +950,96 @@ void resetConfig() {  //sets EEPROM configs back to untouched state
   }
 }
 
-
-
+void displayManualMode() {
+	/*
+		Order of operations:
+			Process key input
+			Transition state
+			Write to display
+	
+	*/
+	static enum {
+		DISPLAY_MANUAL_FUEL_AUGER,
+		DISPLAY_MANUAL_GRATE,
+		DISPLAY_MANUAL_ASH_AUGER
+	} currentFunction;
+	int modeAdv = 0;
+	
+	switch (key) {
+		case 1:		// ADV
+			// Advance the current function
+			currentFunction++;
+			break;
+		case 2:		// Nothing
+			break;
+		case 3:		// MODE
+			modeAdv++;
+			break;
+		default:
+			break;
+	}
+	switch (currentFunction) {
+		case DISPLAY_MANUAL_FUEL_AUGER:
+			break;
+		case DISPLAY_MANUAL_GRATE:
+			break;
+		case DISPLAY_MANUAL_ASH_AUGER:
+			break;
+		default:
+			currentFunction = 0;
+			break;
+	}
+	Disp_CursOff();
+	Disp_RC(0,0);
+	Disp_PutStr(P("   Manual Control   ")); 
+	Disp_RC(1,0);
+	Disp_PutStr(P("Auger:              "));
+	Disp_RC(1,11);
+	if (auger_state == AUGER_ALARM){
+		Disp_PutStr(P("OFF"));
+	} 
+	else {
+		Disp_PutStr(P("AUTO"));
+	}
+	Disp_RC(2,0);
+	Disp_PutStr(P("Grate:              "));
+	Disp_RC(2,11);
+	if (grateMode == GRATE_SHAKE_OFF){
+		Disp_PutStr(P("OFF"));
+	} 
+	else if (grateMode == GRATE_SHAKE_PRATIO){
+		Disp_PutStr(P("AUTO"));
+	} 
+	else {
+		Disp_PutStr(P("ON"));
+	}
+	Disp_RC(3,0);
+	Disp_PutStr(P("Next     Aug   Grate")); 
+	if (key == 2) {
+		config_changed = true;
+		Disp_RC(1,11);
+		if (auger_state == AUGER_ALARM){
+			TransitionAuger(AUGER_OFF);
+		} 
+		else {
+			TransitionAuger(AUGER_ALARM);
+		}
+	}
+	if (key == 3) {
+		config_changed = true;
+		switch (grateMode) {
+			case GRATE_SHAKE_OFF:
+				grateMode = GRATE_SHAKE_ON;
+				Logln("Grate Mode: On");
+				break;
+			case GRATE_SHAKE_ON:
+				grateMode = GRATE_SHAKE_PRATIO;
+				Logln("Grate Mode: Pressure Ratio");
+				break;
+			case GRATE_SHAKE_PRATIO:
+				grateMode = GRATE_SHAKE_OFF;
+				Logln("Grate Mode: Off");
+				break;
+		}
+	}
+}
