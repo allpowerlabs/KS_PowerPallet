@@ -35,7 +35,7 @@ EEPROM bytes used of 4k space:
 //constant definitions
 #define ABSENT -500
 
-#define CODE_VERSION "v1.3-20131205" 
+#define CODE_VERSION "v1.3-20131213" 
 
 //PROGMEM string buffer
 char p_buffer[41] = ""; 

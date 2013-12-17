@@ -3,8 +3,6 @@ void DoDisplay() {
   char config_buffer[] = "               ";
   char config_choice_buffer[] = "        ";
   
-  
-  
   if (millis() % (display_per*200) > (display_per*100) ) {    //  if (millis() % 2000 > 1000) {
     disp_alt = false;
   } 
@@ -652,13 +650,12 @@ void TransitionDisplay(int new_state) {
     break;
   }
   display_state=new_state;
+  Disp_Clear(); // Clear display between menus
 }
 
 void DoKeyInput() {
-  int k;
-  k =  Kpd_GetKeyAsync();
   if (key == -1) { //only update key if it has been cleared
-    key = k;
+    key = Kpd_GetKeyAsync();
   }
   if (key == 0) {
     switch (display_state) {
@@ -741,31 +738,31 @@ void DoKeyInput() {
     }
     key = -1; //key caught
   }
-  if (key == 1) {
-    if (display_state == DISPLAY_CONFIG and config_changed == true){
-      saveConfig(cur_item, config_var);
-      update_config_var(cur_item);
-      config_changed = false;
-    }
-    if (display_state == DISPLAY_RELAY){
-      config_changed = false;
-      turnAllOff();
-    }
-    cur_item += 1;
-    if (cur_item > item_count) {
-      switch (display_state) {
-        case DISPLAY_CONFIG:
-        case DISPLAY_RELAY:
-        case DISPLAY_ANA:
-          cur_item = 0;
-          break;
-        default:
-          cur_item = 1;
-          break;
-      }
-    } 
-    key = -1; //key caught
-  }
+  // if (key == 1) {
+    // if (display_state == DISPLAY_CONFIG and config_changed == true){
+      // saveConfig(cur_item, config_var);
+      // update_config_var(cur_item);
+      // config_changed = false;
+    // }
+    // if (display_state == DISPLAY_RELAY){
+      // config_changed = false;
+      // turnAllOff();
+    // }
+    // cur_item += 1;
+    // if (cur_item > item_count) {
+      // switch (display_state) {
+        // case DISPLAY_CONFIG:
+        // case DISPLAY_RELAY:
+        // case DISPLAY_ANA:
+          // cur_item = 0;
+          // break;
+        // default:
+          // cur_item = 1;
+          // break;
+      // }
+    // } 
+    // key = -1; //key caught
+  // }
 }
 
 void DoHeartBeat() {
@@ -951,95 +948,104 @@ void resetConfig() {  //sets EEPROM configs back to untouched state
 }
 
 void displayManualMode() {
-	/*
-		Order of operations:
-			Process key input
-			Transition state
-			Write to display
-	
-	*/
-	static enum {
-		DISPLAY_MANUAL_FUEL_AUGER,
-		DISPLAY_MANUAL_GRATE,
-		DISPLAY_MANUAL_ASH_AUGER
-	} currentFunction;
-	int modeAdv = 0;
-	
+	static int currentFunction;
+	int modeAdv = 0; // Flag to know when we should advance to the next mode.  Initialization is key.
+	// Key press handling
 	switch (key) {
 		case 1:		// ADV
 			// Advance the current function
 			currentFunction++;
+			config_changed = true; // This is supposed to let the rest of the display code know to jump back to the status screen after the user is done.
 			break;
 		case 2:		// Nothing
 			break;
 		case 3:		// MODE
+			// Advance to the next mode
 			modeAdv++;
+			config_changed = true;
 			break;
 		default:
 			break;
 	}
-	switch (currentFunction) {
-		case DISPLAY_MANUAL_FUEL_AUGER:
-			break;
-		case DISPLAY_MANUAL_GRATE:
-			break;
-		case DISPLAY_MANUAL_ASH_AUGER:
-			break;
-		default:
-			currentFunction = 0;
-			break;
-	}
+	key = -1;
+	//Disp_Clear();
 	Disp_CursOff();
 	Disp_RC(0,0);
 	Disp_PutStr(P("   Manual Control   ")); 
 	Disp_RC(1,0);
-	Disp_PutStr(P("Auger:              "));
-	Disp_RC(1,11);
-	if (auger_state == AUGER_ALARM){
-		Disp_PutStr(P("OFF"));
-	} 
-	else {
-		Disp_PutStr(P("AUTO"));
+	switch (currentFunction) {
+		case 0:
+			Disp_PutStr(P("Fuel Auger: "));
+			switch (auger_state) {
+				case AUGER_ALARM:
+					Disp_PutStr(P("AUTO"));
+					if (modeAdv) TransitionAuger(AUGER_OFF);
+					break;
+				case AUGER_OFF:
+					Disp_PutStr(P("OFF"));
+					if (modeAdv) TransitionAuger(AUGER_ALARM);
+					break;
+				default:
+					break;
+			}
+			break;
+		case 1:
+			Disp_PutStr(P("Grate Shaker: "));
+			switch (grateMode) {
+				case GRATE_SHAKE_OFF:
+					Disp_PutStr(P("OFF"));
+					if (modeAdv) {
+						grateMode = GRATE_SHAKE_ON;
+						Logln("Grate Mode: On");
+					}
+					break;
+				case GRATE_SHAKE_ON:
+					Disp_PutStr(P("ON"));
+					if (modeAdv) {
+						grateMode = GRATE_SHAKE_PRATIO;
+						Logln("Grate Mode: Pressure Ratio");
+					}
+					break;
+				case GRATE_SHAKE_PRATIO:
+					Disp_PutStr(P("AUTO"));
+					if (modeAdv) {
+						grateMode = GRATE_SHAKE_OFF;
+						Logln("Grate Mode: Off");
+					}
+					break;
+				default:
+					break;
+			}
+			break;
+		case 2:
+			Disp_PutStr(P("Ash Auger: "));
+			switch (AshAugerControlState()) {
+				case ASH_AUGER_AUTO:
+					Disp_PutStr(P("AUTO"));
+					if (modeAdv) AshAugerControlRequest(ASH_AUGER_MANUAL);
+					break;
+				case ASH_AUGER_MANUAL:
+					Disp_PutStr(P("ON"));
+					if (modeAdv) AshAugerControlRequest(ASH_AUGER_DISABLED);
+					break;
+				case ASH_AUGER_DISABLED:
+					Disp_PutStr(P("OFF"));
+					if (modeAdv) AshAugerControlRequest(ASH_AUGER_AUTO);
+					break;
+				default:
+					break;
+			}
+			break;
+		default:
+			// If we run out of functions, go back to the beginning
+			currentFunction = 0;
+			break;
 	}
-	Disp_RC(2,0);
-	Disp_PutStr(P("Grate:              "));
-	Disp_RC(2,11);
-	if (grateMode == GRATE_SHAKE_OFF){
-		Disp_PutStr(P("OFF"));
-	} 
-	else if (grateMode == GRATE_SHAKE_PRATIO){
-		Disp_PutStr(P("AUTO"));
-	} 
-	else {
-		Disp_PutStr(P("ON"));
-	}
+	Disp_PutStr(P("          "));  // This is a hack to clear the rest of the line
 	Disp_RC(3,0);
-	Disp_PutStr(P("Next     Aug   Grate")); 
-	if (key == 2) {
-		config_changed = true;
-		Disp_RC(1,11);
-		if (auger_state == AUGER_ALARM){
-			TransitionAuger(AUGER_OFF);
-		} 
-		else {
-			TransitionAuger(AUGER_ALARM);
-		}
-	}
-	if (key == 3) {
-		config_changed = true;
-		switch (grateMode) {
-			case GRATE_SHAKE_OFF:
-				grateMode = GRATE_SHAKE_ON;
-				Logln("Grate Mode: On");
-				break;
-			case GRATE_SHAKE_ON:
-				grateMode = GRATE_SHAKE_PRATIO;
-				Logln("Grate Mode: Pressure Ratio");
-				break;
-			case GRATE_SHAKE_PRATIO:
-				grateMode = GRATE_SHAKE_OFF;
-				Logln("Grate Mode: Off");
-				break;
-		}
-	}
+	Disp_PutStr(P("NEXT"));
+	Disp_RC(3,6);
+	Disp_PutStr(P("ADV"));
+	Disp_RC(3,16);
+	Disp_PutStr(P("MODE"));
 }

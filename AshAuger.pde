@@ -1,22 +1,23 @@
 /*
 Ash Auger Control Logic
 TODO:
-	Disable O2 reset - done!
+	Disable O2 reset - done!  Now do it better...
 	Data logging, how and what
 	Hack manual control mode into UI
 	Add configuration settings
 */
 
 #ifndef ARDUINO
+#include "Config.h"
 #include "AshAuger.h"
 #endif
 
 // Ash auger time variables are in milliseconds
-unsigned int ashAugerLastTime;	// This stores the last time the control logic was executed
-unsigned int ashAugerRunTimer;  // This timer counts how long the auger has been in the current run state
-unsigned int ashAugerControlTimer;  // This timer counts how long the auger has been in the current control state
-unsigned int ashAugerRunPeriod;  // Total cycle time for the auger
-unsigned int ashAugerRunLength;  // Amount of time during the cycle the auger should run.  Must be less than total cycle time.
+unsigned long ashAugerLastTime;	// This stores the last time the control logic was executed
+unsigned long ashAugerRunTimer;  // This timer counts how long the auger has been in the current run state
+unsigned long ashAugerControlTimer;  // This timer counts how long the auger has been in the current control state
+unsigned long ashAugerRunPeriod;  // Total cycle time for the auger
+unsigned long ashAugerRunLength;  // Amount of time during the cycle the auger should run.  Must be less than total cycle time.
 
 ashAugerRunState_t ashAugerRunStateCurrent;
 ashAugerRunState_t ashAugerRunStatePrevious;
@@ -27,8 +28,9 @@ ashAugerControlState_t ashAugerControlStatePrevious;
 ashAugerControlState_t ashAugerControlStateRequested;
 
 void AshAugerRunRequest(ashAugerRunState_t s) {ashAugerRunStateRequested = s;}
-
+ashAugerRunState_t AshAugerRunState() {return ashAugerRunStateCurrent;}
 void AshAugerControlRequest(ashAugerControlState_t s) {ashAugerControlStateRequested = s;}
+ashAugerControlState_t AshAugerControlState() {return ashAugerControlStateCurrent;}
 
 void AshAugerInit() {
 	ashAugerRunPeriod = ASH_AUGER_PERIOD_DEFAULT;
@@ -54,6 +56,7 @@ void AshAugerRotateControlState() {
 	ashAugerControlStateCurrent = ashAugerControlStateRequested;
 	ashAugerControlTimer = 0;
 }
+
 
 void DoAshAuger() {
 	/*
@@ -104,6 +107,12 @@ void DoAshAuger() {
 				default:
 					break;
 			}
+			break;
+		case ASH_AUGER_MANUAL:
+			AshAugerRunRequest(ASH_AUGER_ON);
+			break;
+		case ASH_AUGER_DISABLED:
+			AshAugerRunRequest(ASH_AUGER_OFF);
 			break;
 		default:
 		// MANUAL and DISABLED modes don't require any internal control logic
