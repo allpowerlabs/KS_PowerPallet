@@ -35,7 +35,7 @@ EEPROM bytes used of 4k space:
 //constant definitions
 #define ABSENT -500
 
-#define CODE_VERSION "v1.3-20131213" 
+#define CODE_VERSION "v1.3-20131218" 
 
 //PROGMEM string buffer
 char p_buffer[41] = ""; 
@@ -266,7 +266,7 @@ PROGMEM const char *TestingStateName[] = {testing_state_1, testing_state_2, test
 int lineCount = 0;
 
 //Configuration Variables
-#define CONFIG_COUNT 28  
+#define CONFIG_COUNT 30 
 int config_var;
 byte config_changed = false;
 
@@ -298,8 +298,10 @@ prog_char config_24[] PROGMEM = "Grid tie?      ";
 prog_char config_25[] PROGMEM = "Pratio Low     ";
 prog_char config_26[] PROGMEM = "Ttred Warn Temp";
 prog_char config_27[] PROGMEM = "Pratio High    ";
+prog_char config_28[] PROGMEM = "Ash Aug Period ";
+prog_char config_29[] PROGMEM = "Ash Aug On Time";
 
-PROGMEM const char *Configuration[CONFIG_COUNT] = {config_0, config_1, config_2, config_3, config_4, config_5, config_6, config_7, config_8, config_9, config_10, config_11, config_12, config_13, config_14, config_15, config_16, config_17, config_18, config_19, config_20, config_21, config_22, config_23, config_24, config_25, config_26, config_27};
+PROGMEM const char *Configuration[CONFIG_COUNT] = {config_0, config_1, config_2, config_3, config_4, config_5, config_6, config_7, config_8, config_9, config_10, config_11, config_12, config_13, config_14, config_15, config_16, config_17, config_18, config_19, config_20, config_21, config_22, config_23, config_24, config_25, config_26, config_27, config_28, config_29};
 
 prog_char plus_minus[] PROGMEM = "+    -  ";
 prog_char no_yes[] PROGMEM = "NO  YES ";
@@ -335,13 +337,15 @@ plus_minus,
 no_yes,
 plus_minus,
 plus_minus_five,
-plus_minus
+plus_minus,
+plus_minus_five,
+plus_minus_five
 }; 
 
-//                              0    1    2    3    4   5    6   7    8    9    10   11   12   13   14   15   16   17   18  19   20  21  22  23   24  25   26   27
-int defaults[CONFIG_COUNT]   = {0,   0,   1,   10,  35, 100, 6,  1,   10,  98,  10,  130, 210, 195, 50,  60,  12,  3,   30, 140, 0,  3,  0,  1,   0,  30,  150, 60};  //default values to be saved to EEPROM for the following getConfig variables
-int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   0,   0,   0,   0,  0,   0,  0,  0,  1,   0,  0,   0,   0};  //minimum values allowed 
-int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15, 254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254, 254}; //maximum values allowed  
+//                              0    1    2    3    4   5    6   7    8    9    10   11   12   13   14   15   16   17   18  19   20  21  22  23   24  25   26   27   28   29
+int defaults[CONFIG_COUNT]   = {0,   0,   1,   10,  35, 100, 6,  1,   10,  98,  10,  130, 210, 195, 50,  60,  12,  3,   30, 140, 0,  3,  0,  1,   0,  30,  150, 60,  60,  30};  //default values to be saved to EEPROM for the following getConfig variables
+int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   0,   0,   0,   0,  0,   0,  0,  0,  1,   0,  0,   0,   0,   0,   0};  //minimum values allowed 
+int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15, 254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254, 254, 254, 254}; //maximum values allowed  
 
 //Don't forget to add the following to update_config_var in Display!  The first Configuration, Reset Defaults, is skipped, so these start at 1, not 0. 
 int engine_type = getConfig(1);  
@@ -371,6 +375,8 @@ int grid_tie = getConfig(24);
 int pratio_low_boundary = getConfig(25);
 int ttred_warn = getConfig(26)*5;
 int pratio_high_boundary = getConfig(27);
+//unsigned long ashAugerRunPeriod = getConfig(28) * 5000;
+//unsigned long ashAugerRunLength = getConfig(29) * 5000;
 
 // Grate turning variables
 int grateMode = GRATE_SHAKE_PRATIO; //set default starting state

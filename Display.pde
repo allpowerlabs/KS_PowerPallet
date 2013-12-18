@@ -738,31 +738,32 @@ void DoKeyInput() {
     }
     key = -1; //key caught
   }
-  // if (key == 1) {
-    // if (display_state == DISPLAY_CONFIG and config_changed == true){
-      // saveConfig(cur_item, config_var);
-      // update_config_var(cur_item);
-      // config_changed = false;
-    // }
-    // if (display_state == DISPLAY_RELAY){
-      // config_changed = false;
-      // turnAllOff();
-    // }
-    // cur_item += 1;
-    // if (cur_item > item_count) {
-      // switch (display_state) {
-        // case DISPLAY_CONFIG:
-        // case DISPLAY_RELAY:
-        // case DISPLAY_ANA:
-          // cur_item = 0;
-          // break;
-        // default:
-          // cur_item = 1;
-          // break;
-      // }
-    // } 
-    // key = -1; //key caught
-  // }
+  if (key == 1) {
+	if (display_state == DISPLAY_GRATE) return; // Bug out
+    if (display_state == DISPLAY_CONFIG and config_changed == true){
+      saveConfig(cur_item, config_var);
+      update_config_var(cur_item);
+      config_changed = false;
+    }
+    if (display_state == DISPLAY_RELAY){
+      config_changed = false;
+      turnAllOff();
+    }
+    cur_item += 1;
+    if (cur_item > item_count) {
+      switch (display_state) {
+        case DISPLAY_CONFIG:
+        case DISPLAY_RELAY:
+        case DISPLAY_ANA:
+          cur_item = 0;
+          break;
+        default:
+          cur_item = 1;
+          break;
+      }
+    } 
+    key = -1; //key caught
+  }
 }
 
 void DoHeartBeat() {
@@ -937,6 +938,10 @@ void update_config_var(int var_num){
     pRatioReactorLevelBoundary[0][0] = pratio_high;
     pRatioReactorLevelBoundary[1][1] = pratio_high;
     break;
+  case 28:
+    ashAugerRunPeriod = getConfig(28) * 5000;
+  case 29:
+    ashAugerRunLength = getConfig(29) * 5000;
   }
 }
 

@@ -2,9 +2,9 @@
 Ash Auger Control Logic
 TODO:
 	Disable O2 reset - done!  Now do it better...
-	Data logging, how and what
-	Hack manual control mode into UI
-	Add configuration settings
+	Data logging, how and what - done
+	Hack manual control mode into UI - done
+	Add configuration settings - done
 */
 
 #ifndef ARDUINO
@@ -16,8 +16,10 @@ TODO:
 unsigned long ashAugerLastTime;	// This stores the last time the control logic was executed
 unsigned long ashAugerRunTimer;  // This timer counts how long the auger has been in the current run state
 unsigned long ashAugerControlTimer;  // This timer counts how long the auger has been in the current control state
+//#ifndef ARDUINO
 unsigned long ashAugerRunPeriod;  // Total cycle time for the auger
 unsigned long ashAugerRunLength;  // Amount of time during the cycle the auger should run.  Must be less than total cycle time.
+//#endif
 
 ashAugerRunState_t ashAugerRunStateCurrent;
 ashAugerRunState_t ashAugerRunStatePrevious;
@@ -33,14 +35,16 @@ void AshAugerControlRequest(ashAugerControlState_t s) {ashAugerControlStateReque
 ashAugerControlState_t AshAugerControlState() {return ashAugerControlStateCurrent;}
 
 void AshAugerInit() {
-	ashAugerRunPeriod = ASH_AUGER_PERIOD_DEFAULT;
-	ashAugerRunLength = ASH_AUGER_LENGTH_DEFAULT;
+	//ashAugerRunPeriod = ASH_AUGER_PERIOD_DEFAULT;
+	//ashAugerRunLength = ASH_AUGER_LENGTH_DEFAULT;
 	AshAugerReset();
+	AshAugerRunRequest(ASH_AUGER_OFF);
+	AshAugerControlRequest(ASH_AUGER_AUTO);
 }
 
 void AshAugerReset() {
-	AshAugerRunRequest(ASH_AUGER_OFF);
-	AshAugerControlRequest(ASH_AUGER_AUTO);
+	ashAugerRunPeriod = getConfig(28) * 5000;
+	ashAugerRunLength = getConfig(29) * 5000;
 }
 
 void AshAugerOn() {digitalWrite(FET_ASH_AUGER, HIGH);}
@@ -74,12 +78,15 @@ void DoAshAuger() {
 		// A new control state has been requested.  
 		switch (ashAugerControlStateRequested) {
 			case ASH_AUGER_AUTO:
+				Logln_p("Ash auger automatic mode");
 				// Not much to do here...
 				break;
 			case ASH_AUGER_MANUAL:
+				Logln_p("Ash auger manual mode");
 				// ... or here, either.
 				break;
 			case ASH_AUGER_DISABLED:
+				Logln_p("Ash auger disabled");
 				// Blorp!
 				break;
 			default:
@@ -123,9 +130,11 @@ void DoAshAuger() {
 		// A new run state has been requested.
 		switch (ashAugerRunStateRequested) {
 			case ASH_AUGER_ON:
+				Logln_p("Ash auger ON");
 				AshAugerOn();
 				break;
 			case ASH_AUGER_OFF:
+				Logln_p("Ash auger OFF");
 				AshAugerOff();
 		}
 		//Rotate run states
