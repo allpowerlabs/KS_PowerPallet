@@ -16,10 +16,9 @@ TODO:
 unsigned long ashAugerLastTime;	// This stores the last time the control logic was executed
 unsigned long ashAugerRunTimer;  // This timer counts how long the auger has been in the current run state
 unsigned long ashAugerControlTimer;  // This timer counts how long the auger has been in the current control state
-//#ifndef ARDUINO
+
 unsigned long ashAugerRunPeriod;  // Total cycle time for the auger
 unsigned long ashAugerRunLength;  // Amount of time during the cycle the auger should run.  Must be less than total cycle time.
-//#endif
 
 ashAugerRunState_t ashAugerRunStateCurrent;
 ashAugerRunState_t ashAugerRunStatePrevious;
@@ -43,8 +42,10 @@ void AshAugerInit() {
 }
 
 void AshAugerReset() {
-	ashAugerRunPeriod = getConfig(28) * 5000;
-	ashAugerRunLength = getConfig(29) * 5000;
+	// getConfig(28) is period in 5-second increments
+	// getConfig(29) is % duty cycle
+	ashAugerRunPeriod = (unsigned long) getConfig(28) * 5000;  // Avoid casting error 
+	ashAugerRunLength = (ashAugerRunPeriod * getConfig(29)) / 100;
 }
 
 void AshAugerOn() {digitalWrite(FET_ASH_AUGER, HIGH);}
@@ -53,7 +54,7 @@ void AshAugerOff() {digitalWrite(FET_ASH_AUGER, LOW);}
 void AshAugerRotateRunState() {
 	ashAugerRunStatePrevious = ashAugerRunStateCurrent;
 	ashAugerRunStateCurrent = ashAugerRunStateRequested;
-	ashAugerRunTimer = 0;
+	ashAugerRunTimer = 0;  // Here's where we reset the run timer
 }
 void AshAugerRotateControlState() {
 	ashAugerControlStatePrevious = ashAugerControlStateCurrent;

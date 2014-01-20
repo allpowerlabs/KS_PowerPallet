@@ -155,10 +155,10 @@ void LogPressures(boolean header = false) {
 void LogTemps(boolean header = false) {
   if (header) {
 #if T_TRED != ABSENT
-    PrintColumn(P("T_tred"));
+    PrintColumn(P("T_rst"));
 #endif
 #if T_BRED != ABSENT
-    PrintColumn(P("T_bred"));
+    PrintColumn(P("T_red"));
 #endif
 #if T_PYRO_IN != ABSENT
     PrintColumn(P("T_pyro_in"));

@@ -2,7 +2,7 @@ void DoAuger() {
   checkAuger();
   switch (auger_state) {
   case AUGER_OFF:
-    if (FuelDemand == SWITCH_ON) {
+    if (FuelDemand == SWITCH_ON) { //&& P_reactorLevel > OFF) {
       if (relay_board == 1){
         TransitionAuger(AUGER_STARTING);
       } 

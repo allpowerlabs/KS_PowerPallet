@@ -1,21 +1,25 @@
 void DoFlare() {
-  switch (flare_state) {
-    case FLARE_OFF:
-      break;
-    case FLARE_USER_SET:
-      if (P_reactorLevel != OFF && engine_state != ENGINE_ON && engine_state != ENGINE_STARTING) {
-        ignitor_on = true;
-        digitalWrite(FET_FLARE_IGNITOR,HIGH);
-      } else {
-        ignitor_on = false;
-        digitalWrite(FET_FLARE_IGNITOR,LOW);
-      }
-      break;
-  }
-#if FET_BLOWER != ABSENT
-    blower_dial = analogRead(ANA_BLOWER_DIAL);
-    analogWrite(FET_BLOWER,blower_dial/4);
-#endif
+	switch (flare_state) {
+	case FLARE_OFF:
+		break;
+	case FLARE_USER_SET:
+		if (
+			P_reactorLevel > OFF &&
+			T_tredLevel > COLD &&
+			engine_state == ENGINE_OFF
+		) {
+			ignitor_on = true;
+			digitalWrite(FET_FLARE_IGNITOR,HIGH);
+		} else {
+			ignitor_on = false;
+			digitalWrite(FET_FLARE_IGNITOR,LOW);
+		}
+		break;
+	}
+// #if FET_BLOWER != ABSENT
+    // blower_dial = analogRead(ANA_BLOWER_DIAL);
+    // analogWrite(FET_BLOWER,blower_dial/4);
+// #endif
 }
 
 void DoReactor() {

@@ -7,9 +7,9 @@ void DoEngine() {
       }
       if (grid_tie == 1){
         if (EngineShutdownFromAlarm()){
-          digitalWrite(FET_IGNITION,HIGH);
+          digitalWrite(FET_STARTER,HIGH);
         } else {
-          digitalWrite(FET_IGNITION,LOW);
+          digitalWrite(FET_STARTER,LOW);
         }
       }
       break;
@@ -70,8 +70,8 @@ void DoEngine() {
         TransitionEngine(ENGINE_OFF);
       }
       break;
-    case ENGINE_SHUTDOWN:  
-      if (millis() - engine_state_entered > 3500) {
+    case ENGINE_SHUTDOWN:
+      if (grid_tie || (millis() - engine_state_entered > 3500)) {  // Don't delay shutdown for grid tie
         TransitionEngine(ENGINE_OFF);
       }
       break;
@@ -117,7 +117,7 @@ void TransitionEngine(int new_state) {
         //TransitionMessage("Engine: Shutting down");   
         break;
     }
-  } else { //Engine controlled by Deap Sea for Gridtie
+  } else { //Engine controlled by Derp Sea for Gridtie
     switch (new_state) {
       case ENGINE_OFF:
         Log(p_buffer); Logln_p("Off");
@@ -138,7 +138,7 @@ void TransitionEngine(int new_state) {
         digitalWrite(FET_IGNITION,LOW);
         digitalWrite(FET_STARTER,LOW);
         break;
-      case ENGINE_GOV_TUNING:     //How is this handled by Deap Sea?
+      case ENGINE_GOV_TUNING:     //How is this handled by Derp Sea?
         Log(p_buffer); Logln_p("Gov Tuning");
         digitalWrite(FET_IGNITION,LOW);
         digitalWrite(FET_STARTER,LOW);

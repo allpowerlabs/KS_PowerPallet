@@ -72,30 +72,24 @@ void DoDisplay() {
     else {
       //Row 0
       Disp_RC(0, 0);
-//      if (millis()-transition_entered<2000) {
-//        transition_message.toCharArray(buf,21);
-//        Disp_PutStr(buf);
-//      } 
-//      else {
         if (disp_alt) {
-          sprintf(buf, "Ttred%4i  ", Temp_Data[T_TRED]);
+          sprintf(buf, "Trst %4i  ", Temp_Data[T_TRED]);
         } 
         else {
-          sprintf(buf, "Ttred%s  ", T_tredLevel[TempLevelName]); // add spaces to erase prior
+          sprintf(buf, "Trst %s  ", T_tredLevel[TempLevelName]); // add spaces to erase prior
         }
         Disp_PutStr(buf);
         Disp_RC(0, 11);
         sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
         Disp_PutStr(buf);
-//      }
 
       //Row 1
       Disp_RC(1, 0);
       if (disp_alt) {
-        sprintf(buf, "Tbred%4i  ", Temp_Data[T_BRED]);
+        sprintf(buf, "Tred %4i  ", Temp_Data[T_BRED]);
       } 
       else {
-        sprintf(buf, "Tbred%s  ", T_bredLevel[TempLevelName]); // add spaces to erase prior
+        sprintf(buf, "Tred %s  ", T_bredLevel[TempLevelName]); // add spaces to erase prior
       }
       Disp_PutStr(buf);
       Disp_RC(1, 11);
@@ -633,7 +627,7 @@ void TransitionDisplay(int new_state) {
     break;
   case DISPLAY_RELAY:
     turnAllOff();
-    TransitionAuger(AUGER_OFF);  //reboot auger states
+    TransitionAuger(AUGER_ALARM);  //stop the auger control
     cur_item = 0;
     break; 
   case DISPLAY_CONFIG: 
@@ -673,6 +667,10 @@ void DoKeyInput() {
       break;
     case DISPLAY_GRATE:
       grateMode = GRATE_SHAKE_PRATIO;
+	  if(grateMode == GRATE_SHAKE_ON) {  // Grate shaker got left on
+		grateMode = GRATE_SHAKE_PRATIO;  // Turn it off
+		Logln("Grate Mode: Pressure Ratio");
+	  }
       if (config_changed == true){
         TransitionDisplay(DISPLAY_REACTOR);
       } else {
@@ -699,6 +697,7 @@ void DoKeyInput() {
       break;
     case DISPLAY_RELAY:
       turnAllOff();
+	  TransitionAuger(AUGER_OFF);
       if (engine_state == ENGINE_OFF) {
         TransitionDisplay(DISPLAY_ANA);
       } 
@@ -939,9 +938,11 @@ void update_config_var(int var_num){
     pRatioReactorLevelBoundary[1][1] = pratio_high;
     break;
   case 28:
-    ashAugerRunPeriod = getConfig(28) * 5000;
+    AshAugerReset();
+	break;
   case 29:
-    ashAugerRunLength = getConfig(29) * 5000;
+    AshAugerReset();
+	break;
   }
 }
 
@@ -983,14 +984,12 @@ void displayManualMode() {
 			Disp_PutStr(P("Fuel Auger: "));
 			switch (auger_state) {
 				case AUGER_ALARM:
-					Disp_PutStr(P("AUTO"));
+					Disp_PutStr(P("OFF"));
 					if (modeAdv) TransitionAuger(AUGER_OFF);
 					break;
-				case AUGER_OFF:
-					Disp_PutStr(P("OFF"));
-					if (modeAdv) TransitionAuger(AUGER_ALARM);
-					break;
 				default:
+					Disp_PutStr(P("AUTO"));
+					if (modeAdv) TransitionAuger(AUGER_ALARM);  // Alarm state is used to suppress the auger, but no alarm is raised
 					break;
 			}
 			break;

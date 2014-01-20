@@ -35,7 +35,8 @@ EEPROM bytes used of 4k space:
 //constant definitions
 #define ABSENT -500
 
-#define CODE_VERSION "v1.3-20131218" 
+// #define CODE_VERSION "v1.3-20140114"
+#define CODE_VERSION "v1.3-rc1"
 
 //PROGMEM string buffer
 char p_buffer[41] = ""; 
@@ -242,14 +243,14 @@ unsigned long testing_state_entered = 0;
 int analog_input[] = {ANA0, ANA1, ANA2, ANA3, ANA4, ANA5, ANA6, ANA7};
 
 //prog_char testing_state_0[] PROGMEM = "Off";
-prog_char testing_state_1[] PROGMEM = "FET0 Auger Fwd";
+prog_char testing_state_1[] PROGMEM = "FET0 Fuel Auger Fwd";
 prog_char testing_state_2[] PROGMEM = "FET1 Grate";
 prog_char testing_state_3[] PROGMEM = "FET2 Engine/Governor";
 prog_char testing_state_4[] PROGMEM = "FET3 Starter";
 prog_char testing_state_5[] PROGMEM = "FET4 Flare";
-prog_char testing_state_6[] PROGMEM = "FET5 O2 Reset";
+prog_char testing_state_6[] PROGMEM = "FET5 Ash Auger";
 prog_char testing_state_7[] PROGMEM = "FET6 Alarm";
-prog_char testing_state_8[] PROGMEM = "FET7 Auger Rev";
+prog_char testing_state_8[] PROGMEM = "FET7 Fuel Auger Rev";
 
 prog_char testing_state_9[] PROGMEM =  "ANA_Lambda";
 prog_char testing_state_10[] PROGMEM = "ANA_Fuel_Switch";
@@ -281,9 +282,9 @@ prog_char config_7[] PROGMEM = "Datalog SD card";
 prog_char config_8[] PROGMEM = "Pratio Accum#  "; 
 prog_char config_9[] PROGMEM = "High Coolant T "; 
 prog_char config_10[] PROGMEM = "Display Per .1s"; 
-prog_char config_11[] PROGMEM = "Ttred low temp?"; 
-prog_char config_12[] PROGMEM = "Ttred High Temp"; 
-prog_char config_13[] PROGMEM = "Tbred High Temp";
+prog_char config_11[] PROGMEM = "Trst low temp?"; 
+prog_char config_12[] PROGMEM = "Trst High Temp"; 
+prog_char config_13[] PROGMEM = "Tred High Temp";
 prog_char config_14[] PROGMEM = "Pfilter Accum# "; 
 prog_char config_15[] PROGMEM = "Grate Max Inter"; 
 prog_char config_16[] PROGMEM = "Grate Min Inter"; 
@@ -296,10 +297,10 @@ prog_char config_22[] PROGMEM = "Modbus Parity  ";  //0:None, 1:Odd, 2:Even
 prog_char config_23[] PROGMEM = "Modbus Address ";  //1-127
 prog_char config_24[] PROGMEM = "Grid tie?      "; 
 prog_char config_25[] PROGMEM = "Pratio Low     ";
-prog_char config_26[] PROGMEM = "Ttred Warn Temp";
+prog_char config_26[] PROGMEM = "Trst Warn Temp ";
 prog_char config_27[] PROGMEM = "Pratio High    ";
 prog_char config_28[] PROGMEM = "Ash Aug Period ";
-prog_char config_29[] PROGMEM = "Ash Aug On Time";
+prog_char config_29[] PROGMEM = "Ash Aug Duty(%)";
 
 PROGMEM const char *Configuration[CONFIG_COUNT] = {config_0, config_1, config_2, config_3, config_4, config_5, config_6, config_7, config_8, config_9, config_10, config_11, config_12, config_13, config_14, config_15, config_16, config_17, config_18, config_19, config_20, config_21, config_22, config_23, config_24, config_25, config_26, config_27, config_28, config_29};
 
@@ -339,13 +340,13 @@ plus_minus,
 plus_minus_five,
 plus_minus,
 plus_minus_five,
-plus_minus_five
+plus_minus
 }; 
 
 //                              0    1    2    3    4   5    6   7    8    9    10   11   12   13   14   15   16   17   18  19   20  21  22  23   24  25   26   27   28   29
-int defaults[CONFIG_COUNT]   = {0,   0,   1,   10,  35, 100, 6,  1,   10,  98,  10,  130, 210, 195, 50,  60,  12,  3,   30, 140, 0,  3,  0,  1,   0,  30,  150, 60,  60,  30};  //default values to be saved to EEPROM for the following getConfig variables
-int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   0,   0,   0,   0,  0,   0,  0,  0,  1,   0,  0,   0,   0,   0,   0};  //minimum values allowed 
-int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15, 254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254, 254, 254, 254}; //maximum values allowed  
+int defaults[CONFIG_COUNT]   = {0,   0,   1,   10,  35, 100, 6,  1,   10,  98,  10,  130, 210, 195, 50,  60,  12,  3,   30, 140, 0,  3,  0,  1,   0,  30,  150, 60,  60,  50};  //default values to be saved to EEPROM for the following getConfig variables
+int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   0,   0,   0,   0,  0,   0,  0,  0,  1,   0,  0,   0,   0,   5,   5};  //minimum values allowed 
+int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15, 254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254, 254, 254, 95}; //maximum values allowed  
 
 //Don't forget to add the following to update_config_var in Display!  The first Configuration, Reset Defaults, is skipped, so these start at 1, not 0. 
 int engine_type = getConfig(1);  
@@ -578,8 +579,8 @@ int pressureRatioAccumulator = 0;
 
 #define ALARM_NUM 16
 unsigned long alarm_on[ALARM_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-unsigned long alarm_start[ALARM_NUM] = {240000, 480000, pratio_max, pfilter_alarm, 230, 0, 0, 0, 30000, 60000, 10, 0, 0, 3000, 15000};  //count or time in milliseconds when alarm goes off
-unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 60000, 0, 0, 180000, 0, 0, 3000, 7000, 15000};  //time when engine will be shutdown
+unsigned long alarm_start[ALARM_NUM] = {240000, 480000, pratio_max, pfilter_alarm, 230, 0, 0, 0, 30000, 60000, 10, 0, 0, 3000, 15000, 0};  //count or time in milliseconds when alarm goes off
+unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 60000, 0, 0, 180000, 0, 0, 3000, 7000, 15000, 60000};  //time when engine will be shutdown
 int alarm_count = 0;
 int alarm_queue[ALARM_NUM] = {};
 int alarm_shown = 0;
@@ -606,8 +607,8 @@ prog_char alarm_2[] PROGMEM = "Auger off too long  ";
 prog_char alarm_3[] PROGMEM = "Bad Reactor P_ratio ";
 prog_char alarm_4[] PROGMEM = "Bad Filter P_ratio  ";
 prog_char alarm_5[] PROGMEM = "Reactor Fuel Low    ";
-prog_char alarm_6[] PROGMEM = "tred low for engine ";
-prog_char alarm_7[] PROGMEM = "bred high for engine";
+prog_char alarm_6[] PROGMEM = "Trst low for engine ";
+prog_char alarm_7[] PROGMEM = "Tred high for engine";
 prog_char alarm_8[] PROGMEM = "Check Oil Pressure  ";
 prog_char alarm_9[] PROGMEM  = "No O2 Sensor Signal ";
 prog_char alarm_10[] PROGMEM = "Auger Low Current   ";
@@ -615,10 +616,10 @@ prog_char alarm_11[] PROGMEM = "FuelSwitch/Auger Jam";
 prog_char alarm_12[] PROGMEM = "High P_comb         ";
 prog_char alarm_13[] PROGMEM = "High Coolant Temp   ";
 prog_char alarm_14[] PROGMEM = "Reduction Temp Low  ";
-prog_char alarm_15[] PROGMEM = "Reduction Temp High ";
-//prog_char alarm_16[] PROGMEM = "Reduction Temp High ";
+prog_char alarm_15[] PROGMEM = "Restriction Temp High ";
+prog_char alarm_16[] PROGMEM = "Reduction Temp High ";
 
-PROGMEM const char *display_alarm[]  = {alarm_1, alarm_2, alarm_3, alarm_4, alarm_5, alarm_6, alarm_7, alarm_8, alarm_9, alarm_10, alarm_11, alarm_12, alarm_13, alarm_14, alarm_15, alarm_15};
+PROGMEM const char *display_alarm[]  = {alarm_1, alarm_2, alarm_3, alarm_4, alarm_5, alarm_6, alarm_7, alarm_8, alarm_9, alarm_10, alarm_11, alarm_12, alarm_13, alarm_14, alarm_15, alarm_16};
 
 //line 2 on display.  If shutdown[] is greater than zero, countdown will be added to last 3 spaces.
 prog_char alarm2_1[] PROGMEM = "Check Fuel          ";
@@ -734,7 +735,7 @@ void setup() {
   }
 
  
-  TransitionEngine(ENGINE_ON); //default to engine on. if PCU resets, don't shut a running engine off. in the ENGINE_ON state, should detect and transition out of engine on.
+  if (!grid_tie) TransitionEngine(ENGINE_ON); //default to engine on. if PCU resets, don't shut a running engine off. in the ENGINE_ON state, should detect and transition out of engine on.
   TransitionLambda(LAMBDA_UNKNOWN);
   TransitionAuger(AUGER_OFF);
   TransitionDisplay(DISPLAY_SPLASH);
