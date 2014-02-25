@@ -1,10 +1,11 @@
 /*
 Ash Auger Control Logic
 TODO:
-	Disable O2 reset - done!  Now do it better...
-	Data logging, how and what - done
-	Hack manual control mode into UI - done
-	Add configuration settings - done
+	Hack in VNH bridge control
+	Get rid of duty cycle settings.  Should be on when reactor is running
+	Add current limit and reversing settings
+
+	To change defaults, edit AshAuger.h
 */
 
 #ifndef ARDUINO
@@ -12,133 +13,154 @@ TODO:
 #include "AshAuger.h"
 #endif
 
-// Ash auger time variables are in milliseconds
-unsigned long ashAugerLastTime;	// This stores the last time the control logic was executed
-unsigned long ashAugerRunTimer;  // This timer counts how long the auger has been in the current run state
-unsigned long ashAugerControlTimer;  // This timer counts how long the auger has been in the current control state
+vnh_s ashAuger;
+ashAugerMode_t ashAugerMode;
 
-unsigned long ashAugerRunPeriod;  // Total cycle time for the auger
-unsigned long ashAugerRunLength;  // Amount of time during the cycle the auger should run.  Must be less than total cycle time.
-
-ashAugerRunState_t ashAugerRunStateCurrent;
-ashAugerRunState_t ashAugerRunStatePrevious;
-ashAugerRunState_t ashAugerRunStateRequested;
-
-ashAugerControlState_t ashAugerControlStateCurrent;
-ashAugerControlState_t ashAugerControlStatePrevious;
-ashAugerControlState_t ashAugerControlStateRequested;
-
-void AshAugerRunRequest(ashAugerRunState_t s) {ashAugerRunStateRequested = s;}
-ashAugerRunState_t AshAugerRunState() {return ashAugerRunStateCurrent;}
-void AshAugerControlRequest(ashAugerControlState_t s) {ashAugerControlStateRequested = s;}
-ashAugerControlState_t AshAugerControlState() {return ashAugerControlStateCurrent;}
+// Interrupt service routine for dealing with the ash auger H-bridge
+ISR(TIMER5_COMPA_vect) {
+	vnh_tick(&ashAuger);
+}
+// Init routine for timer 5, which we use for monitoring the H-bridge
+void timer5_init() {
+	// Timer 5 control registers
+	TCCR5A = 0;
+	TCCR5B = _BV(WGM52) | _BV(CS51) | _BV(CS50);  //CTC mode, clk/64 (4uS)
+	TCCR5C = 0;
+	// Timer 5 output compare registers
+	OCR5AH = ASH_AUGER_PERIOD_HI;
+	OCR5AL = ASH_AUGER_PERIOD_LO;
+	// Timer 5 interrupt mask
+	TIMSK5 = _BV(OCIE5A); // Output compare A interrupt enable
+}
 
 void AshAugerInit() {
-	//ashAugerRunPeriod = ASH_AUGER_PERIOD_DEFAULT;
-	//ashAugerRunLength = ASH_AUGER_LENGTH_DEFAULT;
-	AshAugerReset();
-	AshAugerRunRequest(ASH_AUGER_OFF);
-	AshAugerControlRequest(ASH_AUGER_AUTO);
-}
-
-void AshAugerReset() {
-	// getConfig(28) is period in 5-second increments
-	// getConfig(29) is % duty cycle
-	ashAugerRunPeriod = (unsigned long) getConfig(28) * 5000;  // Avoid casting error 
-	ashAugerRunLength = (ashAugerRunPeriod * getConfig(29)) / 100;
-}
-
-void AshAugerOn() {digitalWrite(FET_ASH_AUGER, HIGH);}
-void AshAugerOff() {digitalWrite(FET_ASH_AUGER, LOW);}
-
-void AshAugerRotateRunState() {
-	ashAugerRunStatePrevious = ashAugerRunStateCurrent;
-	ashAugerRunStateCurrent = ashAugerRunStateRequested;
-	ashAugerRunTimer = 0;  // Here's where we reset the run timer
-}
-void AshAugerRotateControlState() {
-	ashAugerControlStatePrevious = ashAugerControlStateCurrent;
-	ashAugerControlStateCurrent = ashAugerControlStateRequested;
-	ashAugerControlTimer = 0;
-}
-
-
-void DoAshAuger() {
-	/*
-		Order of operations:
-			Control state transitions
-			Control logic
-			Run state transitions
-	*/
-	unsigned int loopDelay;
+	ashAuger.mota = (gpio_s) {&PORTL, 0};
+	ashAuger.motb = (gpio_s) {&PORTD, 2};
+	ashAuger.ena = (gpio_s) {&PORTL, 1};
+	ashAuger.enb = (gpio_s) {&PORTD, 1};
+	ashAuger.pwm = (gpio_s) {&PORTL, 2};
+	ashAuger.adc = 7;
+	ashAuger.mod.ramp = 1;
+	ashAuger.mod.target = VNH_MOD_MAX;
+	ashAuger.mod.mode = VNH_PWM_SOFT;
+	ashAuger.climit = ASH_AUGER_CLIMIT;
+	ashAuger.chyst = ASH_AUGER_CHYST;
+	vnh_reset(&ashAuger);
 	
-	loopDelay = (millis() - ashAugerLastTime);
-	ashAugerLastTime = millis();
-	// Do control state transitions first so we can take action immediately after
-	if (ashAugerControlStateRequested != ashAugerControlStateCurrent) {
-		// A new control state has been requested.  
-		switch (ashAugerControlStateRequested) {
-			case ASH_AUGER_AUTO:
-				Logln_p("Ash auger automatic mode");
-				// Not much to do here...
-				break;
-			case ASH_AUGER_MANUAL:
-				Logln_p("Ash auger manual mode");
-				// ... or here, either.
-				break;
-			case ASH_AUGER_DISABLED:
-				Logln_p("Ash auger disabled");
-				// Blorp!
-				break;
-			default:
-				break;
-		}
-		//Rotate control states
-		AshAugerRotateControlState();	
-	}
-	// This is the logic for AUTO control mode
-	switch (ashAugerControlStateCurrent) {
+	timer5_init();
+	
+	AshAugerSetMode(ASH_AUGER_AUTO);
+}
+
+void AshAugerSetMode(ashAugerMode_t mode){
+	switch (mode) {
 		case ASH_AUGER_AUTO:
-			ashAugerRunTimer += loopDelay; // Increment auger run timer
-			// Do checks to see if we should transition run state
-			switch (ashAugerRunStateCurrent) {
-				case ASH_AUGER_OFF:
-					// Is it time to start the auger?
-					if (ashAugerRunTimer > (ashAugerRunPeriod - ashAugerRunLength)) 
-						AshAugerRunRequest(ASH_AUGER_ON);
-					break;
-				case ASH_AUGER_ON:
-					// Have we reached the end of the run cycle?
-					if (ashAugerRunTimer > ashAugerRunLength) 
-						AshAugerRunRequest(ASH_AUGER_OFF);
-					break;
-				default:
-					break;
-			}
+			Logln_p("Ash auger automatic mode");
 			break;
 		case ASH_AUGER_MANUAL:
-			AshAugerRunRequest(ASH_AUGER_ON);
+			Logln_p("Ash auger manual mode");
 			break;
 		case ASH_AUGER_DISABLED:
-			AshAugerRunRequest(ASH_AUGER_OFF);
+			Logln_p("Ash auger disabled");
 			break;
 		default:
-		// MANUAL and DISABLED modes don't require any internal control logic
+			Logln_p("Ash auger unknown mode requested!");
 			break;
 	}
-	// Handle run state transitions at the end.
-	if (ashAugerRunStateRequested != ashAugerRunStateCurrent) {
-		// A new run state has been requested.
-		switch (ashAugerRunStateRequested) {
-			case ASH_AUGER_ON:
-				Logln_p("Ash auger ON");
-				AshAugerOn();
-				break;
-			case ASH_AUGER_OFF:
-				Logln_p("Ash auger OFF");
-				AshAugerOff();
-		}
-		//Rotate run states
-		AshAugerRotateRunState();
+	ashAugerMode = mode;
+}
+
+ashAugerMode_t AshAugerGetMode(){
+	return ashAugerMode;
+}
+
+void AshAugerRun() {
+	enum motor_states {
+		STANDBY,
+		FORWARD,
+		REVERSE,
+		STALL,
+	};
+	
+	static unsigned state=STANDBY;
+	static unsigned long last=0;
+	static unsigned long run_timer=0;
+	static unsigned long limit_accum=0;
+	
+	vnh_status_s status;
+	
+	status = vnh_get_status(&ashAuger);
+	
+	// We use
+	if (vnh_get_fault(&ashAuger)) limit_accum += ASH_AUGER_CLIMIT_ACCUM_UP;
+	else {
+		if (limit_accum > ASH_AUGER_CLIMIT_ACCUM_DOWN)
+			limit_accum -= ASH_AUGER_CLIMIT_ACCUM_DOWN;
+		else limit_accum = 0;
+	}
+	
+	switch (state) {
+		case STANDBY:
+			if (status.mode != VNH_STANDBY) {
+				vnh_standby(&ashAuger);
+				run_timer = 0;
+			}
+			state = FORWARD;
+			break;
+		case FORWARD:
+			if (status.mode != VNH_FORWARD) {
+				vnh_forward(&ashAuger);
+				run_timer = 0;
+			}
+			if (limit_accum > ASH_AUGER_CLIMIT_ACCUM_HIGH) {
+				state = STALL;
+			}
+			break;
+		case REVERSE:
+			if (status.mode != VNH_REVERSE) {
+				run_timer = 0;
+				vnh_reverse(&ashAuger);
+			}
+			if (run_timer > ASH_AUGER_REVERSE_TIME) state = FORWARD;
+			break;
+		case STALL:
+			if (status.mode != VNH_BRAKE) {
+				vnh_brake(&ashAuger);
+				run_timer = 0;
+			}
+			if (run_timer > ASH_AUGER_STALL_TIME) state = REVERSE;
+			break;
+		default:
+			state = STANDBY;
+			break;
+	}
+	run_timer += millis() - last;
+	last = millis();
+}
+
+void AshAugerStop() {
+	vnh_status_s status;
+	
+	status = vnh_get_status(&ashAuger);
+	
+	if (status.mode != VNH_STANDBY) vnh_standby(&ashAuger);
+}
+
+void DoAshAuger() {
+	switch (ashAugerMode) {
+		case ASH_AUGER_AUTO:
+			if (P_reactorLevel > OFF && T_tredLevel > COLD) {
+				AshAugerRun();
+			}
+			else AshAugerStop();
+			break;
+		case ASH_AUGER_MANUAL:
+			AshAugerRun();
+			break;
+		case ASH_AUGER_DISABLED:
+			AshAugerStop();
+			break;
+		default:
+			break;
 	}
 }

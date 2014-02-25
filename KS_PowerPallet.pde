@@ -15,6 +15,7 @@
 #include <timer.h>          // part of KSlibs, not implemented
 #include <ui.h>             // part of KSlibs, menu
 #include <util.h>           // part of KSlibs, utility functions, GCU_Setup
+#include <vnh_bridge.h>		// part of KSlibs, VNHxxx H-bridge driver
 #include <avr/io.h>         // advanced: provides port definitions for the microcontroller (ATmega1280, http://www.atmel.com/dyn/resources/prod_documents/doc2549.PDF)   
 #include <SD.h>             // SD card  
 #include <avr/pgmspace.h>
@@ -36,7 +37,7 @@ EEPROM bytes used of 4k space:
 #define ABSENT -500
 
 // #define CODE_VERSION "v1.3-20140114"
-#define CODE_VERSION "v1.3-rc1"
+#define CODE_VERSION "v1.3-20140221"
 
 //PROGMEM string buffer
 char p_buffer[41] = ""; 
