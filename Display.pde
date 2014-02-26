@@ -121,40 +121,51 @@ void DoDisplay() {
       Disp_PutStr(buf);
       //Row 3
       Disp_RC(3,0);
-      switch(auger_state){ 
-      case AUGER_FORWARD:
-        sprintf(buf, "AugFwd%3i  ", (millis() - auger_state_entered)/1000);
-        break;
-      case AUGER_OFF:
-        if (P_reactorLevel == OFF) {
-          sprintf(buf, "AugOff%s  ", " --"); 
-        } 
-        else {
-          sprintf(buf, "AugOff%3i  ", (millis() - auger_state_entered)/1000);  
-        }
-        break;
-      case AUGER_REVERSE:
-        sprintf(buf, "AugRev%3i  ", (millis() - auger_state_entered)/1000); 
-        break;
-      case AUGER_HIGH:
-        sprintf(buf, "AugHi %3i  ", (millis() - auger_state_entered)/1000); 
-        break;
-      case AUGER_CURRENT_LOW:
-        sprintf(buf, "AugLow%3i  ", (millis() - auger_state_entered)/1000);
-        break;
-      case AUGER_REVERSE_HIGH:
-        sprintf(buf, "AugRHi%3i  ", (millis() - auger_state_entered)/1000); 
-        break;
-      case AUGER_ALARM:
-        sprintf(buf, "AugALRM%3i ", (millis() - auger_state_entered)/1000);
-        break;
-      default:
-        sprintf(buf, "Aug   %3i  ", (millis() - auger_state_entered)/1000);
-        break;
-      }
-      Disp_PutStr(buf);
-      Disp_RC(3, 10);
-      strcpy_P(buf, half_blank);
+      // switch(auger_state){ 
+      // case AUGER_FORWARD:
+        // sprintf(buf, "AugFwd%3i  ", (millis() - auger_state_entered)/1000);
+        // break;
+      // case AUGER_OFF:
+        // if (P_reactorLevel == OFF) {
+          // sprintf(buf, "AugOff%s  ", " --"); 
+        // } 
+        // else {
+          // sprintf(buf, "AugOff%3i  ", (millis() - auger_state_entered)/1000);  
+        // }
+        // break;
+      // case AUGER_REVERSE:
+        // sprintf(buf, "AugRev%3i  ", (millis() - auger_state_entered)/1000); 
+        // break;
+      // case AUGER_HIGH:
+        // sprintf(buf, "AugHi %3i  ", (millis() - auger_state_entered)/1000); 
+        // break;
+      // case AUGER_CURRENT_LOW:
+        // sprintf(buf, "AugLow%3i  ", (millis() - auger_state_entered)/1000);
+        // break;
+      // case AUGER_REVERSE_HIGH:
+        // sprintf(buf, "AugRHi%3i  ", (millis() - auger_state_entered)/1000); 
+        // break;
+      // case AUGER_ALARM:
+        // sprintf(buf, "AugALRM%3i ", (millis() - auger_state_entered)/1000);
+        // break;
+      // default:
+        // sprintf(buf, "Aug   %3i  ", (millis() - auger_state_entered)/1000);
+        // break;
+      // }
+      //Disp_PutStr(buf);
+      //Disp_RC(3, 10);
+	  //strcpy_P(buf, half_blank);
+
+	char mode[] = "SFRB";
+	vnh_status_s stat = vnh_get_status(&ashAuger);
+	sprintf_P(buf, PSTR("A:%3d D:%3d %c%c"), 
+		vnh_get_current(&ashAuger),
+		ashAuger.mod.duty,
+		mode[stat.mode],
+		stat.limit ? 'L' : '_'
+	);
+	  
+      
       //sprintf(buf, "   %6i", millis()/1000);
       //if (disp_alt) {
       //  sprintf(buf, "Hz   %4i", int(CalculatePeriodHertz()));
@@ -938,10 +949,10 @@ void update_config_var(int var_num){
     pRatioReactorLevelBoundary[1][1] = pratio_high;
     break;
   case 28:
-    AshAugerReset();
+    //AshAugerReset();
 	break;
   case 29:
-    AshAugerReset();
+    //AshAugerReset();
 	break;
   }
 }
@@ -1023,18 +1034,18 @@ void displayManualMode() {
 			break;
 		case 2:
 			Disp_PutStr(P("Ash Auger: "));
-			switch (AshAugerControlState()) {
+			switch (AshAugerGetMode()) {
 				case ASH_AUGER_AUTO:
 					Disp_PutStr(P("AUTO"));
-					if (modeAdv) AshAugerControlRequest(ASH_AUGER_MANUAL);
+					if (modeAdv) AshAugerSetMode(ASH_AUGER_MANUAL);
 					break;
 				case ASH_AUGER_MANUAL:
 					Disp_PutStr(P("ON"));
-					if (modeAdv) AshAugerControlRequest(ASH_AUGER_DISABLED);
+					if (modeAdv) AshAugerSetMode(ASH_AUGER_DISABLED);
 					break;
 				case ASH_AUGER_DISABLED:
 					Disp_PutStr(P("OFF"));
-					if (modeAdv) AshAugerControlRequest(ASH_AUGER_AUTO);
+					if (modeAdv) AshAugerSetMode(ASH_AUGER_AUTO);
 					break;
 				default:
 					break;
