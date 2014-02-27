@@ -158,11 +158,12 @@ void DoDisplay() {
 
 	char mode[] = "SFRB";
 	vnh_status_s stat = vnh_get_status(&ashAuger);
-	sprintf_P(buf, PSTR("A:%3d D:%3d %c%c"), 
+	sprintf_P(buf, PSTR("A:%3d D:%3d %c%c %4d"), 
 		vnh_get_current(&ashAuger),
 		ashAuger.mod.duty,
 		mode[stat.mode],
-		stat.limit ? 'L' : '_'
+		stat.limit ? 'L' : '_',
+		limit_accum
 	);
 	  
       

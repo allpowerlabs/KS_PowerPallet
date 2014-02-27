@@ -74,6 +74,8 @@ ashAugerMode_t AshAugerGetMode(){
 	return ashAugerMode;
 }
 
+unsigned long limit_accum=0;
+
 void AshAugerRun() {
 	enum motor_states {
 		STANDBY,
@@ -85,7 +87,7 @@ void AshAugerRun() {
 	static unsigned state=STANDBY;
 	static unsigned long last=0;
 	static unsigned long run_timer=0;
-	static unsigned long limit_accum=0;
+	//static unsigned long limit_accum=0;
 	
 	vnh_status_s status;
 	
@@ -112,7 +114,7 @@ void AshAugerRun() {
 				vnh_forward(&ashAuger);
 				run_timer = 0;
 			}
-			if (limit_accum > ASH_AUGER_CLIMIT_ACCUM_HIGH) {
+			if (limit_accum > ASH_AUGER_CLIMIT_ACCUM_HIGH && run_timer > ASH_AUGER_FORWARD_TIME_MIN) {
 				state = STALL;
 			}
 			break;
