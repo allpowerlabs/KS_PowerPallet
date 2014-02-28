@@ -92,8 +92,9 @@ void AshAugerRun() {
 	vnh_status_s status;
 	
 	status = vnh_get_status(&ashAuger);
-	
-	// We use
+
+	vnh_adc_tick(&ashAuger); // Moved out of interrupt landistan
+
 	if (vnh_get_fault(&ashAuger)) limit_accum += ASH_AUGER_CLIMIT_ACCUM_UP;
 	else {
 		if (limit_accum > ASH_AUGER_CLIMIT_ACCUM_DOWN)
