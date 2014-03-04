@@ -162,7 +162,7 @@ void DoDisplay() {
 		vnh_get_current(&ashAuger),
 		ashAuger.mod.duty,
 		mode[stat.mode],
-		stat.limit ? 'L' : '_',
+		stat.limit ? '!' : ' ',
 		limit_accum
 	);
 	  
@@ -678,10 +678,8 @@ void DoKeyInput() {
       TransitionDisplay(DISPLAY_GRATE);
       break;
     case DISPLAY_GRATE:
-      grateMode = GRATE_SHAKE_PRATIO;
 	  if(grateMode == GRATE_SHAKE_ON) {  // Grate shaker got left on
 		grateMode = GRATE_SHAKE_PRATIO;  // Turn it off
-		Logln("Grate Mode: Pressure Ratio");
 	  }
       if (config_changed == true){
         TransitionDisplay(DISPLAY_REACTOR);
@@ -1012,21 +1010,18 @@ void displayManualMode() {
 					Disp_PutStr(P("OFF"));
 					if (modeAdv) {
 						grateMode = GRATE_SHAKE_ON;
-						Logln("Grate Mode: On");
 					}
 					break;
 				case GRATE_SHAKE_ON:
 					Disp_PutStr(P("ON"));
 					if (modeAdv) {
 						grateMode = GRATE_SHAKE_PRATIO;
-						Logln("Grate Mode: Pressure Ratio");
 					}
 					break;
 				case GRATE_SHAKE_PRATIO:
 					Disp_PutStr(P("AUTO"));
 					if (modeAdv) {
 						grateMode = GRATE_SHAKE_OFF;
-						Logln("Grate Mode: Off");
 					}
 					break;
 				default:

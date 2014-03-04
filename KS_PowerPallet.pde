@@ -7,7 +7,7 @@
 #include <PID_Beta6.h>      // http://www.arduino.cc/playground/Code/PIDLibrary, http://en.wikipedia.org/wiki/PID_controller
 #include <adc.h>            // part of KSlibs, for reading analog inputs
 #include <display.h>        // part of KSlibs, write to display
-#include <fet.h>            // part of KSlibs, control FETs (field effect transitor) to drive motors, solenoids, etc
+#include <fet.h>            // part of KSlibs, control FETs (field effect transistor) to drive motors, solenoids, etc
 #include <keypad.h>         // part of KSlibs, read buttons and keypad
 #include <pressure.h>       // part of KSlibs, read pressure sensors
 #include <servos.h>         // part of KSlibs
@@ -15,6 +15,7 @@
 #include <timer.h>          // part of KSlibs, not implemented
 #include <ui.h>             // part of KSlibs, menu
 #include <util.h>           // part of KSlibs, utility functions, GCU_Setup
+#include <intmath.h>		// part of KSlibs, integer math convenience functions
 #include <vnh_bridge.h>		// part of KSlibs, VNHxxx H-bridge driver
 #include <avr/io.h>         // advanced: provides port definitions for the microcontroller (ATmega1280, http://www.atmel.com/dyn/resources/prod_documents/doc2549.PDF)   
 #include <SD.h>             // SD card  
@@ -148,13 +149,12 @@ Servo Servo_Mixture;
 // Grate Shaking States
 #define GRATE_SHAKE_OFF 0
 #define GRATE_SHAKE_ON 1
-#define GRATE_SHAKE_PRATIO 2
+#define GRATE_SHAKE_TIMED 2
+#define GRATE_SHAKE_PRATIO 3
 
 // Grate Motor States
 #define GRATE_MOTOR_OFF 0
-#define GRATE_MOTOR_LOW 1
-#define GRATE_MOTOR_HIGH 2
-#define GRATE_PRATIO_THRESHOLD 180 //number of seconds until we use high shaking mode
+#define GRATE_MOTOR_ON 1
 
 // Grate Shaking
 #define GRATE_SHAKE_CROSS 5000
@@ -389,15 +389,13 @@ int pratio_high_boundary = getConfig(27);
 //unsigned long ashAugerRunPeriod = getConfig(28) * 5000;
 //unsigned long ashAugerRunLength = getConfig(29) * 5000;
 
-// Grate turning variables
-int grateMode = GRATE_SHAKE_PRATIO; //set default starting state
-int grate_motor_state; //changed to indicate state (for datalogging, etc)
-int grate_val = GRATE_SHAKE_INIT; //variable that is changed and checked
-int grate_pratio_accumulator = 0; // accumulate high pratio to trigger stronger shaking past threshhold
-//define these in init, how much to remove from grate_val each cycle [1 second] (slope)
-int m_grate_bad; 
-int m_grate_good;
-int m_grate_on;
+// Grate tuning variables
+unsigned grateMode;
+unsigned grate_motor_state; //changed to indicate state (for datalogging, etc)
+unsigned grate_val;
+//how much to remove from grate_val each cycle [1 second] (slope)
+unsigned m_grate_bad; 
+unsigned m_grate_good;
 
 // Reactor pressure ratio
 float pRatioReactor;

@@ -35,11 +35,23 @@ void DoReactor() {
       T_bredLevel = (TempLevels) i;
     }
   }
-  for(int i = 0; i < P_REACTOR_LEVEL_COUNT; i++) {
-    if (Press[P_REACTOR] > P_reactorLevelBoundary[i][0] && Press[P_REACTOR] < P_reactorLevelBoundary[i][1]) {
-      P_reactorLevel = (P_reactorLevels) i;
+	for(int i = 0; i < P_REACTOR_LEVEL_COUNT; i++) {
+		if (Press[P_REACTOR] > P_reactorLevelBoundary[i][0] && Press[P_REACTOR] < P_reactorLevelBoundary[i][1]) {
+			P_reactorLevel = (P_reactorLevels) i;
     }
-  }
+	
+	// P_ratio calculations - moved from Grate.pde
+	pRatioReactor = (float)Press[P_COMB]/(float)Press[P_REACTOR];
+	if (pRatioReactor > pRatioReactorLevelBoundary[PR_LOW][0] && pRatioReactor < pRatioReactorLevelBoundary[PR_LOW][1]) {
+		pRatioReactorLevel = PR_LOW;
+	}
+	if (pRatioReactor > pRatioReactorLevelBoundary[PR_CORRECT][0] && pRatioReactor < pRatioReactorLevelBoundary[PR_CORRECT][1]) {
+		pRatioReactorLevel = PR_CORRECT;
+	}
+	if (pRatioReactor > pRatioReactorLevelBoundary[PR_HIGH][0] && pRatioReactor < pRatioReactorLevelBoundary[PR_HIGH][1]) {
+		pRatioReactorLevel = PR_HIGH;
+	}
+}
 //  switch (reactor_state) {
 //    case REACTOR_OFF:
 //      break;
