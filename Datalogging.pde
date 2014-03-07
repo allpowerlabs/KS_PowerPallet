@@ -178,6 +178,9 @@ void LogTemps(boolean header = false) {
 #if T_FILTER != ABSENT
     PrintColumn(P("T_filter"));
 #endif
+//PrintColumn(P("T_8"));
+PrintColumn(P("T_9"));
+PrintColumn(P("T_10"));
   } 
   else {
 #if T_TRED != ABSENT
@@ -204,6 +207,9 @@ void LogTemps(boolean header = false) {
 #if T_FILTER != ABSENT
     PrintColumnInt(Temp_Data[T_FILTER]);
 #endif
+//PrintColumnInt(Temp_Data[8]);
+PrintColumnInt(Temp_Data[9]);
+PrintColumnInt(Temp_Data[10]);
   }
 } 
 

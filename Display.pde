@@ -70,123 +70,99 @@ void DoDisplay() {
       }
     } 
     else {
-      //Row 0
-      Disp_RC(0, 0);
-        if (disp_alt) {
-          sprintf(buf, "Trst %4i  ", Temp_Data[T_TRED]);
-        } 
-        else {
-          sprintf(buf, "Trst %s  ", T_tredLevel[TempLevelName]); // add spaces to erase prior
-        }
+		//Row 0
+		Disp_RC(0, 0);
+        sprintf(buf, "Trst %4i  ", Temp_Data[T_TRED]); 
         Disp_PutStr(buf);
         Disp_RC(0, 11);
         sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
         Disp_PutStr(buf);
 
-      //Row 1
-      Disp_RC(1, 0);
-      if (disp_alt) {
-        sprintf(buf, "Tred %4i  ", Temp_Data[T_BRED]);
-      } 
-      else {
-        sprintf(buf, "Tred %s  ", T_bredLevel[TempLevelName]); // add spaces to erase prior
-      }
-      Disp_PutStr(buf);
-      Disp_RC(1, 11);
-      sprintf(buf, "Preac%4i", Press[P_REACTOR] / 25);
-      Disp_PutStr(buf);
-      //Row 2
-      Disp_RC(2,0);
-      if (P_reactorLevel != OFF) {
-        //the value only means anything if the pressures are high enough, otherwise it is just noise
-        sprintf(buf, "Pratio%3i  ", int(pRatioReactor*100)); //pressure ratio
-        Disp_PutStr(buf);
-      } 
-      else {
-        Disp_PutStr(P("Pratio --  "));
-      }
-      Disp_RC(2, 11);
-      if (true) {
-        sprintf(buf, "Pfilt%4i", Press[P_FILTER] / 25);
-      } 
-      else {
-        //TO DO: Implement filter warning
-        if (pRatioFilterHigh) {
-          sprintf(buf, "Pfilt Bad");
-        } 
-        else {
-          sprintf(buf, "PfiltGood");
-        }
-      }
-      Disp_PutStr(buf);
-      //Row 3
-      Disp_RC(3,0);
-      // switch(auger_state){ 
-      // case AUGER_FORWARD:
-        // sprintf(buf, "AugFwd%3i  ", (millis() - auger_state_entered)/1000);
-        // break;
-      // case AUGER_OFF:
-        // if (P_reactorLevel == OFF) {
-          // sprintf(buf, "AugOff%s  ", " --"); 
-        // } 
-        // else {
-          // sprintf(buf, "AugOff%3i  ", (millis() - auger_state_entered)/1000);  
-        // }
-        // break;
-      // case AUGER_REVERSE:
-        // sprintf(buf, "AugRev%3i  ", (millis() - auger_state_entered)/1000); 
-        // break;
-      // case AUGER_HIGH:
-        // sprintf(buf, "AugHi %3i  ", (millis() - auger_state_entered)/1000); 
-        // break;
-      // case AUGER_CURRENT_LOW:
-        // sprintf(buf, "AugLow%3i  ", (millis() - auger_state_entered)/1000);
-        // break;
-      // case AUGER_REVERSE_HIGH:
-        // sprintf(buf, "AugRHi%3i  ", (millis() - auger_state_entered)/1000); 
-        // break;
-      // case AUGER_ALARM:
-        // sprintf(buf, "AugALRM%3i ", (millis() - auger_state_entered)/1000);
-        // break;
-      // default:
-        // sprintf(buf, "Aug   %3i  ", (millis() - auger_state_entered)/1000);
-        // break;
-      // }
-      //Disp_PutStr(buf);
-      //Disp_RC(3, 10);
-	  //strcpy_P(buf, half_blank);
+		//Row 1
+		Disp_RC(1, 0);
+		sprintf(buf, "Tred %4i  ", Temp_Data[T_BRED]);
+		Disp_PutStr(buf);
+		Disp_RC(1, 11);
+		sprintf(buf, "Preac%4i", Press[P_REACTOR] / 25);
+		Disp_PutStr(buf);
+		
+		//Row 2
+		Disp_RC(2,0);
+		if (P_reactorLevel != OFF) {
+			//the value only means anything if the pressures are high enough, otherwise it is just noise
+			sprintf(buf, "Pratio%3i  ", int(pRatioReactor*100)); //pressure ratio
+			Disp_PutStr(buf);
+		} 
+		else {
+			Disp_PutStr(P("Pratio --  "));
+		}
+		Disp_RC(2, 11);
+		sprintf(buf, "Pfilt%4i", Press[P_FILTER] / 25);
+		Disp_PutStr(buf);
+		
+		//Row 3
+		Disp_RC(3,0);
+		// switch(auger_state){ 
+		// case AUGER_FORWARD:
+		// sprintf(buf, "AugFwd%3i  ", (millis() - auger_state_entered)/1000);
+		// break;
+		// case AUGER_OFF:
+		// if (P_reactorLevel == OFF) {
+		  // sprintf(buf, "AugOff%s  ", " --"); 
+		// } 
+		// else {
+		  // sprintf(buf, "AugOff%3i  ", (millis() - auger_state_entered)/1000);  
+		// }
+		// break;
+		// case AUGER_REVERSE:
+		// sprintf(buf, "AugRev%3i  ", (millis() - auger_state_entered)/1000); 
+		// break;
+		// case AUGER_HIGH:
+		// sprintf(buf, "AugHi %3i  ", (millis() - auger_state_entered)/1000); 
+		// break;
+		// case AUGER_CURRENT_LOW:
+		// sprintf(buf, "AugLow%3i  ", (millis() - auger_state_entered)/1000);
+		// break;
+		// case AUGER_REVERSE_HIGH:
+		// sprintf(buf, "AugRHi%3i  ", (millis() - auger_state_entered)/1000); 
+		// break;
+		// case AUGER_ALARM:
+		// sprintf(buf, "AugALRM%3i ", (millis() - auger_state_entered)/1000);
+		// break;
+		// default:
+		// sprintf(buf, "Aug   %3i  ", (millis() - auger_state_entered)/1000);
+		// break;
+		// }
+		//Disp_PutStr(buf);
+		//Disp_RC(3, 10);
+		//strcpy_P(buf, half_blank);
 
-	char mode[] = "SFRB";
-	vnh_status_s stat = vnh_get_status(&ashAuger);
-	sprintf_P(buf, PSTR("A:%3d D:%3d %c%c %4d"), 
-		vnh_get_current(&ashAuger),
-		ashAuger.mod.duty,
-		mode[stat.mode],
-		stat.limit ? '!' : ' ',
-		limit_accum
-	);
-	  
-      
-      //sprintf(buf, "   %6i", millis()/1000);
-      //if (disp_alt) {
-      //  sprintf(buf, "Hz   %4i", int(CalculatePeriodHertz()));
-      //} else {
-      //  sprintf(buf, "Batt%5i", int(battery_voltage*10));
-      //  //sprintf(buf, "Pow %5i", int(CalculatePulsePower()));
-      //}
-      Disp_PutStr(buf);
+
+		// Ash Auger status
+		// char mode[] = "SFRB";
+		// vnh_status_s stat = vnh_get_status(&ashAuger);
+		// sprintf_P(buf, PSTR("A:%3d D:%3d %c%c %4d"), 
+		// vnh_get_current(&ashAuger),
+		// ashAuger.mod.duty,
+		// mode[stat.mode],
+		// stat.limit ? '!' : ' ',
+		// limit_accum
+		// );
+
+		sprintf_P(buf, PSTR("Time: %5d"), millis()/1000);
+		Disp_PutStr(buf);
     } 
     if (alarm_count > 0){ //keypresses for alarms only
-      if (key == 2) {
-        alarm = false;
-      }
-      if (millis() - alarm_on[alarm_shown] > 4000){ //wait until RESET button shows up, a wait of 4 seconds is given so that 
-        if (key == 3) {
-          removeAlarm(alarm_shown);
-          resetAlarm(alarm_shown);
-          cur_item = 1; //start at beginning of alarm queue
-        }
-      }
+		if (key == 2) {
+			alarm = false;
+		}
+		if (millis() - alarm_on[alarm_shown] > 4000){ //wait until RESET button shows up, a wait of 4 seconds is given so that 
+			if (key == 3) {
+				removeAlarm(alarm_shown);
+				resetAlarm(alarm_shown);
+				cur_item = 1; //start at beginning of alarm queue
+			}
+		}
     }
     break;
   case DISPLAY_ENGINE:

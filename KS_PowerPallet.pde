@@ -12,8 +12,7 @@
 #include <pressure.h>       // part of KSlibs, read pressure sensors
 #include <servos.h>         // part of KSlibs
 #include <temp.h>           // part of KSlibs, read thermocouples
-#include <timer.h>          // part of KSlibs, not implemented
-#include <ui.h>             // part of KSlibs, menu
+#include <timer.h>          // part of KSlibs, hardware timer functions
 #include <util.h>           // part of KSlibs, utility functions, GCU_Setup
 #include <intmath.h>		// part of KSlibs, integer math convenience functions
 #include <vnh_bridge.h>		// part of KSlibs, VNHxxx H-bridge driver
@@ -123,11 +122,11 @@ Servo Servo_Mixture;
 #define T_BRED 1
 #define T_ENG_COOLANT 2
 #define T_REACTOR_GAS_OUT 3
-#define T_PYRO_IN ABSENT
-#define T_PYRO_OUT ABSENT
+#define T_PYRO_IN 4
+#define T_PYRO_OUT 5
 #define T_COMB ABSENT
-#define T_DRYING_GAS_OUT ABSENT
-#define T_FILTER ABSENT
+#define T_DRYING_GAS_OUT 6
+#define T_FILTER 7
 #define T_LOW_FUEL ABSENT
 
 //Pressure Mapping
@@ -706,23 +705,19 @@ void setup() {
  //Library initializations                    
   Disp_Init();
   Kpd_Init();
-  UI_Init();
   ADC_Init();
   Temp_Init();
   Press_Init();
   Fet_Init();
   Servo_Init();
-  Timer_Init();
 
   Disp_Reset();
   Kpd_Reset();
-  UI_Reset();
   ADC_Reset();
   Temp_Reset();
   Press_Reset();
   Fet_Reset();
   Servo_Reset();
-  Timer_Reset();
   
   if(EEPROM.read(35) != 255){
     EEPROMReadAlpha(35, 4, unique_number);

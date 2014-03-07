@@ -16,23 +16,6 @@ TODO:
 vnh_s ashAuger;
 ashAugerMode_t ashAugerMode;
 
-// Interrupt service routine for dealing with the ash auger H-bridge
-ISR(TIMER5_COMPA_vect) {
-	vnh_tick(&ashAuger);
-}
-// Init routine for timer 5, which we use for monitoring the H-bridge
-void timer5_init() {
-	// Timer 5 control registers
-	TCCR5A = 0;
-	TCCR5B = _BV(WGM52) | _BV(CS51) | _BV(CS50);  //CTC mode, clk/64 (4uS)
-	TCCR5C = 0;
-	// Timer 5 output compare registers
-	OCR5AH = ASH_AUGER_PERIOD_HI;
-	OCR5AL = ASH_AUGER_PERIOD_LO;
-	// Timer 5 interrupt mask
-	TIMSK5 = _BV(OCIE5A); // Output compare A interrupt enable
-}
-
 void AshAugerInit() {
 	ashAuger.mota = (gpio_s) {&PORTL, 0};
 	ashAuger.motb = (gpio_s) {&PORTD, 2};
@@ -45,9 +28,11 @@ void AshAugerInit() {
 	ashAuger.mod.mode = VNH_PWM_SOFT;
 	ashAuger.climit = ASH_AUGER_CLIMIT;
 	ashAuger.chyst = ASH_AUGER_CHYST;
+	//ashAuger.pwm_stop = timer5_stop;
+	//ashAuger.pwm_start = timer5_start;
 	vnh_reset(&ashAuger);
 	
-	timer5_init();
+	//timer5_init();
 	
 	AshAugerSetMode(ASH_AUGER_AUTO);
 }
