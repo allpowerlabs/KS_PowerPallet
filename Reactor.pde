@@ -5,7 +5,7 @@ void DoFlare() {
 	case FLARE_USER_SET:
 		if (
 			P_reactorLevel > OFF &&
-			T_tredLevel > COLD &&
+			//T_tredLevel > COLD &&
 			engine_state == ENGINE_OFF
 		) {
 			ignitor_on = true;

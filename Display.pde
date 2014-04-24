@@ -1,14 +1,7 @@
 void DoDisplay() {
-  boolean disp_alt; // Var for alternating value display
   char config_buffer[] = "               ";
   char config_choice_buffer[] = "        ";
   
-  if (millis() % (display_per*200) > (display_per*100) ) {    //  if (millis() % 2000 > 1000) {
-    disp_alt = false;
-  } 
-  else {
-    disp_alt = true;
-  }
   switch (display_state) {
   case DISPLAY_SPLASH:
     //Row 0
@@ -72,12 +65,9 @@ void DoDisplay() {
     else {
       //Row 0
       Disp_RC(0, 0);
-        if (disp_alt) {
-          sprintf(buf, "Trst %4i  ", Temp_Data[T_TRED]);
-        } 
-        else {
-          sprintf(buf, "Trst %s  ", T_tredLevel[TempLevelName]); // add spaces to erase prior
-        }
+        
+        sprintf(buf, "Trst %4i  ", Temp_Data[T_TRED]);
+        
         Disp_PutStr(buf);
         Disp_RC(0, 11);
         sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
@@ -85,12 +75,9 @@ void DoDisplay() {
 
       //Row 1
       Disp_RC(1, 0);
-      if (disp_alt) {
-        sprintf(buf, "Tred %4i  ", Temp_Data[T_BRED]);
-      } 
-      else {
-        sprintf(buf, "Tred %s  ", T_bredLevel[TempLevelName]); // add spaces to erase prior
-      }
+      
+      sprintf(buf, "Tred %4i  ", Temp_Data[T_BRED]);
+      
       Disp_PutStr(buf);
       Disp_RC(1, 11);
       sprintf(buf, "Preac%4i", Press[P_REACTOR] / 25);
@@ -156,26 +143,19 @@ void DoDisplay() {
       //Disp_RC(3, 10);
 	  //strcpy_P(buf, half_blank);
 
-	char mode[] = "SFRB";
+	char ashAugerModes[] = "SFRB";
+	char fuelAugerModes[] = "SFFFRRF";
 	vnh_status_s stat = vnh_get_status(&ashAuger);
-	sprintf_P(buf, PSTR("A:%3d D:%3d %c%c %4d"), 
-		vnh_get_current(&ashAuger),
-		ashAuger.mod.duty,
-		mode[stat.mode],
+	//sprintf_P(buf, PSTR("A:%3d D:%3d %c%c %4d"),
+	sprintf_P(buf, PSTR("Auger|Fuel %c%c Ash %c%c"),
+		fuelAugerModes[auger_state],
 		stat.limit ? '!' : ' ',
-		limit_accum
+		ashAugerModes[stat.mode],
+		(auger_state == AUGER_HIGH || auger_state == AUGER_REVERSE_HIGH) ? '!' : ' '
 	);
-	  
-      
-      //sprintf(buf, "   %6i", millis()/1000);
-      //if (disp_alt) {
-      //  sprintf(buf, "Hz   %4i", int(CalculatePeriodHertz()));
-      //} else {
-      //  sprintf(buf, "Batt%5i", int(battery_voltage*10));
-      //  //sprintf(buf, "Pow %5i", int(CalculatePulsePower()));
-      //}
       Disp_PutStr(buf);
-    } 
+    }
+	
     if (alarm_count > 0){ //keypresses for alarms only
       if (key == 2) {
         alarm = false;
@@ -948,10 +928,13 @@ void update_config_var(int var_num){
     pRatioReactorLevelBoundary[1][1] = pratio_high;
     break;
   case 28:
-    //AshAugerReset();
+    AshAugerReset();
 	break;
+
   case 29:
-    //AshAugerReset();
+    AshAugerReset();
+	break;
+  default:
 	break;
   }
 }

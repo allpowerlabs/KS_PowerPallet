@@ -45,7 +45,7 @@ void DoGrate() { // call once per second
 				grate_motor_state = GRATE_MOTOR_OFF;
 				Logln("Grate Mode: Off");
 			}
-			if (engine_state == ENGINE_ON || engine_state == ENGINE_STARTING || P_reactorLevel != OFF) { //shake only if reactor is on and/or engine is on
+			if (engine_state == ENGINE_ON || engine_state == ENGINE_STARTING || (P_reactorLevel > OFF && T_tredLevel > COOL)) { //shake only if reactor is on and/or engine is on
 			  //condition above will leave grate_val in the last state until conditions are met (not continuing to cycle)
 			  if (grate_val >= GRATE_SHAKE_CROSS) { // not time to shake
 				if (pRatioReactorLevel == PR_LOW) {

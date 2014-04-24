@@ -52,6 +52,11 @@ void AshAugerInit() {
 	AshAugerSetMode(ASH_AUGER_AUTO);
 }
 
+void AshAugerReset() {
+	ashAuger.climit = ashAugerLimit * ASH_AUGER_ONEAMP;
+	ashAuger.chyst = ashAugerHysteresis * ASH_AUGER_ONEAMP;
+}
+
 void AshAugerSetMode(ashAugerMode_t mode){
 	switch (mode) {
 		case ASH_AUGER_AUTO:
