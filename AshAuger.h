@@ -22,8 +22,12 @@ typedef enum {
 	ASH_AUGER_DISABLED
 } ashAugerMode_t;
 
+unsigned int ashAugerAutoRunPeriod;
+
 void AshAugerSetMode(ashAugerMode_t mode);
 ashAugerMode_t AshAugerGetMode();
+
+void AshAugerSetTimer(unsigned int);
 
 void AshAugerRun();
 

@@ -16,6 +16,8 @@ TODO:
 vnh_s ashAuger;
 ashAugerMode_t ashAugerMode;
 
+unsigned long ashAugerAutoRunTimer;
+
 // Interrupt service routine for dealing with the ash auger H-bridge
 ISR(TIMER5_COMPA_vect) {
 	vnh_tick(&ashAuger);
@@ -49,12 +51,16 @@ void AshAugerInit() {
 	
 	timer5_init();
 	
+	AshAugerReset();
+	
+	ashAugerAutoRunTimer = 0;
 	AshAugerSetMode(ASH_AUGER_AUTO);
 }
 
 void AshAugerReset() {
-	ashAuger.climit = ashAugerLimit * ASH_AUGER_ONEAMP;
-	ashAuger.chyst = ashAugerHysteresis * ASH_AUGER_ONEAMP;
+	ashAuger.climit = getConfig(28) * ASH_AUGER_ONEAMP;
+	ashAuger.chyst = getConfig(29) * ASH_AUGER_ONEAMP;
+	ashAugerAutoRunPeriod = getConfig(30) * 5000;
 }
 
 void AshAugerSetMode(ashAugerMode_t mode){
@@ -92,7 +98,6 @@ void AshAugerRun() {
 	static unsigned state=STANDBY;
 	static unsigned long last=0;
 	static unsigned long run_timer=0;
-	//static unsigned long limit_accum=0;
 	
 	vnh_status_s status;
 	
@@ -112,6 +117,7 @@ void AshAugerRun() {
 			if (status.mode != VNH_STANDBY) {
 				vnh_standby(&ashAuger);
 				run_timer = 0;
+				Logln("Ash Auger Mode: Stand-by");
 			}
 			state = FORWARD;
 			break;
@@ -119,6 +125,7 @@ void AshAugerRun() {
 			if (status.mode != VNH_FORWARD) {
 				vnh_forward(&ashAuger);
 				run_timer = 0;
+				Logln("Ash Auger Mode: Forward");
 			}
 			if (limit_accum > ASH_AUGER_CLIMIT_ACCUM_HIGH && run_timer > ASH_AUGER_FORWARD_TIME_MIN) {
 				state = STALL;
@@ -128,6 +135,7 @@ void AshAugerRun() {
 			if (status.mode != VNH_REVERSE) {
 				run_timer = 0;
 				vnh_reverse(&ashAuger);
+				Logln("Ash Auger Mode: Reverse");
 			}
 			if (run_timer > ASH_AUGER_REVERSE_TIME) state = FORWARD;
 			break;
@@ -135,6 +143,7 @@ void AshAugerRun() {
 			if (status.mode != VNH_BRAKE) {
 				vnh_brake(&ashAuger);
 				run_timer = 0;
+				Logln("Ash Auger Mode: Brake");
 			}
 			if (run_timer > ASH_AUGER_STALL_TIME) state = REVERSE;
 			break;
@@ -155,12 +164,17 @@ void AshAugerStop() {
 }
 
 void DoAshAuger() {
+	static unsigned long last_run;
+	ashAugerAutoRunTimer = u_sublim(ashAugerAutoRunTimer, millis() - last_run, 0);
+	last_run = millis();
 	switch (ashAugerMode) {
 		case ASH_AUGER_AUTO:
-			if (P_reactorLevel > OFF && T_tredLevel > COLD) {
-				AshAugerRun();
+			if ((P_reactorLevel > OFF) && (T_tredLevel > COLD) && ashAugerAutoRunTimer) {
+				AshAugerRun();			}
+			else {
+				AshAugerStop();
+				ashAugerAutoRunTimer = 0;
 			}
-			else AshAugerStop();
 			break;
 		case ASH_AUGER_MANUAL:
 			AshAugerRun();
@@ -172,3 +186,7 @@ void DoAshAuger() {
 			break;
 	}
 }
+
+void AshAugerSetTimer(unsigned int t) {
+	ashAugerAutoRunTimer = t;
+}	

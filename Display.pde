@@ -930,9 +930,11 @@ void update_config_var(int var_num){
   case 28:
     AshAugerReset();
 	break;
-
   case 29:
     AshAugerReset();
+	break;
+  case 30:
+	AshAugerReset();
 	break;
   default:
 	break;
