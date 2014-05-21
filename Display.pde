@@ -1,14 +1,7 @@
 void DoDisplay() {
-  boolean disp_alt; // Var for alternating value display
   char config_buffer[] = "               ";
   char config_choice_buffer[] = "        ";
   
-  if (millis() % (display_per*200) > (display_per*100) ) {    //  if (millis() % 2000 > 1000) {
-    disp_alt = false;
-  } 
-  else {
-    disp_alt = true;
-  }
   switch (display_state) {
   case DISPLAY_SPLASH:
     //Row 0
@@ -80,26 +73,37 @@ void DoDisplay() {
 
 		//Row 1
 		Disp_RC(1, 0);
+
 		sprintf(buf, "Tred %4i  ", Temp_Data[T_BRED]);
+
 		Disp_PutStr(buf);
 		Disp_RC(1, 11);
 		sprintf(buf, "Preac%4i", Press[P_REACTOR] / 25);
 		Disp_PutStr(buf);
-		
 		//Row 2
 		Disp_RC(2,0);
 		if (P_reactorLevel != OFF) {
-			//the value only means anything if the pressures are high enough, otherwise it is just noise
-			sprintf(buf, "Pratio%3i  ", int(pRatioReactor*100)); //pressure ratio
-			Disp_PutStr(buf);
+		//the value only means anything if the pressures are high enough, otherwise it is just noise
+		sprintf(buf, "Pratio%3i  ", int(pRatioReactor*100)); //pressure ratio
+		Disp_PutStr(buf);
 		} 
 		else {
-			Disp_PutStr(P("Pratio --  "));
+		Disp_PutStr(P("Pratio --  "));
 		}
 		Disp_RC(2, 11);
+		if (true) {
 		sprintf(buf, "Pfilt%4i", Press[P_FILTER] / 25);
+		} 
+		else {
+		//TO DO: Implement filter warning
+		if (pRatioFilterHigh) {
+		  sprintf(buf, "Pfilt Bad");
+		} 
+		else {
+		  sprintf(buf, "PfiltGood");
+		}
+		}
 		Disp_PutStr(buf);
-		
 		//Row 3
 		Disp_RC(3,0);
 		// switch(auger_state){ 
@@ -137,21 +141,19 @@ void DoDisplay() {
 		//Disp_RC(3, 10);
 		//strcpy_P(buf, half_blank);
 
+		char ashAugerModes[] = "SFRB";
+		char fuelAugerModes[] = "SFFFRRF";
+		vnh_status_s stat = vnh_get_status(&ashAuger);
+		//sprintf_P(buf, PSTR("A:%3d D:%3d %c%c %4d"),
+		sprintf_P(buf, PSTR("Auger|Fuel %c%c Ash %c%c"),
+			fuelAugerModes[auger_state],
+			stat.limit ? '!' : ' ',
+			ashAugerModes[stat.mode],
+			(auger_state == AUGER_HIGH || auger_state == AUGER_REVERSE_HIGH) ? '!' : ' '
+		);
+		  Disp_PutStr(buf);
+    }
 
-		// Ash Auger status
-		// char mode[] = "SFRB";
-		// vnh_status_s stat = vnh_get_status(&ashAuger);
-		// sprintf_P(buf, PSTR("A:%3d D:%3d %c%c %4d"), 
-		// vnh_get_current(&ashAuger),
-		// ashAuger.mod.duty,
-		// mode[stat.mode],
-		// stat.limit ? '!' : ' ',
-		// limit_accum
-		// );
-
-		sprintf_P(buf, PSTR("Time: %5d"), millis()/1000);
-		Disp_PutStr(buf);
-    } 
     if (alarm_count > 0){ //keypresses for alarms only
 		if (key == 2) {
 			alarm = false;
@@ -924,10 +926,15 @@ void update_config_var(int var_num){
     pRatioReactorLevelBoundary[1][1] = pratio_high;
     break;
   case 28:
-    //AshAugerReset();
+    AshAugerReset();
 	break;
   case 29:
-    //AshAugerReset();
+    AshAugerReset();
+	break;
+  case 30:
+	AshAugerReset();
+	break;
+  default:
 	break;
   }
 }

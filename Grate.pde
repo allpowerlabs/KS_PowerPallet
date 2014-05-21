@@ -45,7 +45,7 @@ void DoGrate() { // call once per second
 				grate_motor_state = GRATE_MOTOR_OFF;
 				Logln("Grate Mode: Off");
 			}
-			if (engine_state == ENGINE_ON || engine_state == ENGINE_STARTING || P_reactorLevel != OFF) { //shake only if reactor is on and/or engine is on
+			if (engine_state == ENGINE_ON || engine_state == ENGINE_STARTING || (P_reactorLevel > OFF && T_tredLevel > COOL)) { //shake only if reactor is on and/or engine is on
 			  //condition above will leave grate_val in the last state until conditions are met (not continuing to cycle)
 			  if (grate_val >= GRATE_SHAKE_CROSS) { // not time to shake
 				if (pRatioReactorLevel == PR_LOW) {
@@ -68,7 +68,10 @@ void DoGrate() { // call once per second
 				if (grate_motor_state != GRATE_MOTOR_ON) {
 					grate_motor_state = GRATE_MOTOR_ON;
 					digitalWrite(FET_GRATE,HIGH);
+					Logln("Grate Mode: On");
 				}
+				// Start up the ash auger
+				AshAugerSetTimer(ashAugerAutoRunPeriod);
 			}
 			else {
 				// Timer reached 0, switch off and go back to watch mode
@@ -76,6 +79,7 @@ void DoGrate() { // call once per second
 				grate_motor_state = GRATE_MOTOR_OFF;
 				digitalWrite(FET_GRATE, LOW);
 				grateMode = GRATE_SHAKE_PRATIO;
+				Logln("Grate Mode: Off");
 			}
 			break;
 		default:
