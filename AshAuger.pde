@@ -1,9 +1,5 @@
 /*
 Ash Auger Control Logic
-TODO:
-	Hack in VNH bridge control
-	Get rid of duty cycle settings.  Should be on when reactor is running
-	Add current limit and reversing settings
 
 	To change defaults, edit AshAuger.h
 */
@@ -12,25 +8,22 @@ struct ashAuger {
 	vnh_s * vnh;
 	pwm_s * pwm;
 	adc_s * adc;
-	uint16_t low_current;
-	uint16_t high_current;
-	uint16_t limit_current;
+	uint16_t low_current;		// Below this the motor is probably disconnected
+	uint16_t high_current;		// Above this we are pushing too hard
+	uint16_t limit_current;		// Current must be limited to this level by PWM
 	uint8_t p_gain;
-	unsigned int run_period;
-	unsigned int run_timer;
-	ashAugerMode_t mode;
+	unsigned int run_period;	// This is how long we run in auto mode
+	unsigned int run_timer;		
+	ashAugerMode_t mode;		// Modes are AUTO, MANUAL, and DISABLED
+	
 };
 
 vnh_s ashAuger_vnh;
 adc_s ashAuger_adc;
 
-unsigned long ashAugerAutoRunTimer;
-
+void AshAugerAuto();
 
 void AshAugerInit() {
-	ashAuger.limit_current = 0;
-	ashAuger.p_gain = 1;
-	
 	ashAuger.vnh = &ashAuger_vnh;
 	ashAuger.vnh->mota = (gpio_s) {&PORTL, 0};
 	ashAuger.vnh->motb = (gpio_s) {&PORTD, 2};
@@ -40,121 +33,82 @@ void AshAugerInit() {
 	
 	ashAuger.pwm = &pwm1;
 	pwm_init();
-	pwm_set_duty(&pwm1, 127);
 	
 	ashAuger.adc = &ashAuger_adc;
 	ashAuger.adc->n = 1;
 	
 	AshAugerReset();
 	
-	ashAugerAutoRunTimer = 0;
 	AshAugerSetMode(ASH_AUGER_AUTO);
 }
 
 void AshAugerReset() {
-	ashAuger.climit = getConfig(28) * ASH_AUGER_ONEAMP;
-	ashAuger.chyst = getConfig(29) * ASH_AUGER_ONEAMP;
-	ashAugerAutoRunPeriod = getConfig(30) * 5000;
+	ashAuger.limit_current = getConfig(28) * ASH_AUGER_ONEAMP;
+	ashAuger.low_current = getConfig(29) * ASH_AUGER_ONEAMP;
+	ashAuger.high_current = getConfig(30) * ASH_AUGER_ONEAMP;
+	ashAuger.run_period = getConfig(31) * 5000;
+	ashAuger.p_gain = 1;
+	ashAuger.run_timer = 0;
 }
 
 void AshAugerSetMode(ashAugerMode_t mode){
 	switch (mode) {
 		case ASH_AUGER_AUTO:
-			Logln_p("Ash auger automatic mode");
+			Logln_p("Ash auger control: automatic");
 			break;
 		case ASH_AUGER_MANUAL:
-			Logln_p("Ash auger manual mode");
+			Logln_p("Ash auger control: manual");
 			break;
 		case ASH_AUGER_DISABLED:
-			Logln_p("Ash auger disabled");
+			Logln_p("Ash auger control: disabled");
 			break;
 		default:
-			Logln_p("Ash auger unknown mode requested!");
+			Logln_p("Ash auger on fire!");
 			break;
 	}
-	ashAugerMode = mode;
+	ashAuger.mode = mode;
 }
 
 ashAugerMode_t AshAugerGetMode(){
-	return ashAugerMode;
+	return ashAuger.mode;
 }
 
-unsigned long limit_accum=0;
-
-void AshAugerRun() {
-	enum motor_states {
-		STANDBY,
-		FORWARD,
-		REVERSE,
-		STALL,
-	};
-	
-	static unsigned state=STANDBY;
-	static unsigned long last=0;
-	static unsigned long run_timer=0;
-	
-	vnh_status_s status;
-	
-	status = vnh_get_status(&ashAuger);
-
-	vnh_adc_tick(&ashAuger); // Moved out of interrupt landistan
-
-	if (vnh_get_fault(&ashAuger)) limit_accum += ASH_AUGER_CLIMIT_ACCUM_UP;
-	else {
-		if (limit_accum > ASH_AUGER_CLIMIT_ACCUM_DOWN)
-			limit_accum -= ASH_AUGER_CLIMIT_ACCUM_DOWN;
-		else limit_accum = 0;
-	}
+void AshAugerAuto(unsigned long lapse) {
 	
 	switch (state) {
 		case STANDBY:
-			if (status.mode != VNH_STANDBY) {
-				vnh_standby(&ashAuger);
-				run_timer = 0;
-				Logln("Ash Auger Mode: Stand-by");
+			if (vnh_get_mode(&ashAuger.vnh) != VNH_STANDBY) 
+				vnh_standby(&ashAuger.vnh);
+				Logln("Ash Auger Motor: Stand-by");
 			}
-			state = FORWARD;
 			break;
 		case FORWARD:
-			if (status.mode != VNH_FORWARD) {
-				vnh_forward(&ashAuger);
-				run_timer = 0;
-				Logln("Ash Auger Mode: Forward");
-			}
-			if (limit_accum > ASH_AUGER_CLIMIT_ACCUM_HIGH && run_timer > ASH_AUGER_FORWARD_TIME_MIN) {
-				state = STALL;
+			if (vnh_get_mode(&ashAuger.vnh) != VNH_FORWARD) {
+				vnh_forward(&ashAuger.vnh);
+				Logln("Ash Auger Motor: Forward");
 			}
 			break;
 		case REVERSE:
-			if (status.mode != VNH_REVERSE) {
-				run_timer = 0;
-				vnh_reverse(&ashAuger);
-				Logln("Ash Auger Mode: Reverse");
+			if (vnh_get_mode(&ashAuger.vnh) != VNH_REVERSE) {
+				vnh_reverse(&ashAuger.vnh);
+				Logln("Ash Auger Motor: Reverse");
 			}
-			if (run_timer > ASH_AUGER_REVERSE_TIME) state = FORWARD;
 			break;
-		case STALL:
-			if (status.mode != VNH_BRAKE) {
-				vnh_brake(&ashAuger);
-				run_timer = 0;
-				Logln("Ash Auger Mode: Brake");
+		case BRAKE:
+			if (vnh_get_mode(&ashAuger.vnh) != VNH_BRAKE) {
+				vnh_brake(&ashAuger.vnh);
+				Logln("Ash Auger Motor: Brake");
 			}
-			if (run_timer > ASH_AUGER_STALL_TIME) state = REVERSE;
 			break;
 		default:
 			state = STANDBY;
 			break;
 	}
-	run_timer += millis() - last;
-	last = millis();
 }
 
 void AshAugerStop() {
-	vnh_status_s status;
-	
-	status = vnh_get_status(&ashAuger);
-	
-	if (status.mode != VNH_STANDBY) vnh_standby(&ashAuger);
+	if (vnh_get_mode(&ashAuger.vnh) != VNH_STANDBY) 
+		vnh_standby(&ashAuger.vnh);
 }
 
 void DoAshAuger() {

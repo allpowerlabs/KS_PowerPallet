@@ -1,11 +1,6 @@
 #define ASH_AUGER_ONEAMP (27)
 
-#define TIMING_TICK (62500)
-#define ASH_AUGER_PERIOD_LO (25)
-#define ASH_AUGER_PERIOD_HI (0)
-
 #define ASH_AUGER_CLIMIT (346)		// 346 = 13 amps, 266 = 10 amps
-#define ASH_AUGER_CHYST (27)		// 79 = 3A, 133 = 5A
 
 #define ASH_AUGER_CLIMIT_ACCUM_UP (3)
 #define ASH_AUGER_CLIMIT_ACCUM_DOWN (1)
@@ -23,10 +18,6 @@ typedef enum {
 
 void AshAugerSetMode(ashAugerMode_t mode);
 ashAugerMode_t AshAugerGetMode();
-
-void AshAugerSetTimer(unsigned int);
-
-void AshAugerRun();
 
 void DoAshAuger();
 
