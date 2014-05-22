@@ -8,50 +8,42 @@ TODO:
 	To change defaults, edit AshAuger.h
 */
 
-#ifndef ARDUINO
-#include "Config.h"
-#include "AshAuger.h"
-#endif
+struct ashAuger {
+	vnh_s * vnh;
+	pwm_s * pwm;
+	adc_s * adc;
+	uint16_t low_current;
+	uint16_t high_current;
+	uint16_t limit_current;
+	uint8_t p_gain;
+	unsigned int run_period;
+	unsigned int run_timer;
+	ashAugerMode_t mode;
+};
 
-vnh_s ashAuger;
-ashAugerMode_t ashAugerMode;
+vnh_s ashAuger_vnh;
+adc_s ashAuger_adc;
 
 unsigned long ashAugerAutoRunTimer;
 
-// Interrupt service routine for dealing with the ash auger H-bridge
-ISR(TIMER5_COMPA_vect) {
-	vnh_tick(&ashAuger);
-}
-// Init routine for timer 5, which we use for monitoring the H-bridge
-void timer5_init() {
-	// Timer 5 control registers
-	TCCR5A = 0;
-	TCCR5B = _BV(WGM52) | _BV(CS51) | _BV(CS50);  //CTC mode, clk/64 (4uS)
-	TCCR5C = 0;
-	// Timer 5 output compare registers
-	OCR5AH = ASH_AUGER_PERIOD_HI;
-	OCR5AL = ASH_AUGER_PERIOD_LO;
-	// Timer 5 interrupt mask
-	TIMSK5 = _BV(OCIE5A); // Output compare A interrupt enable
-}
 
 void AshAugerInit() {
-	ashAuger.mota = (gpio_s) {&PORTL, 0};
-	ashAuger.motb = (gpio_s) {&PORTD, 2};
-	ashAuger.ena = (gpio_s) {&PORTL, 1};
-	ashAuger.enb = (gpio_s) {&PORTD, 1};
-	ashAuger.pwm = (gpio_s) {&PORTL, 2};
-	ashAuger.adc = 7;
-	ashAuger.mod.ramp = 1;
-	ashAuger.mod.target = VNH_MOD_MAX;
-	ashAuger.mod.mode = VNH_PWM_SOFT;
-	ashAuger.climit = ASH_AUGER_CLIMIT;
-	ashAuger.chyst = ASH_AUGER_CHYST;
-	//ashAuger.pwm_stop = timer5_stop;
-	//ashAuger.pwm_start = timer5_start;
-	vnh_reset(&ashAuger);
+	ashAuger.limit_current = 0;
+	ashAuger.p_gain = 1;
 	
-	//timer5_init();
+	ashAuger.vnh = &ashAuger_vnh;
+	ashAuger.vnh->mota = (gpio_s) {&PORTL, 0};
+	ashAuger.vnh->motb = (gpio_s) {&PORTD, 2};
+	ashAuger.vnh->ena = (gpio_s) {&PORTL, 1};
+	ashAuger.vnh->enb = (gpio_s) {&PORTD, 1};
+	vnh_reset(ashAuger.vnh);
+	
+	ashAuger.pwm = &pwm1;
+	pwm_init();
+	pwm_set_duty(&pwm1, 127);
+	
+	ashAuger.adc = &ashAuger_adc;
+	ashAuger.adc->n = 1;
 	
 	AshAugerReset();
 	

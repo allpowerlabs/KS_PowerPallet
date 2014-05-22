@@ -15,14 +15,11 @@
 #define ASH_AUGER_STALL_TIME (100)
 #define ASH_AUGER_FORWARD_TIME_MIN (2000)
 
-
 typedef enum {
 	ASH_AUGER_AUTO,
 	ASH_AUGER_MANUAL,
 	ASH_AUGER_DISABLED
 } ashAugerMode_t;
-
-unsigned int ashAugerAutoRunPeriod;
 
 void AshAugerSetMode(ashAugerMode_t mode);
 ashAugerMode_t AshAugerGetMode();
