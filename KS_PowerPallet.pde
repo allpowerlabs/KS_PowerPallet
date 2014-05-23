@@ -714,6 +714,7 @@ void setup() {
   Press_Init();
   Fet_Init();
   Servo_Init();
+  pwm_init(); // Initialize hardware PWM channels
 
   Disp_Reset();
   Kpd_Reset();
@@ -730,7 +731,6 @@ void setup() {
     EEPROMReadAlpha(40, 10, serial_num);
   }
   
-  //unique_number = uniqueNumber();
   InitSD();
   DoDatalogging();
   InitLambda();
