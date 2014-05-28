@@ -308,8 +308,8 @@ prog_char config_24[] PROGMEM = "Grid tie?      ";
 prog_char config_25[] PROGMEM = "Pratio Low     ";
 prog_char config_26[] PROGMEM = "Trst Warn Temp ";
 prog_char config_27[] PROGMEM = "Pratio High    ";
-prog_char config_28[] PROGMEM = "Ash Aug Lim (A)";
-prog_char config_29[] PROGMEM = "Ash Aug Hyst(A)";
+prog_char config_28[] PROGMEM = "Ash Aug Max (A)";
+prog_char config_29[] PROGMEM = "Ash Aug High(A)";
 prog_char config_30[] PROGMEM = "Ash Aug Period ";
 
 PROGMEM const char *Configuration[CONFIG_COUNT] = {config_0, config_1, config_2, config_3, config_4, config_5, config_6, config_7, config_8, config_9, config_10, config_11, config_12, config_13, config_14, config_15, config_16, config_17, config_18, config_19, config_20, config_21, config_22, config_23, config_24, config_25, config_26, config_27, config_28, config_29, config_30};
@@ -357,7 +357,7 @@ plus_minus_five
 //                              0    1    2    3    4   5    6   7    8    9    10   11   12   13   14   15   16   17   18  19   20  21  22  23   24  25   26   27   28   29   30
 int defaults[CONFIG_COUNT]   = {0,   0,   1,   10,  35, 100, 6,  1,   10,  98,  10,  130, 210, 195, 50,  60,  12,  3,   30, 140, 0,  3,  0,  1,   0,  30,  150, 60,  10,  1,   180};  //default values to be saved to EEPROM for the following getConfig variables
 int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   0,   0,   0,   0,  0,   0,  0,  0,  1,   0,  0,   0,   0,   3,   1,   0};  //minimum values allowed 
-int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15,  254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254, 254, 13, 3,   240}; //maximum values allowed  
+int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15,  254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254, 254, 13, 12,  240}; //maximum values allowed  
 
 //Don't forget to add the following to update_config_var in Display!  The first Configuration, Reset Defaults, is skipped, so these start at 1, not 0. 
 int engine_type = getConfig(1);  

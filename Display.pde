@@ -140,7 +140,7 @@ void DoDisplay() {
 		//Disp_PutStr(buf);
 		//Disp_RC(3, 10);
 		//strcpy_P(buf, half_blank);
-
+/* 
 		char ashAugerModes[] = "SFRB";
 		char fuelAugerModes[] = "SFFFRRF";
 		vnh_status_s stat = vnh_get_status(&ashAuger);
@@ -152,7 +152,8 @@ void DoDisplay() {
 			(auger_state == AUGER_HIGH || auger_state == AUGER_REVERSE_HIGH) ? '!' : ' '
 		);
 		  Disp_PutStr(buf);
-    }
+*/    
+	}
 
     if (alarm_count > 0){ //keypresses for alarms only
 		if (key == 2) {
@@ -1014,17 +1015,17 @@ void displayManualMode() {
 		case 2:
 			Disp_PutStr(P("Ash Auger: "));
 			switch (AshAugerGetMode()) {
-				case ASH_AUGER_AUTO:
+				case AUTO:
 					Disp_PutStr(P("AUTO"));
-					if (modeAdv) AshAugerSetMode(ASH_AUGER_MANUAL);
+					if (modeAdv) AshAugerSwitchMode(MANUAL);
 					break;
-				case ASH_AUGER_MANUAL:
+				case MANUAL:
 					Disp_PutStr(P("ON"));
-					if (modeAdv) AshAugerSetMode(ASH_AUGER_DISABLED);
+					if (modeAdv) AshAugerSwitchMode(DISABLED);
 					break;
-				case ASH_AUGER_DISABLED:
+				case DISABLED:
 					Disp_PutStr(P("OFF"));
-					if (modeAdv) AshAugerSetMode(ASH_AUGER_AUTO);
+					if (modeAdv) AshAugerSwitchMode(AUTO);
 					break;
 				default:
 					break;

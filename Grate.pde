@@ -71,7 +71,7 @@ void DoGrate() { // call once per second
 					Logln("Grate Mode: On");
 				}
 				// Start up the ash auger
-				AshAugerSetTimer(ashAugerAutoRunPeriod);
+				AshAugerStart();
 			}
 			else {
 				// Timer reached 0, switch off and go back to watch mode
