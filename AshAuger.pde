@@ -13,9 +13,9 @@ struct {
 	unsigned limit_current;		// Current must be limited to this level by PWM
 	unsigned oc_accum;			// Over-current accumulator
 	unsigned p_gain;
-	unsigned run_period;	// This is how long we run in auto mode
-	unsigned run_timer;		// Time how long we've been running 
-	unsigned drive_timer;	// Time in the current drive state
+	unsigned long run_period;	// This is how long we run in auto mode
+	unsigned long run_timer;		// Time how long we've been running 
+	unsigned long drive_timer;	// Time in the current drive state
 	unsigned mode;			// Run modes are AUTO, MANUAL, and DISABLED
 	unsigned drive_state;	// Drive state of the ash auger run cycle
 } ashAuger;
@@ -27,10 +27,10 @@ void AshAugerRun();
 void AshAugerInit() {
 	// Initialize H-bridge
 	ashAuger.vnh = &ashAuger_vnh;
-	ashAuger.vnh->mota = (gpio_s) {&PORTL, 0};
-	ashAuger.vnh->motb = (gpio_s) {&PORTD, 2};
-	ashAuger.vnh->ena = (gpio_s) {&PORTL, 1};
-	ashAuger.vnh->enb = (gpio_s) {&PORTD, 1};
+	ashAuger.vnh->mota = (gpio_s) {&PORTC, 1};
+	ashAuger.vnh->motb = (gpio_s) {&PORTC, 2};
+	ashAuger.vnh->ena = (gpio_s) {&PORTC, 0};
+	ashAuger.vnh->enb = (gpio_s) {&PORTC, 0};
 	vnh_reset(ashAuger.vnh);
 	// Initialize PWM
 	ashAuger.pwm = &PWM1;
@@ -105,8 +105,8 @@ void DoAshAuger() {
 	// Update timers
 	lapse = millis() - last_run;
 	last_run = millis();
-	ashAuger.run_timer = u_sublim(ashAuger.run_timer, lapse, 0);
-	ashAuger.drive_timer = u_sublim(ashAuger.drive_timer, lapse, 0);
+	ashAuger.run_timer = ul_sublim(ashAuger.run_timer, lapse, 0);
+	ashAuger.drive_timer = ul_sublim(ashAuger.drive_timer, lapse, 0);
 	
 	// Current control
 	duty = pwm_get_duty(ashAuger.pwm);
@@ -155,7 +155,7 @@ void DoAshAuger() {
 	/* 
 	Drive state handling.
 	The basic strategy is to go forward until we encounter an obstruction.  We 
-	then brake, reverse for a moment, brake again, and resume going forward.  
+	then brake, reverse for a moment, brake again, and resume going forward.
 	There's a minimum forward time, so we don't reverse more than we go forward
 	when the auger is stuck.  Over-current is cumulative, so we can raise an
 	alarm if the auger can't come unbound.
