@@ -15,10 +15,11 @@
 #define MANUAL 2
 
 #define STANDBY 0
+#define BRAKE 2
 #define FORWARD 1
-#define REVERSE 2
 #define FORWARD_BRAKE 3
-#define REVERSE_BRAKE 4
+#define REVERSE 5
+#define REVERSE_BRAKE 7
 
 void AshAugerSwitchMode(int mode);
 int AshAugerGetMode();
