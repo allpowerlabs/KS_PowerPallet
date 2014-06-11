@@ -20,11 +20,13 @@ void GrateInit() {
 	vnh_reset(grate.hbr);
 	
 	grate.pwm = &PWM2;
-	pwm_set_duty(grate.pwm, 50);
+	pwm_set_duty(grate.pwm, 255);
 	
-	grate.direction = FORWARD;
-	grate.fwdtime = grate_on_interval * 1000;
-	grate.revtime = 2;
+	grateMode = GRATE_SHAKE_PRATIO; //set default starting state
+	grate_motor_state = GRATE_MOTOR_OFF; //changed to indicate state (for datalogging, etc)
+	grate_val = GRATE_SHAKE_INIT; //variable that is changed and checked
+
+	GrateReset();
 }
 
 void GrateStart (void) {
@@ -50,19 +52,14 @@ void GrateStop(void) {
 	timer_set(&grate.timer, 0);
 }
 
-void InitGrate() {
-	GrateInit();
-	grateMode = GRATE_SHAKE_PRATIO; //set default starting state
-	grate_motor_state = GRATE_MOTOR_OFF; //changed to indicate state (for datalogging, etc)
-	grate_val = GRATE_SHAKE_INIT; //variable that is changed and checked
-
-	CalculateGrate();
-}
-
-void CalculateGrate() {
+void GrateReset() {
 	//setup grate slopes
 	m_grate_bad = (GRATE_SHAKE_INIT-GRATE_SHAKE_CROSS)/grate_min_interval;
 	m_grate_good = (GRATE_SHAKE_INIT-GRATE_SHAKE_CROSS)/grate_max_interval;
+	
+	grate.direction = FORWARD;
+	grate.fwdtime = grate_on_interval * 1000;
+	grate.revtime = grate_on_interval * 1000;
 }
 
 void DoGrate() { // call once per second	  
@@ -79,14 +76,14 @@ void DoGrate() { // call once per second
 			if (grate_motor_state != GRATE_MOTOR_OFF) {
 				GrateStop();
 				grate_motor_state = GRATE_MOTOR_OFF;
-				Logln("Grate Mode: Pressure Ratio");
+				Logln("Grate Mode: Disabled");
 			}
 			break;
 		case GRATE_SHAKE_PRATIO:
 			if (grate_motor_state != GRATE_MOTOR_OFF) {
 				GrateStop();
 				grate_motor_state = GRATE_MOTOR_OFF;
-				Logln("Grate Mode: Off");
+				Logln("Grate Mode: Pressure Ratio");
 			}
 			if (engine_state == ENGINE_ON || engine_state == ENGINE_STARTING || (P_reactorLevel > OFF && T_tredLevel > COOL)) { //shake only if reactor is on and/or engine is on
 			  //condition above will leave grate_val in the last state until conditions are met (not continuing to cycle)
@@ -101,6 +98,8 @@ void DoGrate() { // call once per second
 			if (grate_val <= GRATE_SHAKE_CROSS) {	//time to shake or reset
 				// Switch to timed shaking mode
 				grateMode = GRATE_SHAKE_TIMED;
+				GrateStart();
+				AshAugerStart();	// This is when we start the ash auger, too
 			}
 			break;
 		case GRATE_SHAKE_TIMED:
@@ -108,10 +107,7 @@ void DoGrate() { // call once per second
 				// Timer's on, make sure we're shakin'
 				if (grate_motor_state != GRATE_MOTOR_ON) {
 					grate_motor_state = GRATE_MOTOR_ON;
-					GrateStart();
-					Logln("Grate Mode: On");
-					// Start up the ash auger
-					AshAugerStart();
+					Logln("Grate Mode: On Timer");
 				}
 			}
 			else {

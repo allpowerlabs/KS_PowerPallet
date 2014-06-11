@@ -871,17 +871,17 @@ void update_config_var(int var_num){
   case 15:
     grate_max_interval = getConfig(15)*5;  //longest total interval in seconds
     regs[MB_CONFIG15] = grate_max_interval;
-    CalculateGrate();
+    GrateReset();
     break;
   case 16:
     grate_min_interval = getConfig(16)*5;
     regs[MB_CONFIG16] = grate_min_interval;
-    CalculateGrate();
+    GrateReset();
     break;
   case 17:
     grate_on_interval = getConfig(17); 
     regs[MB_CONFIG17] = grate_on_interval;
-    CalculateGrate();
+    GrateReset();
     break;
   case 18:
     servo_start = getConfig(18);

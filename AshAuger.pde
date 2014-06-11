@@ -14,8 +14,8 @@ struct {
 	unsigned oc_accum;			// Over-current accumulator
 	unsigned p_gain;
 	unsigned long run_period;	// This is how long we run in auto mode
-	unsigned long run_timer;		// Time how long we've been running 
-	unsigned long drive_timer;	// Time in the current drive state
+	timer_s run_timer;	// Time how long we've been running 
+	timer_s drive_timer;	// Time in the current drive state
 	unsigned mode;			// Run modes are AUTO, MANUAL, and DISABLED
 	unsigned drive_state;	// Drive state of the ash auger run cycle
 } ashAuger;
@@ -43,13 +43,13 @@ void AshAugerInit() {
 }
 
 void AshAugerReset() {
-	ashAuger.limit_current = 150; //getConfig(28) * ASH_AUGER_ONEAMP;
+	ashAuger.limit_current = 266; //getConfig(28) * ASH_AUGER_ONEAMP;
 	ashAuger.low_current = 40; //getConfig(29) * ASH_AUGER_ONEAMP;
-	ashAuger.high_current = 100; //getConfig(30) * ASH_AUGER_ONEAMP;
-	ashAuger.run_period = 10000; //getConfig(31) * 5000;
+	ashAuger.high_current = 240; //getConfig(30) * ASH_AUGER_ONEAMP;
+	ashAuger.run_period = 180000; //getConfig(31) * 5000;
 	ashAuger.p_gain = 1;
-	ashAuger.run_timer = 0;
-	ashAuger.drive_timer = 0;
+	timer_set(&ashAuger.run_timer, 0);
+	timer_set(&ashAuger.drive_timer, 0);
 	ashAuger.oc_accum = 0;
 }
 
@@ -86,27 +86,21 @@ void AshAugerStart() {
 			ashAuger.oc_accum = 0;
 		}
 		// Restart the run timer
-		ashAuger.run_timer = ashAuger.run_period;
+		timer_set(&ashAuger.run_timer, ashAuger.run_period);
+		timer_start(&ashAuger.run_timer);
 	}
 }
 
 void AshAugerStop() {
 	ashAuger.drive_state = STANDBY;
-	ashAuger.run_timer = 0;
+	timer_stop(&ashAuger.run_timer);
 }
 
 void DoAshAuger() {
-	static unsigned long last_run;
-	unsigned long lapse;
 	unsigned duty; 
 	unsigned vnh_mode;
 	unsigned current;
 	
-	// Update timers
-	lapse = millis() - last_run;
-	last_run = millis();
-	ashAuger.run_timer = ul_sublim(ashAuger.run_timer, lapse, 0);
-	ashAuger.drive_timer = ul_sublim(ashAuger.drive_timer, lapse, 0);
 	
 	// Current control
 	duty = pwm_get_duty(ashAuger.pwm);
@@ -146,7 +140,7 @@ void DoAshAuger() {
 	
 	// Stop the ash auger when the timer runs out in AUTO mode
 	if (ashAuger.mode == AUTO && ashAuger.drive_state != STANDBY) {
-		if (!ashAuger.run_timer) {
+		if (!timer_read(&ashAuger.run_timer)) {
 			Logln_p("Ash Auger: Run timer expired.");
 			AshAugerStop();
 		}
@@ -173,11 +167,12 @@ void DoAshAuger() {
 			if (vnh_mode != VNH_FORWARD) {
 				pwm_set_duty(ashAuger.pwm, 0);
 				vnh_forward(ashAuger.vnh);
-				ashAuger.drive_timer = ASH_AUGER_FORWARD_TIME;
+				timer_set(&ashAuger.drive_timer, ASH_AUGER_FORWARD_TIME);
+				timer_start(&ashAuger.drive_timer);
 				Logln("Ash Auger Motor: Forward");
 			}
 			// Try for some amount of time before giving up in a stall
-			if (!ashAuger.drive_timer && (ashAuger.oc_accum > ASH_AUGER_ACCUM_STALL)) {
+			if (!timer_read(&ashAuger.drive_timer) && (ashAuger.oc_accum > ASH_AUGER_ACCUM_STALL)) {
 				ashAuger.drive_state = FORWARD_BRAKE;
 			}
 			break;
@@ -185,10 +180,10 @@ void DoAshAuger() {
 			if (vnh_mode != VNH_BRAKE) {
 				pwm_set_duty(ashAuger.pwm, 0);
 				vnh_brake(ashAuger.vnh);
-				ashAuger.drive_timer = ASH_AUGER_BRAKE_TIME;
+				timer_set(&ashAuger.drive_timer, ASH_AUGER_BRAKE_TIME);
 				Logln("Ash Auger Motor: Brake");
 			}
-			if (!ashAuger.drive_timer) {
+			if (!timer_read(&ashAuger.drive_timer)) {
 				ashAuger.drive_state = REVERSE;
 			}
 			break;
@@ -196,11 +191,12 @@ void DoAshAuger() {
 			if (vnh_mode != VNH_REVERSE) {
 				pwm_set_duty(ashAuger.pwm, 0);
 				vnh_reverse(ashAuger.vnh);
-				ashAuger.drive_timer = ASH_AUGER_REVERSE_TIME;
+				timer_set(&ashAuger.drive_timer, ASH_AUGER_REVERSE_TIME);
+				timer_start(&ashAuger.drive_timer);
 				Logln("Ash Auger Motor: Reverse");
 			}
 			// Reverse until the timer runs out
-			if (!ashAuger.drive_timer) {
+			if (!timer_read(&ashAuger.drive_timer)) {
 				ashAuger.drive_state = REVERSE_BRAKE;
 			}
 			break;
@@ -208,10 +204,11 @@ void DoAshAuger() {
 			if (vnh_mode != VNH_BRAKE) {
 				pwm_set_duty(ashAuger.pwm, 0);
 				vnh_brake(ashAuger.vnh);
-				ashAuger.drive_timer = ASH_AUGER_BRAKE_TIME;
+				timer_set(&ashAuger.drive_timer, ASH_AUGER_BRAKE_TIME);
+				timer_start(&ashAuger.drive_timer);
 				Logln("Ash Auger Motor: Brake");
 			}
-			if (!ashAuger.drive_timer) {
+			if (!timer_read(&ashAuger.drive_timer)) {
 				ashAuger.drive_state = FORWARD;
 			}
 			break;

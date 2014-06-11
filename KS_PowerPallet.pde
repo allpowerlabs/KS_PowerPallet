@@ -56,8 +56,8 @@ char p_buffer[41] = "";
 #define Log_p(x) Log(P(x))
 #define Logln_p(x) Logln(P(x))
 
-const prog_char co_product[] PROGMEM = "# http:\\\\AllPowerlabs.org  Power Pallet ";
-const prog_char help[] PROGMEM = { 
+const char co_product[] PROGMEM = "# http:\\\\AllPowerlabs.org  Power Pallet ";
+const char help[] PROGMEM = { 
   "#All Power Labs Power Pallet Serial Help:\r\n"
   "# ?: device info\r\n"
   "# #: Serial Number (follow with number if changing)\r\n"
@@ -461,7 +461,7 @@ unsigned long auger_pulse_time = 500;
 int auger_pulse_state = 0;
 
 //Auger Current Levels
-int AugerCurrentValue = 0; // current level in .1A,  ADC Count = (120 * Current) + 1350
+unsigned AugerCurrentValue = 0; // current level in .1A,  ADC Count = (120 * Current) + 1350
 enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;  
 static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
 //Any changes to the following needs to be updated to update_config_var!!!   AugerCurrentLevel[AugerCurrentLevelName]
@@ -715,6 +715,7 @@ void setup() {
   Fet_Init();
   Servo_Init();
   pwm_init(); // Initialize hardware PWM channels
+  timer_init();  // Initialize timer system
 
   Disp_Reset();
   Kpd_Reset();
@@ -735,7 +736,7 @@ void setup() {
   DoDatalogging();
   InitLambda();
   InitServos();
-  InitGrate();
+  GrateInit();
   AshAugerInit();  
   if (use_modbus == 1){
     InitModbusSlave();
