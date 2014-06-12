@@ -297,7 +297,7 @@ prog_char config_13[] PROGMEM = "Tred High Temp";
 prog_char config_14[] PROGMEM = "Pfilter Accum# "; 
 prog_char config_15[] PROGMEM = "Grate Max Inter"; 
 prog_char config_16[] PROGMEM = "Grate Min Inter"; 
-prog_char config_17[] PROGMEM = "Grate On Interv";
+prog_char config_17[] PROGMEM = "Grate Shake .1s";
 prog_char config_18[] PROGMEM = "Servo Start Pos";
 prog_char config_19[] PROGMEM = "Lambda Rich    ";
 prog_char config_20[] PROGMEM = "Modbus Enabled?";  //Set to Modbus baud of zero and remove this configuration?
@@ -355,7 +355,7 @@ plus_minus_five
 }; 
 
 //                              0    1    2    3    4   5    6   7    8    9    10   11   12   13   14   15   16   17   18  19   20  21  22  23   24  25   26   27   28   29   30
-int defaults[CONFIG_COUNT]   = {0,   0,   1,   10,  35, 100, 6,  1,   10,  98,  10,  130, 210, 195, 50,  60,  12,  3,   30, 140, 0,  3,  0,  1,   0,  30,  150, 60,  10,  1,   180};  //default values to be saved to EEPROM for the following getConfig variables
+int defaults[CONFIG_COUNT]   = {0,   0,   1,   10,  35, 100, 6,  1,   10,  98,  10,  130, 210, 195, 50,  60,  12,  30,   30, 140, 0,  3,  0,  1,   0,  30,  150, 60,  10,  1,   180};  //default values to be saved to EEPROM for the following getConfig variables
 int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   0,   0,   0,   0,  0,   0,  0,  0,  1,   0,  0,   0,   0,   3,   1,   0};  //minimum values allowed 
 int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15,  254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254, 254, 13, 12,  240}; //maximum values allowed  
 
@@ -393,7 +393,6 @@ int pratio_high_boundary = getConfig(27);
 //unsigned int ashAugerAutoRunPeriod = getConfig(30)*5;
 
 // Grate tuning variables
-unsigned grateMode;
 unsigned grate_motor_state; //changed to indicate state (for datalogging, etc)
 unsigned grate_val;
 //how much to remove from grate_val each cycle [1 second] (slope)

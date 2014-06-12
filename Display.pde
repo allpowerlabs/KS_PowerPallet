@@ -657,8 +657,8 @@ void DoKeyInput() {
       TransitionDisplay(DISPLAY_GRATE);
       break;
     case DISPLAY_GRATE:
-	  if(grateMode == GRATE_SHAKE_ON) {  // Grate shaker got left on
-		grateMode = GRATE_SHAKE_PRATIO;  // Turn it off
+	  if(GrateGetMode() == GRATE_SHAKE_ON) {  // Grate shaker got left on
+		GrateSwitchMode(GRATE_SHAKE_PRATIO);  // Turn it off
 	  }
       if (config_changed == true){
         TransitionDisplay(DISPLAY_REACTOR);
@@ -989,23 +989,23 @@ void displayManualMode() {
 			break;
 		case 1:
 			Disp_PutStr(P("Grate Shaker: "));
-			switch (grateMode) {
+			switch (GrateGetMode()) {
 				case GRATE_SHAKE_OFF:
 					Disp_PutStr(P("OFF"));
 					if (modeAdv) {
-						grateMode = GRATE_SHAKE_ON;
+						GrateSwitchMode(GRATE_SHAKE_ON);
 					}
 					break;
 				case GRATE_SHAKE_ON:
 					Disp_PutStr(P("ON"));
 					if (modeAdv) {
-						grateMode = GRATE_SHAKE_PRATIO;
+						GrateSwitchMode(GRATE_SHAKE_PRATIO);
 					}
 					break;
 				case GRATE_SHAKE_PRATIO:
 					Disp_PutStr(P("AUTO"));
 					if (modeAdv) {
-						grateMode = GRATE_SHAKE_OFF;
+						GrateSwitchMode(GRATE_SHAKE_OFF);
 					}
 					break;
 				default:

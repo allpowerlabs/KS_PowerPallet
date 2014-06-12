@@ -49,7 +49,7 @@ void DoModbus() {
           TransitionAuger(regs[MB_AUGER_STATE]);
           break;
         case MB_GRATE_STATE:
-          grateMode = regs[MB_GRATE_STATE];
+          GrateSwitchMode(regs[MB_GRATE_STATE]);
           break;
         case MB_FLARE_STATE:
           flare_state = regs[MB_FLARE_STATE]; //???
@@ -102,7 +102,7 @@ void DoModbus() {
     //regs[MB_BLOWER_STATE] = ABSENT; //(NOT SURE IF THIS CAN BE COMBINED WITH FLARE)
     regs[MB_ENGINE_STATE] = engine_state;
     regs[MB_FLARE_STATE] = flare_state;
-    regs[MB_GRATE_STATE] = grateMode;  //grate_motor_state;
+    regs[MB_GRATE_STATE] = GrateGetMode();  //grate_motor_state;
     regs[MB_T_BRED] = (int)Temp_Data[T_BRED];
     //regs[MB_T_COMB] = (int)Temp_Data[T_COMB]; //ABSENT;
     //regs[MB_T_DRYING_GAS_OUT] = (int)Temp_Data[T_COMB]; //ABSENT;

@@ -84,18 +84,15 @@ void DoSerialIn() {
       Logln("Grate Shaken");
       break;
     case 'G':  
-      switch (grateMode) {
+      switch (GrateGetMode()) {
       case GRATE_SHAKE_OFF:
-        grateMode = GRATE_SHAKE_ON;
-        Logln("Grate Mode: On");
+        GrateSwitchMode(GRATE_SHAKE_ON);
         break;
       case GRATE_SHAKE_ON:
-        grateMode = GRATE_SHAKE_PRATIO;
-        Logln("Grate Mode: Pressure Ratio");
+        GrateSwitchMode(GRATE_SHAKE_PRATIO);
         break;
       case GRATE_SHAKE_PRATIO:
-        grateMode = GRATE_SHAKE_OFF;
-        Logln("Grate Mode: Off");
+        GrateSwitchMode(GRATE_SHAKE_OFF);
         break;
       }
       break;  

@@ -6,7 +6,7 @@ struct {
 	unsigned fwdtime;
 	unsigned revtime;
 	timer_s timer;
-	unsigned drive_state;
+	unsigned mode;
 } grate;
 
 vnh_s grate_hbr;
@@ -22,11 +22,9 @@ void GrateInit() {
 	grate.pwm = &PWM2;
 	pwm_set_duty(grate.pwm, 255);
 	
-	grateMode = GRATE_SHAKE_PRATIO; //set default starting state
-	grate_motor_state = GRATE_MOTOR_OFF; //changed to indicate state (for datalogging, etc)
-	grate_val = GRATE_SHAKE_INIT; //variable that is changed and checked
-
 	GrateReset();
+
+	GrateSwitchMode(GRATE_SHAKE_PRATIO); //set default starting state
 }
 
 void GrateStart (void) {
@@ -47,7 +45,7 @@ void GrateStart (void) {
 }
 
 void GrateStop(void) {
-	vnh_standby(grate.hbr);
+	vnh_brake(grate.hbr);
 	timer_stop(&grate.timer);
 	timer_set(&grate.timer, 0);
 }
@@ -58,33 +56,57 @@ void GrateReset() {
 	m_grate_good = (GRATE_SHAKE_INIT-GRATE_SHAKE_CROSS)/grate_max_interval;
 	
 	grate.direction = FORWARD;
-	grate.fwdtime = grate_on_interval * 1000;
-	grate.revtime = grate_on_interval * 1000;
+	grate.fwdtime = grate_on_interval * 100;
+	grate.revtime = grate_on_interval * 100;
+}
+
+void GrateSwitchMode(unsigned mode) {
+	if (grate.mode != mode) {
+		grate.mode = mode;
+		switch (mode) {
+			case GRATE_SHAKE_ON:
+				GrateStart();
+				grate_motor_state = GRATE_MOTOR_ON;
+				Logln("Grate Mode: On");
+				break;
+			case GRATE_SHAKE_OFF:
+				GrateStop();
+				grate_motor_state = GRATE_MOTOR_OFF;
+				Logln("Grate Mode: Disabled");
+				break;
+			case GRATE_SHAKE_PRATIO:
+				GrateStop();
+				grate_val = GRATE_SHAKE_INIT;
+				grate_motor_state = GRATE_MOTOR_OFF;
+				Logln("Grate Mode: Pressure Ratio");
+				break;
+			case GRATE_SHAKE_TIMED:
+				GrateStart();
+				grate_motor_state = GRATE_MOTOR_ON;
+				Logln("Grate Mode: Timed Shake");
+				break;
+			default:
+				GrateStop();
+				grate_val = GRATE_SHAKE_INIT;
+				grate_motor_state = GRATE_MOTOR_OFF;
+				Logln("Grate Mode: Pressure Ratio");
+				break;
+		}
+	}
+}
+
+unsigned GrateGetMode() {
+	return grate.mode;
 }
 
 void DoGrate() { // call once per second	  
 	// handle different shaking modes
-	switch (grateMode) {
+	switch (grate.mode) {
 		case GRATE_SHAKE_ON:	// Continuous grate shake requested by user
-			if (grate_motor_state != GRATE_MOTOR_ON) {
-				GrateStart();
-				grate_motor_state = GRATE_MOTOR_ON;
-				Logln("Grate Mode: On");
-			}
 			break;
 		case GRATE_SHAKE_OFF:	// Grate shake inhibited by user
-			if (grate_motor_state != GRATE_MOTOR_OFF) {
-				GrateStop();
-				grate_motor_state = GRATE_MOTOR_OFF;
-				Logln("Grate Mode: Disabled");
-			}
 			break;
 		case GRATE_SHAKE_PRATIO:
-			if (grate_motor_state != GRATE_MOTOR_OFF) {
-				GrateStop();
-				grate_motor_state = GRATE_MOTOR_OFF;
-				Logln("Grate Mode: Pressure Ratio");
-			}
 			if (engine_state == ENGINE_ON || engine_state == ENGINE_STARTING || (P_reactorLevel > OFF && T_tredLevel > COOL)) { //shake only if reactor is on and/or engine is on
 			  //condition above will leave grate_val in the last state until conditions are met (not continuing to cycle)
 			  if (grate_val >= GRATE_SHAKE_CROSS) { // not time to shake
@@ -97,30 +119,16 @@ void DoGrate() { // call once per second
 			}
 			if (grate_val <= GRATE_SHAKE_CROSS) {	//time to shake or reset
 				// Switch to timed shaking mode
-				grateMode = GRATE_SHAKE_TIMED;
-				GrateStart();
+				GrateSwitchMode(GRATE_SHAKE_TIMED);
 				AshAugerStart();	// This is when we start the ash auger, too
 			}
 			break;
 		case GRATE_SHAKE_TIMED:
-			if (timer_read(&grate.timer)) {
-				// Timer's on, make sure we're shakin'
-				if (grate_motor_state != GRATE_MOTOR_ON) {
-					grate_motor_state = GRATE_MOTOR_ON;
-					Logln("Grate Mode: On Timer");
-				}
-			}
-			else {
+			if (!timer_read(&grate.timer)) {
 				// Timer reached 0, switch off and go back to watch mode
-				grate_val = GRATE_SHAKE_INIT;
-				grate_motor_state = GRATE_MOTOR_OFF;
 				GrateStop();
-				grateMode = GRATE_SHAKE_PRATIO;
-				Logln("Grate Mode: Off");
+				GrateSwitchMode(GRATE_SHAKE_PRATIO);
 			}
-			break;
-		default:
-			grateMode = GRATE_SHAKE_PRATIO;
 			break;
 	}
 }
