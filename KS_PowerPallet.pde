@@ -70,8 +70,8 @@ const char help[] PROGMEM = {
   "# c: Calibrate Pressure Sensors\r\n"
   "# s: add 10 to Servo1 calibration\r\n"
   "# S: subtract 10 from Servo1 position\r\n"
-  "# l: add 0.01 to lambda_setpoint\r\n"
-  "# L: subtract 0.01 from lambda_setpoint\r\n"
+  "# l: increase lambda_setpoint\r\n"
+  "# L: decrease lambda_setpoint\r\n"
   "# t: subtract 100 ms from Sample Period (loopPeriod1)\r\n"
   "# T: add 100 ms from Sample Period (loopPeriod1)\r\n"
   "# g: Shake grate\r\n"
@@ -174,6 +174,7 @@ Servo Servo_Mixture;
 
 //Lambda
 #define LAMBDA_SIGNAL_CHECK TRUE
+#define LAMBDA_SETPOINT_ADJUSTMENT (0.0025)
 
 //Flare States
 #define FLARE_OFF 0

@@ -247,35 +247,37 @@ void DoDisplay() {
     I=lambda_PID.GetI_Param();
     // Row 0
     Disp_RC(0,0);
-    sprintf(buf, "LamSet%3i  ", int(ceil(lambda_setpoint*100.0)));
+	sprintf(buf, "Lambda   ");
     Disp_PutStr(buf);
-    Disp_RC(0,11);
-    sprintf(buf, "Lambda%3i", int(lambda_input*100.0));
-    Disp_PutStr(buf);
-    //Row 1
+	Disp_PutStr(dtostrf(lambda_input, 6, 3, buf));
+	// Row 1
     Disp_RC(1,0);
-    sprintf(buf, "P     %3i  ", int(ceil(lambda_PID.GetP_Param()*100.0)));
+    sprintf(buf, "Setpoint ", lambda_setpoint);
     Disp_PutStr(buf);
-    Disp_RC(1,11);
-    sprintf(buf, "I     %3i", int(ceil(lambda_PID.GetI_Param()*100.0)));
-    Disp_PutStr(buf);
+	Disp_PutStr(dtostrf(lambda_setpoint, 6, 3, buf));
+    // Row 2
     Disp_RC(2,0);
-    Disp_PutStr("                    ");
+    sprintf(buf, "P     %3i I     %3i", 
+		int(ceil(lambda_PID.GetP_Param()*100.0)),
+		int(ceil(lambda_PID.GetI_Param()*100.0))
+	);
+    Disp_PutStr(buf);
+	// Row 3
+	Disp_RC(3,0);
+    strcpy_P(buf, menu1);
+    Disp_PutStr(buf);
     switch (cur_item) {
     case 1: // Lambda setpoint
       if (key == 2) {
-        lambda_setpoint += 0.01;
+        lambda_setpoint += LAMBDA_SETPOINT_ADJUSTMENT;
         WriteLambda();
       }
       if (key == 3) {
-        lambda_setpoint -= 0.01;
+        lambda_setpoint -= LAMBDA_SETPOINT_ADJUSTMENT;
         WriteLambda();
       }          
-      Disp_RC(0,0);
+      Disp_RC(1,0);
       Disp_CursOn();
-      Disp_RC(3,0);
-      strcpy_P(buf, menu1);
-      Disp_PutStr(buf);
       break;
     case 2: //Lambda P
       if (key == 2) {
@@ -289,10 +291,7 @@ void DoDisplay() {
         WriteLambda();
       }
       lambda_PID.SetTunings(P,I,0);
-      Disp_RC(3,0);
-      strcpy_P(buf, menu1);
-      Disp_PutStr(buf);
-      Disp_RC(1,0);
+      Disp_RC(2,0);
       Disp_CursOn();
       break;
     case 3: //Lambda I
@@ -307,18 +306,9 @@ void DoDisplay() {
         WriteLambda();
       }
       lambda_PID.SetTunings(P,I,0);
-      Disp_RC(3,0);
-      strcpy_P(buf, menu1);
-      Disp_PutStr(buf);
-      Disp_RC(1,11);
+      Disp_RC(2,10);
       Disp_CursOn();
       break;
-//    case 4: //Lambda reading - because it's NOT editable, moved it out of the edit selection path.
-//      Disp_RC(3,0);
-//      Disp_PutStr(P("NEXT  ADV           "));
-//      Disp_RC(0,11);
-//      Disp_CursOn();
-//      break;
     }
     break;
   case DISPLAY_GRATE: 
