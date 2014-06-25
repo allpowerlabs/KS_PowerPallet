@@ -215,12 +215,12 @@ Servo Servo_Mixture;
 #define DISPLAY_RELAY 12
 #define DISPLAY_ANA 13
 
-const prog_char menu1[] PROGMEM = "NEXT  ADV   +    -  ";
-const prog_char blank[] PROGMEM = "                    ";
-const prog_char new_engine_state[] PROGMEM = "New Engine State: ";
-const prog_char engine_shutdown[] PROGMEM = ", Engine Shutdown.";
-const prog_char new_auger_state[] PROGMEM = "New Auger State: ";
-const prog_char half_blank[] PROGMEM = "          ";
+const char menu1[] PROGMEM = "NEXT  ADV   +    -  ";
+const char blank[] PROGMEM = "                    ";
+const char new_engine_state[] PROGMEM = "New Engine State: ";
+const char engine_shutdown[] PROGMEM = ", Engine Shutdown.";
+const char new_auger_state[] PROGMEM = "New Auger State: ";
+const char half_blank[] PROGMEM = "          ";
 char choice[5];
 char buf[22] = "";
 
@@ -255,26 +255,26 @@ int testing_state = TESTING_OFF;
 unsigned long testing_state_entered = 0;
 int analog_input[] = {ANA0, ANA1, ANA2, ANA3, ANA4, ANA5, ANA6, ANA7};
 
-//prog_char testing_state_0[] PROGMEM = "Off";
-prog_char testing_state_1[] PROGMEM = "FET0 Fuel Auger Fwd";
-prog_char testing_state_2[] PROGMEM = "FET1 Grate";
-prog_char testing_state_3[] PROGMEM = "FET2 Engine/Governor";
-prog_char testing_state_4[] PROGMEM = "FET3 Starter";
-prog_char testing_state_5[] PROGMEM = "FET4 Flare";
-prog_char testing_state_6[] PROGMEM = "FET5 Ash Auger";
-prog_char testing_state_7[] PROGMEM = "FET6 Alarm";
-prog_char testing_state_8[] PROGMEM = "FET7 Fuel Auger Rev";
+//const char testing_state_0[] PROGMEM = "Off";
+const char testing_state_1[] PROGMEM = "FET0 Fuel Auger Fwd";
+const char testing_state_2[] PROGMEM = "FET1 Grate";
+const char testing_state_3[] PROGMEM = "FET2 Engine/Governor";
+const char testing_state_4[] PROGMEM = "FET3 Starter";
+const char testing_state_5[] PROGMEM = "FET4 Flare";
+const char testing_state_6[] PROGMEM = "FET5 Ash Auger";
+const char testing_state_7[] PROGMEM = "FET6 Alarm";
+const char testing_state_8[] PROGMEM = "FET7 Fuel Auger Rev";
 
-prog_char testing_state_9[] PROGMEM =  "ANA_Lambda";
-prog_char testing_state_10[] PROGMEM = "ANA_Fuel_Switch";
-prog_char testing_state_11[] PROGMEM = "ANA_Eng_Switch";
-prog_char testing_state_12[] PROGMEM = "ANA_Oil";
-prog_char testing_state_13[] PROGMEM = "ANA_Auger_current";
-prog_char testing_state_14[] PROGMEM = "ANA_Throttle_Pos";
-prog_char testing_state_15[] PROGMEM = "ANA_Coolant_Temp";
-prog_char testing_state_16[] PROGMEM = "Unused"; 
+const char testing_state_9[] PROGMEM =  "ANA_Lambda";
+const char testing_state_10[] PROGMEM = "ANA_Fuel_Switch";
+const char testing_state_11[] PROGMEM = "ANA_Eng_Switch";
+const char testing_state_12[] PROGMEM = "ANA_Oil";
+const char testing_state_13[] PROGMEM = "ANA_Auger_current";
+const char testing_state_14[] PROGMEM = "ANA_Throttle_Pos";
+const char testing_state_15[] PROGMEM = "ANA_Coolant_Temp";
+const char testing_state_16[] PROGMEM = "Unused"; 
 
-PROGMEM const char *TestingStateName[] = {testing_state_1, testing_state_2, testing_state_3, testing_state_4, testing_state_5, testing_state_6, testing_state_7, testing_state_8, testing_state_9, testing_state_10, testing_state_11, testing_state_12, testing_state_13, testing_state_14, testing_state_15, testing_state_16};
+const char * const TestingStateName[] PROGMEM = {testing_state_1, testing_state_2, testing_state_3, testing_state_4, testing_state_5, testing_state_6, testing_state_7, testing_state_8, testing_state_9, testing_state_10, testing_state_11, testing_state_12, testing_state_13, testing_state_14, testing_state_15, testing_state_16};
 
 // Datalogging variables
 int lineCount = 0;
@@ -284,47 +284,47 @@ int lineCount = 0;
 int config_var;
 byte config_changed = false;
 
-prog_char config_0[] PROGMEM = "Reset Defaults?";
-prog_char config_1[] PROGMEM = "Engine Type    "; 
-prog_char config_2[] PROGMEM = "Relay Board    "; 
-prog_char config_3[] PROGMEM = "Auger Rev (.1s)"; 
-prog_char config_4[] PROGMEM = "Auger Low (.1A)"; 
-prog_char config_5[] PROGMEM = "Auger High(.1A)"; 
-prog_char config_6[] PROGMEM = "Low Oil (PSI)  "; 
-prog_char config_7[] PROGMEM = "Datalog SD card"; 
-prog_char config_8[] PROGMEM = "Pratio Accum#  "; 
-prog_char config_9[] PROGMEM = "High Coolant T "; 
-prog_char config_10[] PROGMEM = "Display Per .1s"; 
-prog_char config_11[] PROGMEM = "Trst low temp?"; 
-prog_char config_12[] PROGMEM = "Trst High Temp"; 
-prog_char config_13[] PROGMEM = "Tred High Temp";
-prog_char config_14[] PROGMEM = "Pfilter Accum# "; 
-prog_char config_15[] PROGMEM = "Grate Max Inter"; 
-prog_char config_16[] PROGMEM = "Grate Min Inter"; 
-prog_char config_17[] PROGMEM = "Grate Shake .1s";
-prog_char config_18[] PROGMEM = "Servo Start Pos";
-prog_char config_19[] PROGMEM = "Lambda Rich    ";
-prog_char config_20[] PROGMEM = "Modbus Enabled?";  //Set to Modbus baud of zero and remove this configuration?
-prog_char config_21[] PROGMEM = "Modbus Baud    ";  //0:2400, 1:4800, 2:9600, 3:19200, 4:38400, 5:57600, 6:115200 
-prog_char config_22[] PROGMEM = "Modbus Parity  ";  //0:None, 1:Odd, 2:Even
-prog_char config_23[] PROGMEM = "Modbus Address ";  //1-127
-prog_char config_24[] PROGMEM = "Grid tie?      "; 
-prog_char config_25[] PROGMEM = "Pratio Low     ";
-prog_char config_26[] PROGMEM = "Trst Warn Temp ";
-prog_char config_27[] PROGMEM = "Pratio High    ";
-prog_char config_28[] PROGMEM = "Ash Aug Max (A)";
-prog_char config_29[] PROGMEM = "Ash Aug High(A)";
-prog_char config_30[] PROGMEM = "Ash Aug Period ";
+const char config_0[] PROGMEM = "Reset Defaults?";
+const char config_1[] PROGMEM = "Engine Type    "; 
+const char config_2[] PROGMEM = "Relay Board    "; 
+const char config_3[] PROGMEM = "Auger Rev (.1s)"; 
+const char config_4[] PROGMEM = "Auger Low (.1A)"; 
+const char config_5[] PROGMEM = "Auger High(.1A)"; 
+const char config_6[] PROGMEM = "Low Oil (PSI)  "; 
+const char config_7[] PROGMEM = "Datalog SD card"; 
+const char config_8[] PROGMEM = "Pratio Accum#  "; 
+const char config_9[] PROGMEM = "High Coolant T "; 
+const char config_10[] PROGMEM = "Display Per .1s"; 
+const char config_11[] PROGMEM = "Trst low temp?"; 
+const char config_12[] PROGMEM = "Trst High Temp"; 
+const char config_13[] PROGMEM = "Tred High Temp";
+const char config_14[] PROGMEM = "Pfilter Accum# "; 
+const char config_15[] PROGMEM = "Grate Max Inter"; 
+const char config_16[] PROGMEM = "Grate Min Inter"; 
+const char config_17[] PROGMEM = "Grate Shake .1s";
+const char config_18[] PROGMEM = "Servo Start Pos";
+const char config_19[] PROGMEM = "Lambda Rich    ";
+const char config_20[] PROGMEM = "Modbus Enabled?";  //Set to Modbus baud of zero and remove this configuration?
+const char config_21[] PROGMEM = "Modbus Baud    ";  //0:2400, 1:4800, 2:9600, 3:19200, 4:38400, 5:57600, 6:115200 
+const char config_22[] PROGMEM = "Modbus Parity  ";  //0:None, 1:Odd, 2:Even
+const char config_23[] PROGMEM = "Modbus Address ";  //1-127
+const char config_24[] PROGMEM = "Grid tie?      "; 
+const char config_25[] PROGMEM = "Pratio Low     ";
+const char config_26[] PROGMEM = "Trst Warn Temp ";
+const char config_27[] PROGMEM = "Pratio High    ";
+const char config_28[] PROGMEM = "Ash Aug Max (A)";
+const char config_29[] PROGMEM = "Ash Aug High(A)";
+const char config_30[] PROGMEM = "Ash Aug Period ";
 
-PROGMEM const char *Configuration[CONFIG_COUNT] = {config_0, config_1, config_2, config_3, config_4, config_5, config_6, config_7, config_8, config_9, config_10, config_11, config_12, config_13, config_14, config_15, config_16, config_17, config_18, config_19, config_20, config_21, config_22, config_23, config_24, config_25, config_26, config_27, config_28, config_29, config_30};
+const char * const Configuration[CONFIG_COUNT] PROGMEM = {config_0, config_1, config_2, config_3, config_4, config_5, config_6, config_7, config_8, config_9, config_10, config_11, config_12, config_13, config_14, config_15, config_16, config_17, config_18, config_19, config_20, config_21, config_22, config_23, config_24, config_25, config_26, config_27, config_28, config_29, config_30};
 
-prog_char plus_minus[] PROGMEM = "+    -  ";
-prog_char no_yes[] PROGMEM = "NO  YES ";
-prog_char ten_twenty_k[] PROGMEM = "10k 20k ";
-prog_char plus_minus_five[] PROGMEM = "+5  -5  ";
+const char plus_minus[] PROGMEM = "+    -  ";
+const char no_yes[] PROGMEM = "NO  YES ";
+const char ten_twenty_k[] PROGMEM = "10k 20k ";
+const char plus_minus_five[] PROGMEM = "+5  -5  ";
 
 
-PROGMEM const char *Config_Choices[CONFIG_COUNT] = {
+const char * const Config_Choices[CONFIG_COUNT] PROGMEM = {
 no_yes, 
 ten_twenty_k,
 no_yes,
@@ -615,44 +615,44 @@ int alarm_shown = 0;
 #define ALARM_TTRED_HIGH 14
 #define ALARM_TBRED_HIGH 15
 
-prog_char alarm_1[] PROGMEM = "Auger on too long   ";
-prog_char alarm_2[] PROGMEM = "Auger off too long  ";
-prog_char alarm_3[] PROGMEM = "Bad Reactor P_ratio ";
-prog_char alarm_4[] PROGMEM = "Bad Filter P_ratio  ";
-prog_char alarm_5[] PROGMEM = "Reactor Fuel Low    ";
-prog_char alarm_6[] PROGMEM = "Trst low for engine ";
-prog_char alarm_7[] PROGMEM = "Tred high for engine";
-prog_char alarm_8[] PROGMEM = "Check Oil Pressure  ";
-prog_char alarm_9[] PROGMEM  = "No O2 Sensor Signal ";
-prog_char alarm_10[] PROGMEM = "Auger Low Current   ";
-prog_char alarm_11[] PROGMEM = "FuelSwitch/Auger Jam";
-prog_char alarm_12[] PROGMEM = "High P_comb         ";
-prog_char alarm_13[] PROGMEM = "High Coolant Temp   ";
-prog_char alarm_14[] PROGMEM = "Reduction Temp Low  ";
-prog_char alarm_15[] PROGMEM = "Restriction Temp High ";
-prog_char alarm_16[] PROGMEM = "Reduction Temp High ";
+const char alarm_1[] PROGMEM = "Auger on too long   ";
+const char alarm_2[] PROGMEM = "Auger off too long  ";
+const char alarm_3[] PROGMEM = "Bad Reactor P_ratio ";
+const char alarm_4[] PROGMEM = "Bad Filter P_ratio  ";
+const char alarm_5[] PROGMEM = "Reactor Fuel Low    ";
+const char alarm_6[] PROGMEM = "Trst low for engine ";
+const char alarm_7[] PROGMEM = "Tred high for engine";
+const char alarm_8[] PROGMEM = "Check Oil Pressure  ";
+const char alarm_9[] PROGMEM  = "No O2 Sensor Signal ";
+const char alarm_10[] PROGMEM = "Auger Low Current   ";
+const char alarm_11[] PROGMEM = "FuelSwitch/Auger Jam";
+const char alarm_12[] PROGMEM = "High P_comb         ";
+const char alarm_13[] PROGMEM = "High Coolant Temp   ";
+const char alarm_14[] PROGMEM = "Reduction Temp Low  ";
+const char alarm_15[] PROGMEM = "Restriction Temp High ";
+const char alarm_16[] PROGMEM = "Reduction Temp High ";
 
-PROGMEM const char *display_alarm[]  = {alarm_1, alarm_2, alarm_3, alarm_4, alarm_5, alarm_6, alarm_7, alarm_8, alarm_9, alarm_10, alarm_11, alarm_12, alarm_13, alarm_14, alarm_15, alarm_16};
+const char * const display_alarm[] PROGMEM = {alarm_1, alarm_2, alarm_3, alarm_4, alarm_5, alarm_6, alarm_7, alarm_8, alarm_9, alarm_10, alarm_11, alarm_12, alarm_13, alarm_14, alarm_15, alarm_16};
 
 //line 2 on display.  If shutdown[] is greater than zero, countdown will be added to last 3 spaces.
-prog_char alarm2_1[] PROGMEM = "Check Fuel          ";
-prog_char alarm2_2[] PROGMEM = "Bridging?           ";
-prog_char alarm2_3[] PROGMEM = "Reactor Fuel Issue  ";
-prog_char alarm2_4[] PROGMEM = "Check Filter        ";
-prog_char alarm2_5[] PROGMEM = "Check Auger/Fuel    ";  //Not implemented!!
-prog_char alarm2_6[] PROGMEM = "Increase Load       ";
-prog_char alarm2_7[] PROGMEM = "Low Fuel in Reactor?";
-//prog_char alarm2_8[] PROGMEM = "                    ";
-//prog_char alarm2_9[] PROGMEM = "                    ";
-//prog_char alarm2_10[] PROGMEM = "Check Fuel          ";
-prog_char alarm2_11[] PROGMEM = "Check Fuel & Switch ";
-prog_char alarm2_12[] PROGMEM = "Check Air Intake    ";
-//prog_char alarm2_13[] PROGMEM = "                    ";
-//prog_char alarm2_14[] PROGMEM = "                    ";
-prog_char alarm2_15[] PROGMEM = "Reduce Load         ";
-//prog_char alarm2_16[] PROGMEM = "Reduce Load         ";
+const char alarm2_1[] PROGMEM = "Check Fuel          ";
+const char alarm2_2[] PROGMEM = "Bridging?           ";
+const char alarm2_3[] PROGMEM = "Reactor Fuel Issue  ";
+const char alarm2_4[] PROGMEM = "Check Filter        ";
+const char alarm2_5[] PROGMEM = "Check Auger/Fuel    ";  //Not implemented!!
+const char alarm2_6[] PROGMEM = "Increase Load       ";
+const char alarm2_7[] PROGMEM = "Low Fuel in Reactor?";
+//const char alarm2_8[] PROGMEM = "                    ";
+//const char alarm2_9[] PROGMEM = "                    ";
+//const char alarm2_10[] PROGMEM = "Check Fuel          ";
+const char alarm2_11[] PROGMEM = "Check Fuel & Switch ";
+const char alarm2_12[] PROGMEM = "Check Air Intake    ";
+//const char alarm2_13[] PROGMEM = "                    ";
+//const char alarm2_14[] PROGMEM = "                    ";
+const char alarm2_15[] PROGMEM = "Reduce Load         ";
+//const char alarm2_16[] PROGMEM = "Reduce Load         ";
 
-PROGMEM const char *display_alarm2[] = {alarm2_1, alarm2_2, alarm2_3, alarm2_4, alarm2_5, alarm2_6, alarm2_7, blank, blank, alarm2_1, alarm2_11, alarm2_12, blank, blank, alarm2_15, alarm2_15};
+const char * const display_alarm2[] PROGMEM = {alarm2_1, alarm2_2, alarm2_3, alarm2_4, alarm2_5, alarm2_6, alarm2_7, blank, blank, alarm2_1, alarm2_11, alarm2_12, blank, blank, alarm2_15, alarm2_15};
 
 //modbus
 long baud_rates[] = {2400, 4800, 9600, 19200, 38400, 57600, 115200};

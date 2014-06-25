@@ -244,12 +244,12 @@ void PrintLambdaUpdate(double P, double I, double D, double nP, double nI, doubl
 
 // given a zero-terminated huge PROGMEM string, without copying to RAM, using Serial.print() to send it out
 // pgm read is far on ATMega1280, 128k
-void printProgStr(const prog_char str[])
+void printProgStr(const char str[])
 {
   char c;
   if(!str) return;
   while((c = (char) pgm_read_byte_far(str++))) 
-    Serial.print(c,BYTE);
+    Serial.write(c);
 }
 
 void SerialShowInfo(void) {
