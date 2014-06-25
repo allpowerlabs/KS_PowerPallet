@@ -7,14 +7,6 @@ void DoLambda() {
   lambda_input = GetLambda();
   switch(lambda_state) {
   case LAMBDA_CLOSEDLOOP:
-    //don't reset changed PID values
-    //        if (display_state != DISPLAY_LAMBDA) {
-    //          if (lambda_input < lambda_setpoint - 0.1) {
-    //            lambda_PID.SetTunings(lambda_P[0]*1.5, lambda_I[0], lambda_D[0]);
-    //          } else {
-    //            lambda_PID.SetTunings(lambda_P[0], lambda_I[0], lambda_D[0]);
-    //          }
-    //        }
     lambda_PID.SetTunings(lambda_P[0], lambda_I[0], lambda_D[0]);
     lambda_PID.Compute();
     SetPremixServoAngle(lambda_output);
@@ -200,10 +192,6 @@ void TransitionLambda(int new_state) {
   switch (new_state) {
   case LAMBDA_CLOSEDLOOP:
     strcpy(lambda_state_name, P("Closed Loop"));
-    lambda_setpoint = lambda_setpoint_mode[0];
-    //      if (engine_state == ENGINE_STARTING){
-    //        lambda_output = premix_valve_center;
-    //      }
     lambda_PID.SetMode(AUTO);
     lambda_PID.SetSampleTime(20);
     lambda_PID.SetInputLimits(0.5,1.5);
@@ -276,39 +264,35 @@ void WriteLambda() {
 }
 
 void WriteLambda(double setpoint) {
-  int val,p,i;
-  p = constrain(lambda_PID.GetP_Param()*100,0,255);
-  i = constrain(lambda_PID.GetI_Param()*10,0,255);
-  lambda_setpoint_mode[0] = setpoint;
-  val = constrain(128+(setpoint-1.0)*100,0,255);
-  EEPROM.write(12,128); //check point
-  EEPROM.write(13, val);
-  EEPROM.write(14, p);
-  EEPROM.write(15, i);
-  Logln_p("Writing lambda settings to EEPROM");
+	// We use a union to avoid float->int conversion
+	union dong {
+		double d;
+		uint32_t l;
+	} dong;
+	Logln_p("Writing lambda settings to EEPROM");
+	dong.d = setpoint;
+	eeprom_write_dword((uint32_t *)CFG_ADDR_LAMBDA_SETPOINT, dong.l);
+	dong.d = lambda_PID.GetP_Param();
+	eeprom_write_dword((uint32_t *)CFG_ADDR_LAMBDA_P_GAIN, dong.l);
+	dong.d = lambda_PID.GetI_Param();
+	eeprom_write_dword((uint32_t *)CFG_ADDR_LAMBDA_I_GAIN, dong.l);
+	
 }
 
 void LoadLambda() {
-  byte check;
-  double val,p,i;
-  check = EEPROM.read(12); 
-  val = 1.0+(EEPROM.read(13)-128)*0.01;
-  p = EEPROM.read(14)*0.01;
-  i = EEPROM.read(15)*0.1;
-  if (check == 128 && val >= 0.5 && val <= 1.5) { //check to see if lambda has been set
-    Logln_p("Loading lambda from EEPROM");
-    lambda_setpoint = val;
-    lambda_PID.SetTunings(p,i,0);
-    lambda_P[0] = p;
-    lambda_I[0] = i;
-  } 
-  else {
-    Logln_p("Saving default lambda setpoint to EEPROM");
-    val = lambda_setpoint_mode[0];
-    WriteLambda(val);
-  }
-  lambda_setpoint = val;
-  lambda_setpoint_mode[0] = val;
+	union dong {
+		double d;
+		uint32_t l;
+	} dong;
+	Logln_p("Loading lambda settings from EEPROM");
+	dong.l = eeprom_read_dword((uint32_t *)CFG_ADDR_LAMBDA_SETPOINT);
+	lambda_setpoint = dong.d;
+	if (lambda_setpoint > 1.5 || lambda_setpoint < 0.5) lambda_setpoint = LAMBDA_SETPOINT_DEFAULT;
+	dong.l = (double)eeprom_read_dword((uint32_t *)CFG_ADDR_LAMBDA_P_GAIN);
+	lambda_P[0] = dong.d;
+	dong.l = (double)eeprom_read_dword((uint32_t *)CFG_ADDR_LAMBDA_I_GAIN);
+	lambda_I[0] = dong.d;
+	lambda_PID.SetTunings(lambda_P[0], lambda_I[0],	0.0);
 }
 
 

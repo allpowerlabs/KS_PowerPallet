@@ -241,10 +241,7 @@ void DoDisplay() {
     break;
   case DISPLAY_LAMBDA:
      Disp_CursOff();
-    double P,I;
     item_count = 3;  // was 4, but moved Lambda display out of the edit path
-    P=lambda_PID.GetP_Param();
-    I=lambda_PID.GetI_Param();
     // Row 0
     Disp_RC(0,0);
 	sprintf(buf, "Lambda   ");
@@ -257,11 +254,10 @@ void DoDisplay() {
 	Disp_PutStr(dtostrf(lambda_setpoint, 6, 3, buf));
     // Row 2
     Disp_RC(2,0);
-    sprintf(buf, "P     %3i I     %3i", 
-		int(ceil(lambda_PID.GetP_Param()*100.0)),
-		int(ceil(lambda_PID.GetI_Param()*100.0))
-	);
-    Disp_PutStr(buf);
+	sprintf(buf, "P  "); Disp_PutStr(buf);
+	Disp_PutStr(dtostrf(lambda_PID.GetP_Param(), 6, 2, buf));
+	sprintf(buf, " I  "); Disp_PutStr(buf);
+	Disp_PutStr(dtostrf(lambda_PID.GetI_Param(), 6, 2, buf));
 	// Row 3
 	Disp_RC(3,0);
     strcpy_P(buf, menu1);
@@ -281,31 +277,29 @@ void DoDisplay() {
       break;
     case 2: //Lambda P
       if (key == 2) {
-        P += 0.01;
-        lambda_P[0] = P;
+        lambda_P[0] += 0.01;
+		lambda_PID.SetTunings(lambda_P[0], lambda_I[0], 0);
         WriteLambda();
       }
       if (key == 3) {
-        P -= 0.01;
-        lambda_P[0] = P;
+        lambda_P[0] -= 0.01;
+		lambda_PID.SetTunings(lambda_P[0], lambda_I[0], 0);
         WriteLambda();
       }
-      lambda_PID.SetTunings(P,I,0);
       Disp_RC(2,0);
       Disp_CursOn();
       break;
     case 3: //Lambda I
       if (key == 2) {
-        I += 0.1;
-        lambda_I[0] = I;
+        lambda_I[0] += 0.1;
+		lambda_PID.SetTunings(lambda_P[0], lambda_I[0], 0);
         WriteLambda();
       }
       if (key == 3) {
-        I -= 0.1;
-        lambda_I[0] = I; 
+        lambda_I[0] -= 0.1;
+		lambda_PID.SetTunings(lambda_P[0], lambda_I[0], 0);
         WriteLambda();
       }
-      lambda_PID.SetTunings(P,I,0);
       Disp_RC(2,10);
       Disp_CursOn();
       break;

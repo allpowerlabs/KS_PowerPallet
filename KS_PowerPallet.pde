@@ -2,6 +2,7 @@
 // Library used to run APL Power Pallet
 // Developed for the APL GCU/PCU: http://gekgasifier.pbworks.com/Gasifier-Control-Unit
 
+#include <avr/eeprom.h>
 #include <EEPROM.h>         // included with Arduino, can read/writes to non-volatile memory
 #include <Servo.h>          // Arduino's native servo library
 #include <PID_Beta6.h>      // http://www.arduino.cc/playground/Code/PIDLibrary, http://en.wikipedia.org/wiki/PID_controller
@@ -23,6 +24,7 @@
 #include <ModbusSlave.h>
 //#include <MCP2515.h> 
 //#include <SPI.h>
+#include "Config.h"
 #include "AshAuger.h"		// Ash auger typedefs.
 
 
@@ -175,6 +177,7 @@ Servo Servo_Mixture;
 //Lambda
 #define LAMBDA_SIGNAL_CHECK TRUE
 #define LAMBDA_SETPOINT_ADJUSTMENT (0.0025)
+#define LAMBDA_SETPOINT_DEFAULT (1.05)
 
 //Flare States
 #define FLARE_OFF 0
@@ -357,7 +360,7 @@ plus_minus_five
 
 //                              0    1    2    3    4   5    6   7    8    9    10   11   12   13   14   15   16   17   18  19   20  21  22  23   24  25   26   27   28   29   30
 int defaults[CONFIG_COUNT]   = {0,   0,   1,   10,  35, 100, 6,  1,   10,  98,  10,  130, 210, 195, 50,  60,  12,  30,   30, 140, 0,  3,  0,  1,   0,  30,  150, 60,  10,  1,   180};  //default values to be saved to EEPROM for the following getConfig variables
-int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   0,   0,   0,   0,  0,   0,  0,  0,  1,   0,  0,   0,   0,   3,   1,   0};  //minimum values allowed 
+int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   1,   1,   1,   0,  0,   0,  0,  0,  1,   0,  0,   0,   0,   3,   1,   0};  //minimum values allowed 
 int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15,  254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254, 254, 13, 12,  240}; //maximum values allowed  
 
 //Don't forget to add the following to update_config_var in Display!  The first Configuration, Reset Defaults, is skipped, so these start at 1, not 0. 
@@ -527,15 +530,14 @@ double premix_valve_closed = 5;
 double premix_valve_max = 1.0;  //minimum of range for closed loop operation (percent open)
 double premix_valve_min = 0.00; //maximum of range for closed loop operation (percent open)
 double premix_valve_center = servo_start/100; //initial value when entering closed loop operation (percent open)
-double lambda_setpoint;
+double lambda_setpoint = LAMBDA_SETPOINT_DEFAULT;
 double lambda_input;
 double lambda_output;
 double lambda_value;
-double lambda_setpoint_mode[1] = {1.05};
 double lambda_P[1] = {0.13}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
 double lambda_I[1] = {1.0}; //Make I_Param about the same as your manual response time (in Seconds)/4 
 double lambda_D[1] = {0.0}; //Unless you know what it's for, don't use D
-PID lambda_PID(&lambda_input, &lambda_output, &lambda_setpoint,lambda_P[0],lambda_I[0],lambda_D[0]);
+PID lambda_PID(&lambda_input, &lambda_output, &lambda_setpoint, lambda_P[0], lambda_I[0], lambda_D[0]);
 unsigned long lamba_updated_time;
 boolean write_lambda = false;
 char lambda_state_name[40] = "Unknown";
