@@ -51,6 +51,7 @@ void DatalogSD(char file_name[13], boolean newline) {    //file_name should be 8
 
 void appendTimestamp(){
   dtostrf(millis()/100, 5, 3, float_buf);
+  //sprintf(float_buf, "%07lu", millis()/1000);  Gonna fix the timestamp someday
   strncat(float_buf, comma, 15);
   strncat(string_buffer, "# ", BUFFER_SIZE);
   strncat(string_buffer, float_buf, BUFFER_SIZE);
@@ -98,6 +99,16 @@ void Logln(int str) {
 }
 
 void Log(int str) {
+  sprintf(float_buf, "%d", str);
+  Log(float_buf);
+}
+
+void Logln(unsigned str) {
+  sprintf(float_buf, "%d", str);
+  Logln(float_buf);
+}
+
+void Log(unsigned str) {
   sprintf(float_buf, "%d", str);
   Log(float_buf);
 }
