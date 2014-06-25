@@ -25,6 +25,7 @@
 //#include <MCP2515.h> 
 //#include <SPI.h>
 #include "Config.h"
+#include "Modes.h"
 #include "AshAuger.h"		// Ash auger typedefs.
 
 
