@@ -680,6 +680,8 @@ char sd_log_file_name[] = "No SD Card  ";
 //char sd_in_char=0;
 //int sd_index=0;  
 
+timer_s control_timer;
+
 void setup() {
   GCU_Setup(V3,FULLFILL,P777722);
   DDRJ |= 0x80;      
@@ -744,33 +746,37 @@ void setup() {
     InitModbusSlave();
   }
 
- 
   if (!grid_tie) TransitionEngine(ENGINE_ON); //default to engine on. if PCU resets, don't shut a running engine off. in the ENGINE_ON state, should detect and transition out of engine on.
   TransitionLambda(LAMBDA_UNKNOWN);
   TransitionAuger(AUGER_OFF);
   TransitionDisplay(DISPLAY_SPLASH);
- 
+
+  timer_set(&control_timer, 0);
+  timer_start(&control_timer);
 }
 
 void loop() {
-  if (testing_state == TESTING_OFF) {
-    Temp_ReadAll();  // reads into array Temp_Data[], in deg C
-    Press_ReadAll(); // reads into array Press_Data[], in hPa
-    // the above two Readalls take peak 2.9msec, avg 2.2msec
-    DoPressure();
-    DoSerialIn();
-    DoLambda();
-    DoControlInputs();
-    DoOilPressure();
-    DoEngine();
-    DoFlare();
-    DoReactor();
-    DoAuger();
-	DoAshAuger();	// New!
-    if (use_modbus == 1){
-      DoModbus();
-    }
-  }
+	if (testing_state == TESTING_OFF) {
+		Temp_ReadAll();  // reads into array Temp_Data[], in deg C
+		Press_ReadAll(); // reads into array Press_Data[], in hPa
+		// the above two Readalls take peak 2.9msec, avg 2.2msec
+		if (!timer_read(&control_timer)) {
+			DoPressure();
+			DoSerialIn();
+			DoLambda();
+			DoControlInputs();
+			DoOilPressure();
+			DoEngine();
+			DoFlare();
+			DoReactor();
+			DoAuger();
+			DoAshAuger();	// New!
+			if (use_modbus == 1){
+			  DoModbus();
+			}
+			timer_set(&control_timer, 100);
+		}
+	}
   DoKeyInput();
   DoHeartBeat(); // blink heartbeat LED
   if (millis() >= nextTime2) {
