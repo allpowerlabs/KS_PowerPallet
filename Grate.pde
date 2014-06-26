@@ -39,7 +39,7 @@ void GrateConfig() {
 	grate.revtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_REV) * 100;
 	if (grate.revtime > 10000 || grate.revtime < 100) grate.revtime = 3000;
 	
-	grate.duty = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_DUTY);
+	grate.duty = (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_DUTY) * 2) + 55;
 	pwm_set_duty(grate.pwm, grate.duty);
 	
 	//setup grate slopes

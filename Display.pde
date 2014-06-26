@@ -855,15 +855,15 @@ void update_config_var(int var_num){
     break;
   case 15:
     regs[MB_CONFIG15] = getConfig(15)*5;
-    GrateReset();
+    GrateConfig();
     break;
   case 16:
     regs[MB_CONFIG16] = getConfig(16)*5;
-    GrateReset();
+    GrateConfig();
     break;
   case 17:
     regs[MB_CONFIG17] = getConfig(17);
-    GrateReset();
+    GrateConfig();
     break;
   case 18:
     servo_start = getConfig(18);
@@ -916,6 +916,15 @@ void update_config_var(int var_num){
 	break;
   case 30:
 	AshAugerReset();
+	break;
+  case 31:
+	AshAugerReset();
+	break;
+  case 32:
+	GrateConfig();
+	break;
+  case 33:
+	GrateConfig();
 	break;
   default:
 	break;

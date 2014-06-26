@@ -43,10 +43,10 @@ void AshAugerInit() {
 }
 
 void AshAugerReset() {
-	ashAuger.limit_current = 266; //getConfig(28) * ASH_AUGER_ONEAMP;
-	ashAuger.low_current = 40; //getConfig(29) * ASH_AUGER_ONEAMP;
-	ashAuger.high_current = 240; //getConfig(30) * ASH_AUGER_ONEAMP;
-	ashAuger.run_period = 180000; //getConfig(31) * 5000;
+	ashAuger.limit_current = getConfig(28) * ASH_AUGER_ONEAMP;
+	ashAuger.low_current = getConfig(29) * ASH_AUGER_ONEAMP;
+	ashAuger.high_current = getConfig(30) * ASH_AUGER_ONEAMP;
+	ashAuger.run_period = getConfig(31) * 5000;
 	ashAuger.p_gain = 1;
 	timer_set(&ashAuger.run_timer, 0);
 	timer_set(&ashAuger.drive_timer, 0);
