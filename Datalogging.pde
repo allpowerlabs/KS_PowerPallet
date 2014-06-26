@@ -4,7 +4,7 @@ void LogTime(boolean header = false) {
     PrintColumn(P("Time"));
   } 
   else {
-    PrintColumn(millis()/100.0);  // Gonna fix the timestamp some day
+    PrintColumn(millis()/1000); // Gonna fix the timestamp some day
   }
 }
 
@@ -76,18 +76,16 @@ void LogAnalogInputs(boolean header = false) {
 
 void LogGrate(boolean header = false) {
   if (header) {
-    //PrintColumn("grateMode");
     PrintColumn(P("Grate"));
     PrintColumn(P("P_ratio_reactor"));
     PrintColumn(P("P_ratio_state_reactor"));
     PrintColumn(P("Grate_Val"));
   } 
   else {
-    //PrintColumnInt(grateMode);
-    PrintColumnInt(grate_motor_state);
+    PrintColumnInt(GrateGetMotorState());
     PrintColumn(pRatioReactor);
     PrintColumn(pRatioReactorLevel[pRatioReactorLevelName]);
-    PrintColumn(grate_val);
+    PrintColumnInt(GrateGetAccum());
   }
 }
 
@@ -371,8 +369,8 @@ void PrintColumn(float str) {
   }
 }
 
-void PrintColumnInt(int str) {
-  sprintf(float_buf, "%d, ", str);
+void PrintColumnInt(long str) {
+  sprintf(float_buf, "%ld, ", str);
   if (buffer_size + strlen(float_buf) < BUFFER_SIZE){
     strncat(string_buffer, float_buf, BUFFER_SIZE);
     buffer_size = strlen(string_buffer);

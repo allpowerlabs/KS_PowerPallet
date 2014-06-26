@@ -1,4 +1,19 @@
 
+
+// Grate Shaking States - now using generic modes AUTOMATIC, MANUAL, DISABLED
+// #define GRATE_SHAKE_OFF 0
+// #define GRATE_SHAKE_ON 1
+// #define GRATE_SHAKE_TIMED 2
+// #define GRATE_SHAKE_PRATIO 3
+
+// Grate Motor States
+//#define GRATE_MOTOR_OFF 0
+//#define GRATE_MOTOR_ON 1
+
+// Grate Shaking
+// Maximum interval is 1270 sec.  Multiply by 100 for 10mS precision  
+#define GRATE_SHAKE_CROSS (127000)
+
 struct {
 	vnh_s * hbr;
 	pwm_s * pwm;
@@ -7,6 +22,9 @@ struct {
 	unsigned revtime;
 	timer_s timer;
 	unsigned mode;
+	unsigned long pr_accum;	// Pressure ratio accumulator
+	unsigned m_good;	// Good pressure ratio accumulator rise rate
+	unsigned m_bad;		// Bad pressure ratio accumulator rise rate
 } grate;
 
 vnh_s grate_hbr;
@@ -24,72 +42,71 @@ void GrateInit() {
 	
 	GrateReset();
 
-	GrateSwitchMode(GRATE_SHAKE_PRATIO); //set default starting state
+	GrateSwitchMode(AUTOMATIC); //set default starting state
+}
+
+void GrateReset() {
+	grate.direction = FORWARD;
+	grate.fwdtime = getConfig(17) * 100;
+	grate.revtime = grate.fwdtime;
+	
+	//setup grate slopes
+	grate.m_good = GRATE_SHAKE_CROSS / (getConfig(15)*50);		//divide by longest total interval in seconds
+	grate.m_bad = GRATE_SHAKE_CROSS / (getConfig(16)*50);		//divide by shortest total interval in seconds
+
+	Log_p("Grate good slope value now:");
+	Logln(grate.m_good);
+	Log_p("Grate bad slope value now:");
+	Logln(grate.m_bad);
 }
 
 void GrateStart (void) {
+	//if (grate.mode == DISABLED) return;
 	switch (grate.direction) {
 		case FORWARD:
 			if (vnh_get_mode(grate.hbr) != VNH_FORWARD)
 				vnh_forward(grate.hbr);
 			timer_set(&grate.timer, grate.fwdtime);
-			timer_start(&grate.timer); 
+			timer_start(&grate.timer);
+			Logln("Grate: Motor on forward");
 			break;
 		case REVERSE:
 			if (vnh_get_mode(grate.hbr) != VNH_REVERSE)
 				vnh_reverse(grate.hbr);
 			timer_set(&grate.timer, grate.revtime);
 			timer_start(&grate.timer);
+			Logln("Grate: Motor on reverse");
 			break;
 	}
 }
 
 void GrateStop(void) {
-	vnh_brake(grate.hbr);
-	timer_stop(&grate.timer);
-	timer_set(&grate.timer, 0);
-}
-
-void GrateReset() {
-	//setup grate slopes
-	m_grate_bad = (GRATE_SHAKE_INIT-GRATE_SHAKE_CROSS)/grate_min_interval;
-	m_grate_good = (GRATE_SHAKE_INIT-GRATE_SHAKE_CROSS)/grate_max_interval;
-	
-	grate.direction = FORWARD;
-	grate.fwdtime = grate_on_interval * 100;
-	grate.revtime = grate_on_interval * 100;
+	if (vnh_get_mode(grate.hbr) != VNH_BRAKE) {
+		vnh_brake(grate.hbr);
+		timer_stop(&grate.timer);
+		timer_set(&grate.timer, 0);
+		Logln("Grate: Motor off");
+	}
 }
 
 void GrateSwitchMode(unsigned mode) {
 	if (grate.mode != mode) {
 		grate.mode = mode;
 		switch (mode) {
-			case GRATE_SHAKE_ON:
+			case MANUAL:
 				GrateStart();
-				grate_motor_state = GRATE_MOTOR_ON;
 				Logln("Grate Mode: On");
 				break;
-			case GRATE_SHAKE_OFF:
+			case DISABLED:
 				GrateStop();
-				grate_motor_state = GRATE_MOTOR_OFF;
 				Logln("Grate Mode: Disabled");
 				break;
-			case GRATE_SHAKE_PRATIO:
-				GrateStop();
-				grate_val = GRATE_SHAKE_INIT;
-				grate_motor_state = GRATE_MOTOR_OFF;
-				Logln("Grate Mode: Pressure Ratio");
-				break;
-			case GRATE_SHAKE_TIMED:
-				GrateStart();
-				grate_motor_state = GRATE_MOTOR_ON;
-				Logln("Grate Mode: Timed Shake");
-				break;
+			case AUTOMATIC:
+				// Fall through.  Automatic is the default.
 			default:
+				grate.mode = AUTOMATIC;
 				GrateStop();
-				grate_val = GRATE_SHAKE_INIT;
-				grate_motor_state = GRATE_MOTOR_OFF;
-				Logln("Grate Mode: Pressure Ratio");
+				Logln("Grate Mode: Automatic");
 				break;
 		}
 	}
@@ -99,35 +116,48 @@ unsigned GrateGetMode() {
 	return grate.mode;
 }
 
-void DoGrate() { // call once per second	  
+unsigned GrateGetMotorState() {
+	return vnh_get_mode(grate.hbr);
+}
+
+unsigned long GrateGetAccum() {
+	return grate.pr_accum;
+}
+
+void DoGrate() {
+	// Check for drive system faults
+	if (vnh_get_mode(grate.hbr) == VNH_FORWARD || vnh_get_mode(grate.hbr) == VNH_REVERSE) {
+		Logln_p("Grate: Motor drive fault!");
+		GrateSwitchMode(DISABLED);  // Disable the grate
+		vnh_reset(grate.hbr);
+		// Alarm
+		// alarm(grate.fault_alarm);
+	}
 	// handle different shaking modes
 	switch (grate.mode) {
-		case GRATE_SHAKE_ON:	// Continuous grate shake requested by user
-			break;
-		case GRATE_SHAKE_OFF:	// Grate shake inhibited by user
-			break;
-		case GRATE_SHAKE_PRATIO:
-			if (engine_state == ENGINE_ON || engine_state == ENGINE_STARTING || (P_reactorLevel > OFF && T_tredLevel > COOL)) { //shake only if reactor is on and/or engine is on
-			  //condition above will leave grate_val in the last state until conditions are met (not continuing to cycle)
-			  if (grate_val >= GRATE_SHAKE_CROSS) { // not time to shake
+		case MANUAL:	// Continuous grate shake requested by user
+			return;		// Avoid timer check
+		case DISABLED:	// Grate shake inhibited by user
+			return;		// Nothing to do
+		case AUTOMATIC:
+			// TODO: Move this logic into the reactor code
+			// shake only if reactor is on
+			if (P_reactorLevel > OFF && T_tredLevel > COOL) {
+				//condition above will leave pr_accum in the last state until conditions are met (not continuing to cycle)
 				if (pRatioReactorLevel == PR_LOW) {
-				  grate_val = u_sublim(grate_val, m_grate_bad, 0);
+					grate.pr_accum = ul_addlim(grate.pr_accum, grate.m_bad, GRATE_SHAKE_CROSS);
 				} else {
-				  grate_val = u_sublim(grate_val, m_grate_good, 0);
+					grate.pr_accum = ul_addlim(grate.pr_accum, grate.m_good, GRATE_SHAKE_CROSS);
 				}
-			  }
+				if (grate.pr_accum >= GRATE_SHAKE_CROSS) {			
+					GrateStart();		//time to shake
+					AshAugerStart();	// This is when we start the ash auger, too
+					grate.pr_accum = 0;	// Reset pressure ratio accumulator
+				}
 			}
-			if (grate_val <= GRATE_SHAKE_CROSS) {	//time to shake or reset
-				// Switch to timed shaking mode
-				GrateSwitchMode(GRATE_SHAKE_TIMED);
-				AshAugerStart();	// This is when we start the ash auger, too
-			}
-			break;
-		case GRATE_SHAKE_TIMED:
 			if (!timer_read(&grate.timer)) {
 				// Timer reached 0, switch off and go back to watch mode
 				GrateStop();
-				GrateSwitchMode(GRATE_SHAKE_PRATIO);
 			}
 			break;
 	}

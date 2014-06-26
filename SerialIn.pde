@@ -80,37 +80,39 @@ void DoSerialIn() {
       Logln(loopPeriod1);
       break;
     case 'g':  
-      grate_val = GRATE_SHAKE_CROSS; //set grate val to shake for grate_on_interval
-      Logln("Grate Shaken");
+		Log_p("Broken, will fix later...");
+		//Logln("Grate Shaken");
       break;
     case 'G':  
       switch (GrateGetMode()) {
-      case GRATE_SHAKE_OFF:
-        GrateSwitchMode(GRATE_SHAKE_ON);
+      case DISABLED:
+        GrateSwitchMode(MANUAL);
         break;
-      case GRATE_SHAKE_ON:
-        GrateSwitchMode(GRATE_SHAKE_PRATIO);
+      case MANUAL:
+        GrateSwitchMode(AUTOMATIC);
         break;
-      case GRATE_SHAKE_PRATIO:
-        GrateSwitchMode(GRATE_SHAKE_OFF);
+      case AUTOMATIC:
+        GrateSwitchMode(DISABLED);
         break;
       }
       break;  
     case 'm':
-      grate_max_interval += 5;
-      grate_min_interval = grate_max_interval*0.5;
-      Log_p("Grate Max Interval now:");
-      Logln(grate_max_interval);
-      Log_p("Grate Min Interval now:");
-      Logln(grate_min_interval);
+      // grate_max_interval += 5;
+      // grate_min_interval = grate_max_interval*0.5;
+      // Log_p("Grate Max Interval now:");
+      // Logln(grate_max_interval);
+      // Log_p("Grate Min Interval now:");
+      // Logln(grate_min_interval);
+	  Log_p("Broken, will fix later...");
       break;
     case 'M':
-      grate_max_interval -= 5;
-      grate_min_interval = grate_max_interval*0.5;
-      Log_p("Grate Max Interval now:");
-      Logln(grate_max_interval);
-      Log_p("Grate Min Interval now:");
-      Logln(grate_min_interval);
+      // grate_max_interval -= 5;
+      // grate_min_interval = grate_max_interval*0.5;
+      // Log_p("Grate Max Interval now:");
+      // Logln(grate_max_interval);
+      // Log_p("Grate Min Interval now:");
+      // Logln(grate_min_interval);
+	  Log_p("Broken, will fix later...");
       break;   
     case 'e':
       TransitionEngine(ENGINE_GOV_TUNING);

@@ -15,9 +15,9 @@ void InitModbusSlave(){  //include in Setup() loop
     regs[MB_CONFIG12] = ttred_high;
     regs[MB_CONFIG13] = tbred_high;
     regs[MB_CONFIG14] = pfilter_alarm;
-    regs[MB_CONFIG15] = grate_max_interval;
-    regs[MB_CONFIG16] = grate_min_interval;
-    regs[MB_CONFIG17] = grate_on_interval;
+    regs[MB_CONFIG15] = 0;  // Broken, will fix later
+    regs[MB_CONFIG16] = 0;	// Broken, will fix later
+    regs[MB_CONFIG17] = 0;	// Broken, will fix later
     regs[MB_CONFIG18] = servo_start;
     regs[MB_CONFIG19] = lambda_rich;
     regs[MB_CONFIG20] = use_modbus;
@@ -112,7 +112,7 @@ void DoModbus() {
     //regs[MB_T_PYRO_OUT] = Temp_Data[T_PYRO_OUT]; //ABSENT;
     //regs[MB_T_REACTOR_GAS_OUT] = (int)Temp_Data[T_REACTOR_GAS_OUT];  //(ABSENT?)
     regs[MB_T_TRED] = (int)Temp_Data[T_TRED];
-    regs[MB_GRATE_VAL] = grate_val;	
+    regs[MB_GRATE_VAL] = 0;	// Broken, will fix later;	
     regs[MB_LAMBDA_IN] = int(100*lambda_input);
     regs[MB_LAMBDA_OUT] = int(100*lambda_output);
     regs[MB_P_RATIO_FILTER] = int(pRatioFilter*100);	

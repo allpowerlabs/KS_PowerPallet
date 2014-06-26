@@ -148,20 +148,6 @@ Servo Servo_Mixture;
 //#define INT_HERTZ 5 //interrupt number (not pin number)
 //#define INT_ENERGY_PULSE 4
 
-// Grate Shaking States
-#define GRATE_SHAKE_OFF 0
-#define GRATE_SHAKE_ON 1
-#define GRATE_SHAKE_TIMED 2
-#define GRATE_SHAKE_PRATIO 3
-
-// Grate Motor States
-#define GRATE_MOTOR_OFF 0
-#define GRATE_MOTOR_ON 1
-
-// Grate Shaking
-#define GRATE_SHAKE_CROSS 5000
-#define GRATE_SHAKE_INIT 32000
-
 //Control States
 //TODO: Use these for auto-start/shutdown sequence (e.g. equivalent to a backup generator command)
 #define CONTROL_OFF 0
@@ -379,9 +365,9 @@ int tred_low_temp = getConfig(11)*5;
 int ttred_high = getConfig(12)*5;
 int tbred_high = getConfig(13)*5;
 int pfilter_alarm = getConfig(14);
-int grate_max_interval = getConfig(15)*5;  //longest total interval in seconds
-int grate_min_interval = getConfig(16)*5;
-int grate_on_interval = getConfig(17);
+//int grate_max_interval = getConfig(15)*5;  //longest total interval in seconds
+//int grate_min_interval = getConfig(16)*5;
+//int grate_on_interval = getConfig(17);
 int servo_start = getConfig(18);
 int lambda_rich = getConfig(19);
 int use_modbus = getConfig(20);
@@ -398,11 +384,11 @@ int pratio_high_boundary = getConfig(27);
 //unsigned int ashAugerAutoRunPeriod = getConfig(30)*5;
 
 // Grate tuning variables
-unsigned grate_motor_state; //changed to indicate state (for datalogging, etc)
-unsigned grate_val;
+//unsigned grate_motor_state; //changed to indicate state (for datalogging, etc)
+//unsigned grate_val;
 //how much to remove from grate_val each cycle [1 second] (slope)
-unsigned m_grate_bad; 
-unsigned m_grate_good;
+//unsigned m_grate_bad; 
+//unsigned m_grate_good;
 
 // Reactor pressure ratio
 float pRatioReactor;
@@ -771,6 +757,7 @@ void loop() {
 			DoFlare();
 			DoReactor();
 			DoAuger();
+			DoGrate();
 			DoAshAuger();	// New!
 			if (use_modbus == 1){
 			  DoModbus();
@@ -786,7 +773,6 @@ void loop() {
     if (millis() >= nextTime1) {
       nextTime1 += loopPeriod1;
       if (testing_state == TESTING_OFF) {
-        DoGrate();
         DoFilter();
         DoDatalogging(); // No SD card: 27msec peak, 22msec normal. With SD card: 325msec at first, 288msec normal
         DoAlarmUpdate();

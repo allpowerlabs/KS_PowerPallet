@@ -1,3 +1,20 @@
+/*
+	Engine states: OFF, ON, START
+	OFF - Ignition and starter are off.  No sensor checks are performed.
+	ON - Ignition is on, starter is off.  Oil pressure is monitored.
+	START - Ignition and starter are on.  Oil pressure is not monitored.  After
+		30 seconds in start mode, engine is returned to off state.
+*/
+
+struct {
+	unsigned ignition_pin;		// Pin number of ignition
+	unsigned starter_pin;		// Pin number of starter
+	unsigned grid_tie;			// 1 for grid-tie controller
+	unsigned control_state;		// Off, ON, START
+	timer_s timer;				// Control timer
+	
+} engine;
+
 void DoEngine() {   
   strcpy_P(buf, engine_shutdown);
   switch (engine_state) {

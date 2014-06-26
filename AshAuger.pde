@@ -129,6 +129,7 @@ void DoAshAuger() {
 		Logln_p("Ash Auger: Auger is stuck!");
 		AshAugerSwitchMode(DISABLED);  // Disable the auger
 		// Ring the alarm, like Tenor Saw
+		// alarm(ashAuger.oc_alarm);
 	}
 	// Check for H-bridge channel faults
 	if (vnh_mode != VNH_STANDBY && (!gpio_get_pin(ashAuger.vnh->ena) || !gpio_get_pin(ashAuger.vnh->enb))) {
@@ -136,6 +137,7 @@ void DoAshAuger() {
 		AshAugerSwitchMode(DISABLED);  // Disable the auger
 		vnh_reset(ashAuger.vnh);
 		// Alarm
+		// alarm(ashAuger.fault_alarm);
 	}
 	
 	// Stop the ash auger when the timer runs out in AUTO mode

@@ -106,6 +106,7 @@ void DoDisplay() {
 		Disp_PutStr(buf);
 		//Row 3
 		Disp_RC(3,0);
+		Disp_PutStr("                    ");
 		// switch(auger_state){ 
 		// case AUGER_FORWARD:
 		// sprintf(buf, "AugFwd%3i  ", (millis() - auger_state_entered)/1000);
@@ -641,8 +642,8 @@ void DoKeyInput() {
       TransitionDisplay(DISPLAY_GRATE);
       break;
     case DISPLAY_GRATE:
-	  if(GrateGetMode() == GRATE_SHAKE_ON) {  // Grate shaker got left on
-		GrateSwitchMode(GRATE_SHAKE_PRATIO);  // Turn it off
+	  if(GrateGetMode() == MANUAL) {  // Grate shaker got left on
+		GrateSwitchMode(AUTOMATIC);  // Turn it off
 	  }
       if (config_changed == true){
         TransitionDisplay(DISPLAY_REACTOR);
@@ -853,18 +854,15 @@ void update_config_var(int var_num){
     regs[MB_CONFIG14] = pfilter_alarm;
     break;
   case 15:
-    grate_max_interval = getConfig(15)*5;  //longest total interval in seconds
-    regs[MB_CONFIG15] = grate_max_interval;
+    regs[MB_CONFIG15] = getConfig(15)*5;
     GrateReset();
     break;
   case 16:
-    grate_min_interval = getConfig(16)*5;
-    regs[MB_CONFIG16] = grate_min_interval;
+    regs[MB_CONFIG16] = getConfig(16)*5;
     GrateReset();
     break;
   case 17:
-    grate_on_interval = getConfig(17); 
-    regs[MB_CONFIG17] = grate_on_interval;
+    regs[MB_CONFIG17] = getConfig(17);
     GrateReset();
     break;
   case 18:
@@ -974,22 +972,22 @@ void displayManualMode() {
 		case 1:
 			Disp_PutStr(P("Grate Shaker: "));
 			switch (GrateGetMode()) {
-				case GRATE_SHAKE_OFF:
+				case DISABLED:
 					Disp_PutStr(P("OFF"));
 					if (modeAdv) {
-						GrateSwitchMode(GRATE_SHAKE_ON);
+						GrateSwitchMode(MANUAL);
 					}
 					break;
-				case GRATE_SHAKE_ON:
+				case MANUAL:
 					Disp_PutStr(P("ON"));
 					if (modeAdv) {
-						GrateSwitchMode(GRATE_SHAKE_PRATIO);
+						GrateSwitchMode(AUTOMATIC);
 					}
 					break;
-				case GRATE_SHAKE_PRATIO:
+				case AUTOMATIC:
 					Disp_PutStr(P("AUTO"));
 					if (modeAdv) {
-						GrateSwitchMode(GRATE_SHAKE_OFF);
+						GrateSwitchMode(DISABLED);
 					}
 					break;
 				default:
@@ -999,7 +997,7 @@ void displayManualMode() {
 		case 2:
 			Disp_PutStr(P("Ash Auger: "));
 			switch (AshAugerGetMode()) {
-				case AUTO:
+				case AUTOMATIC:
 					Disp_PutStr(P("AUTO"));
 					if (modeAdv) AshAugerSwitchMode(MANUAL);
 					break;
@@ -1009,7 +1007,7 @@ void displayManualMode() {
 					break;
 				case DISABLED:
 					Disp_PutStr(P("OFF"));
-					if (modeAdv) AshAugerSwitchMode(AUTO);
+					if (modeAdv) AshAugerSwitchMode(AUTOMATIC);
 					break;
 				default:
 					break;
