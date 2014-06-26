@@ -1,22 +1,11 @@
 
-
-// Grate Shaking States - now using generic modes AUTOMATIC, MANUAL, DISABLED
-// #define GRATE_SHAKE_OFF 0
-// #define GRATE_SHAKE_ON 1
-// #define GRATE_SHAKE_TIMED 2
-// #define GRATE_SHAKE_PRATIO 3
-
-// Grate Motor States
-//#define GRATE_MOTOR_OFF 0
-//#define GRATE_MOTOR_ON 1
-
-// Grate Shaking
 // Maximum interval is 1270 sec.  Multiply by 100 for 10mS precision  
 #define GRATE_SHAKE_CROSS (127000)
 
 struct {
 	vnh_s * hbr;
 	pwm_s * pwm;
+	unsigned duty;
 	unsigned direction;
 	unsigned fwdtime;
 	unsigned revtime;
@@ -38,26 +27,32 @@ void GrateInit() {
 	vnh_reset(grate.hbr);
 	
 	grate.pwm = &PWM2;
-	pwm_set_duty(grate.pwm, 255);
+	pwm_set_duty(grate.pwm, 0);
 	
+	GrateConfig();
 	GrateReset();
+}
 
-	GrateSwitchMode(AUTOMATIC); //set default starting state
+void GrateConfig() {
+	grate.fwdtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_FWD) * 100;
+	if (grate.fwdtime > 10000 || grate.fwdtime < 100) grate.fwdtime = 3000;
+	grate.revtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_REV) * 100;
+	if (grate.revtime > 10000 || grate.revtime < 100) grate.revtime = 3000;
+	
+	grate.duty = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_DUTY);
+	pwm_set_duty(grate.pwm, grate.duty);
+	
+	//setup grate slopes
+	grate.m_good = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MAX) * 50);	//divide by longest total interval in seconds
+	grate.m_bad = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MIN) * 50);		//divide by shortest total interval in seconds
 }
 
 void GrateReset() {
 	grate.direction = FORWARD;
-	grate.fwdtime = getConfig(17) * 100;
-	grate.revtime = grate.fwdtime;
+	grate.pr_accum = 0;
+	pwm_set_duty(grate.pwm, grate.duty);
 	
-	//setup grate slopes
-	grate.m_good = GRATE_SHAKE_CROSS / (getConfig(15)*50);		//divide by longest total interval in seconds
-	grate.m_bad = GRATE_SHAKE_CROSS / (getConfig(16)*50);		//divide by shortest total interval in seconds
-
-	Log_p("Grate good slope value now:");
-	Logln(grate.m_good);
-	Log_p("Grate bad slope value now:");
-	Logln(grate.m_bad);
+	GrateSwitchMode(AUTOMATIC); //set default starting state
 }
 
 void GrateStart (void) {
@@ -126,7 +121,7 @@ unsigned long GrateGetAccum() {
 
 void DoGrate() {
 	// Check for drive system faults
-	if (vnh_get_mode(grate.hbr) == VNH_FORWARD || vnh_get_mode(grate.hbr) == VNH_REVERSE) {
+	if (vnh_get_mode(grate.hbr) != VNH_STANDBY && (!gpio_get_pin(grate.hbr->ena) || !gpio_get_pin(grate.hbr->enb))) {
 		Logln_p("Grate: Motor drive fault!");
 		GrateSwitchMode(DISABLED);  // Disable the grate
 		vnh_reset(grate.hbr);
