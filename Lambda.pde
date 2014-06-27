@@ -287,7 +287,11 @@ void LoadLambda() {
 	Logln_p("Loading lambda settings from EEPROM");
 	dong.l = eeprom_read_dword((uint32_t *)CFG_ADDR_LAMBDA_SETPOINT);
 	lambda_setpoint = dong.d;
-	if (lambda_setpoint > 1.5 || lambda_setpoint < 0.5) lambda_setpoint = LAMBDA_SETPOINT_DEFAULT;
+	if (!(lambda_setpoint < 1.5) || !(lambda_setpoint > 0.5)) {
+		lambda_setpoint = LAMBDA_SETPOINT_DEFAULT;
+		lambda_P[0] = 0.13;
+		lambda_I[0] = 0.1;
+	}
 	dong.l = (double)eeprom_read_dword((uint32_t *)CFG_ADDR_LAMBDA_P_GAIN);
 	lambda_P[0] = dong.d;
 	dong.l = (double)eeprom_read_dword((uint32_t *)CFG_ADDR_LAMBDA_I_GAIN);

@@ -43,3 +43,10 @@
 #define CFG_ADDR_GRATE_REV	(531)
 #define CFG_ADDR_GRATE_DUTY	(532)
 #define CFG_ADDR_REACT_VERS	(533)
+
+
+
+typedef struct configurable_s {
+	const char * label;
+	
+} configurable_s;

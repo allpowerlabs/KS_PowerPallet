@@ -256,9 +256,9 @@ void DoDisplay() {
     // Row 2
     Disp_RC(2,0);
 	sprintf(buf, "P  "); Disp_PutStr(buf);
-	Disp_PutStr(dtostrf(lambda_PID.GetP_Param(), 6, 2, buf));
+	Disp_PutStr(dtostrf(lambda_P[0], 6, 2, buf));
 	sprintf(buf, " I  "); Disp_PutStr(buf);
-	Disp_PutStr(dtostrf(lambda_PID.GetI_Param(), 6, 2, buf));
+	Disp_PutStr(dtostrf(lambda_I[0], 6, 2, buf));
 	// Row 3
 	Disp_RC(3,0);
     strcpy_P(buf, menu1);
