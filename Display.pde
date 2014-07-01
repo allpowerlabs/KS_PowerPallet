@@ -106,54 +106,8 @@ void DoDisplay() {
 		Disp_PutStr(buf);
 		//Row 3
 		Disp_RC(3,0);
-		Disp_PutStr("                    ");
-		// switch(auger_state){ 
-		// case AUGER_FORWARD:
-		// sprintf(buf, "AugFwd%3i  ", (millis() - auger_state_entered)/1000);
-		// break;
-		// case AUGER_OFF:
-		// if (P_reactorLevel == OFF) {
-		  // sprintf(buf, "AugOff%s  ", " --"); 
-		// } 
-		// else {
-		  // sprintf(buf, "AugOff%3i  ", (millis() - auger_state_entered)/1000);  
-		// }
-		// break;
-		// case AUGER_REVERSE:
-		// sprintf(buf, "AugRev%3i  ", (millis() - auger_state_entered)/1000); 
-		// break;
-		// case AUGER_HIGH:
-		// sprintf(buf, "AugHi %3i  ", (millis() - auger_state_entered)/1000); 
-		// break;
-		// case AUGER_CURRENT_LOW:
-		// sprintf(buf, "AugLow%3i  ", (millis() - auger_state_entered)/1000);
-		// break;
-		// case AUGER_REVERSE_HIGH:
-		// sprintf(buf, "AugRHi%3i  ", (millis() - auger_state_entered)/1000); 
-		// break;
-		// case AUGER_ALARM:
-		// sprintf(buf, "AugALRM%3i ", (millis() - auger_state_entered)/1000);
-		// break;
-		// default:
-		// sprintf(buf, "Aug   %3i  ", (millis() - auger_state_entered)/1000);
-		// break;
-		// }
-		//Disp_PutStr(buf);
-		//Disp_RC(3, 10);
-		//strcpy_P(buf, half_blank);
-/* 
-		char ashAugerModes[] = "SFRB";
-		char fuelAugerModes[] = "SFFFRRF";
-		vnh_status_s stat = vnh_get_status(&ashAuger);
-		//sprintf_P(buf, PSTR("A:%3d D:%3d %c%c %4d"),
-		sprintf_P(buf, PSTR("Auger|Fuel %c%c Ash %c%c"),
-			fuelAugerModes[auger_state],
-			stat.limit ? '!' : ' ',
-			ashAugerModes[stat.mode],
-			(auger_state == AUGER_HIGH || auger_state == AUGER_REVERSE_HIGH) ? '!' : ' '
-		);
-		  Disp_PutStr(buf);
-*/    
+		sprintf(buf, "Run Time: %lu", millis() / 1000);
+		Disp_PutStr(buf);
 	}
 
     if (alarm_count > 0){ //keypresses for alarms only
@@ -947,6 +901,7 @@ void displayManualMode() {
 			// Advance the current function
 			currentFunction++;
 			config_changed = true; // This is supposed to let the rest of the display code know to jump back to the status screen after the user is done.
+			Disp_Clear();  // Clear display when changing functions
 			break;
 		case 2:		// Nothing
 			break;
@@ -969,7 +924,7 @@ void displayManualMode() {
 			Disp_PutStr(P("Fuel Auger: "));
 			switch (auger_state) {
 				case AUGER_ALARM:
-					Disp_PutStr(P("OFF"));
+					Disp_PutStr(P("OFF "));
 					if (modeAdv) TransitionAuger(AUGER_OFF);
 					break;
 				default:
@@ -977,18 +932,41 @@ void displayManualMode() {
 					if (modeAdv) TransitionAuger(AUGER_ALARM);  // Alarm state is used to suppress the auger, but no alarm is raised
 					break;
 			}
+			Disp_RC(2,0);
+			Disp_PutStr(P("F: "));
+			if (FuelDemand == SWITCH_ON) Disp_PutStr(P("1"));
+			else Disp_PutStr(P("0"));
+			Disp_PutStr(P(" M: "));
+			switch (auger_state) {
+				case AUGER_OFF:
+				case AUGER_ALARM:
+					Disp_PutStr(P("OFF"));
+					break;
+				case AUGER_STARTING:
+				case AUGER_FORWARD:
+				case AUGER_HIGH:
+				case AUGER_MANUAL_FORWARD:
+					Disp_PutStr(P("FWD"));
+					break;
+				case AUGER_REVERSE:
+				case AUGER_REVERSE_HIGH:
+					Disp_PutStr(P("REV"));
+					break;
+			}
+			sprintf(buf, " I: %u", AugerCurrentValue);
+			Disp_PutStr(buf);
 			break;
 		case 1:
 			Disp_PutStr(P("Grate Shaker: "));
 			switch (GrateGetMode()) {
 				case DISABLED:
-					Disp_PutStr(P("OFF"));
+					Disp_PutStr(P("OFF "));
 					if (modeAdv) {
 						GrateSwitchMode(MANUAL);
 					}
 					break;
 				case MANUAL:
-					Disp_PutStr(P("ON"));
+					Disp_PutStr(P("ON  "));
 					if (modeAdv) {
 						GrateSwitchMode(AUTOMATIC);
 					}
@@ -1011,11 +989,11 @@ void displayManualMode() {
 					if (modeAdv) AshAugerSwitchMode(MANUAL);
 					break;
 				case MANUAL:
-					Disp_PutStr(P("ON"));
+					Disp_PutStr(P("ON  "));
 					if (modeAdv) AshAugerSwitchMode(DISABLED);
 					break;
 				case DISABLED:
-					Disp_PutStr(P("OFF"));
+					Disp_PutStr(P("OFF "));
 					if (modeAdv) AshAugerSwitchMode(AUTOMATIC);
 					break;
 				default:
@@ -1027,7 +1005,7 @@ void displayManualMode() {
 			currentFunction = 0;
 			break;
 	}
-	Disp_PutStr(P("          "));  // This is a hack to clear the rest of the line
+	//Disp_PutStr(P("          "));  // This is a hack to clear the rest of the line
 	Disp_RC(3,0);
 	Disp_PutStr(P("NEXT"));
 	Disp_RC(3,6);

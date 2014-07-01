@@ -232,7 +232,7 @@ void checkAuger(){
     }
   }
   if (relay_board == 1){     //when relay board is present auger current sensing is enabled
-    AugerCurrentValue = (10*(u_sublim(analogRead(ANA_AUGER_CURRENT), 120, 0)))/12;  //convert from analog values to current (.1A) values
+    AugerCurrentValue = (u_sublim(analogRead(ANA_AUGER_CURRENT), 120, 0) * 10)/12;  //convert from analog values to current (.1A) values
     if (AugerCurrentValue > AugerCurrentLevelBoundary[CURRENT_OFF][0] && AugerCurrentValue < AugerCurrentLevelBoundary[CURRENT_OFF][1]) {
       AugerCurrentLevel = CURRENT_OFF;
     }
