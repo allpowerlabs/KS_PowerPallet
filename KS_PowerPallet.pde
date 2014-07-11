@@ -451,7 +451,7 @@ unsigned AugerCurrentValue = 0; // current level in .1A,  ADC Count = (120 * Cur
 enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;  
 static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
 //Any changes to the following needs to be updated to update_config_var!!!   AugerCurrentLevel[AugerCurrentLevelName]
-int AugerCurrentLevelBoundary[4][2] = { { -140, 10}, { 10, current_low_boundary}, {current_low_boundary+10, current_high_boundary-10}, {current_high_boundary, 750} };  //.1A readings
+unsigned AugerCurrentLevelBoundary[4][2] = { { 0, 10}, { 10, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 750} };  //.1A readings
 
 //oil pressure
 int EngineOilPressureValue;
