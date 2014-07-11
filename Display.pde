@@ -26,12 +26,12 @@ void DoDisplay() {
     break;
   case DISPLAY_REACTOR:
     Disp_CursOff();
-    alarm_shown = alarm_queue[cur_item - 1];
-    if (millis() % 10000 > 5000 && (alarm_count > 0)) {
+    if ((cur_item > 0 || alarm) && alarm_count > 0) {
       item_count = alarm_count;
-      if (cur_item>item_count) {  //if an alarm is removed while displaying start over at beginning
+      if (cur_item>item_count || cur_item < 1) {  // Keep the cur_item within bounds
         cur_item = 1;
       } 
+	  alarm_shown = alarm_queue[cur_item - 1];
       //Row 0
       Disp_RC(0, 0);
       if (shutdown[alarm_shown]> 0){
@@ -61,6 +61,17 @@ void DoDisplay() {
         Disp_RC(3, 15);
         Disp_PutStr(P("RESET"));
       }
+	  if (key == 2) {
+		  alarm = false;
+		  cur_item = 0;
+	  }
+	  if (millis() - alarm_on[alarm_shown] > 4000){ //wait until RESET button shows up, a wait of 4 seconds is given so that 
+		if (key == 3) {
+			removeAlarm(alarm_shown);
+			resetAlarm(alarm_shown);
+			cur_item = 1; //start at beginning of alarm queue
+		}
+	  }
     } 
     else {
 		//Row 0
@@ -106,28 +117,15 @@ void DoDisplay() {
 		Disp_PutStr(buf);
 		//Row 3
 		Disp_RC(3,0);
-		if (alarm_count > 0)
-			sprintf(buf, "     ALARM");
+		if ((alarm_count > 0) && (millis() % 1000 > 500))
+			sprintf(buf, "     ALARM", cur_item);
 		else
-			sprintf(buf, half_blank);
+			sprintf_P(buf, half_blank);
 		Disp_PutStr(buf);
 		Disp_RC(3,10);
 		sprintf(buf, " %9lu", millis() / 1000);
 		Disp_PutStr(buf);
 	}
-
-    if (alarm_count > 0){ //keypresses for alarms only
-		if (key == 2) {
-			alarm = false;
-		}
-		if (millis() - alarm_on[alarm_shown] > 4000){ //wait until RESET button shows up, a wait of 4 seconds is given so that 
-			if (key == 3) {
-				removeAlarm(alarm_shown);
-				resetAlarm(alarm_shown);
-				cur_item = 1; //start at beginning of alarm queue
-			}
-		}
-    }
     break;
   case DISPLAY_ENGINE:
     Disp_CursOff();
@@ -539,7 +537,7 @@ void TransitionDisplay(int new_state) {
   case DISPLAY_SPLASH:
     break;
   case DISPLAY_REACTOR:
-    cur_item = 1;
+    cur_item = 0;
     break;
   case DISPLAY_ENGINE:
     break;
