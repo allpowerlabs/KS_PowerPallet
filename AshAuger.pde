@@ -98,6 +98,7 @@ void AshAugerStart() {
 
 void AshAugerStop() {
 	ashAuger.drive_state = STANDBY;
+	vnh_standby(ashAuger.vnh);
 	timer_stop(&ashAuger.run_timer);
 }
 
