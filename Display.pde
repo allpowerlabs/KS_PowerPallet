@@ -968,7 +968,7 @@ void displayManualMode() {
 					Disp_PutStr(P("???"));
 					break;
 			}
-			sprintf(buf, " I: %-3u", AugerCurrentValue);
+			sprintf(buf, " I: %02u.%.1u", AugerCurrentValue / 10, AugerCurrentValue % 10);
 			Disp_PutStr(buf);
 			break;
 		case 1:
