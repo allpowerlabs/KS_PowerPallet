@@ -1,5 +1,5 @@
 
-// Maximum interval is 1270 sec.  Multiply by 100 for 10mS precision  
+// Maximum interval is 1270 sec (254 * 5).  Multiply by 100 for 10mS precision  
 #define GRATE_SHAKE_CROSS (127000)
 
 struct {
@@ -50,6 +50,7 @@ void GrateConfig() {
 void GrateReset() {
 	grate.direction = FORWARD;
 	grate.pr_accum = 0;
+	vnh_reset(grate.hbr);
 	pwm_set_duty(grate.pwm, grate.duty);
 	
 	GrateSwitchMode(AUTOMATIC); //set default starting state
@@ -124,7 +125,7 @@ void DoGrate() {
 	if (vnh_get_mode(grate.hbr) != VNH_STANDBY && (!gpio_get_pin(grate.hbr->ena) || !gpio_get_pin(grate.hbr->enb))) {
 		Logln_p("Grate: Motor drive fault!");
 		GrateSwitchMode(DISABLED);  // Disable the grate
-		vnh_reset(grate.hbr);
+		setAlarm(ALARM_GRATE_FAULT);
 		// Alarm
 		// alarm(grate.fault_alarm);
 	}

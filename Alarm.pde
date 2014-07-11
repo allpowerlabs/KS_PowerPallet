@@ -211,6 +211,9 @@ void resetAlarm(int alarm_num){
     break;
   case ALARM_TRED_LOW:
     break;
+  case ALARM_GRATE_FAULT:
+	GrateReset();
+	break;
   }
 }
 
