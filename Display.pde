@@ -106,7 +106,13 @@ void DoDisplay() {
 		Disp_PutStr(buf);
 		//Row 3
 		Disp_RC(3,0);
-		sprintf(buf, "Run Time: %lu", millis() / 1000);
+		if (alarm_count > 0)
+			sprintf(buf, "     ALARM");
+		else
+			sprintf(buf, half_blank);
+		Disp_PutStr(buf);
+		Disp_RC(3,10);
+		sprintf(buf, " %9lu", millis() / 1000);
 		Disp_PutStr(buf);
 	}
 
@@ -944,16 +950,27 @@ void displayManualMode() {
 					break;
 				case AUGER_STARTING:
 				case AUGER_FORWARD:
-				case AUGER_HIGH:
 				case AUGER_MANUAL_FORWARD:
 					Disp_PutStr(P("FWD"));
 					break;
-				case AUGER_REVERSE:
+				case AUGER_CURRENT_LOW:
+					Disp_PutStr(P("LOW"));
+					break;
+				case AUGER_HIGH:
 				case AUGER_REVERSE_HIGH:
+					Disp_PutStr(P("HI "));
+					break;
+				case AUGER_REVERSE:
 					Disp_PutStr(P("REV"));
 					break;
+				case AUGER_PULSE:
+					Disp_PutStr(P("PUL"));
+					break;
+				default:
+					Disp_PutStr(P("???"));
+					break;
 			}
-			sprintf(buf, " I: %u", AugerCurrentValue);
+			sprintf(buf, " I: %-3u", AugerCurrentValue);
 			Disp_PutStr(buf);
 			break;
 		case 1:
