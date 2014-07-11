@@ -28,7 +28,10 @@
 #include "Modes.h"
 #include "Alarm.h"
 #include "AshAuger.h"		// Ash auger typedefs.
+#include "Version.h"
 
+#define RELEASE_CYCLE RELEASE_DEVELOPMENT
+#define V_BUILD "101"
 
 /*
 EEPROM bytes used of 4k space:
@@ -39,18 +42,6 @@ EEPROM bytes used of 4k space:
 
 //constant definitions
 #define ABSENT -500
-
-#define RELEASE_TESTING 0
-#define RELEASE_PRODUCTION 1
-#define RELEASE_CYCLE RELEASE_TESTING
-#define V_MAJOR "1"
-#define V_MINOR "3"
-#define V_MAINT "0"
-#if RELEASE_CYCLE == RELEASE_PRODUCTION
-#define CODE_VERSION "v" V_MAJOR "." V_MINOR "." V_MAINT
-#else
-#define CODE_VERSION "v" V_MAJOR "." V_MINOR "." V_MAINT "-" __DATE__
-#endif
 
 //PROGMEM string buffer
 char p_buffer[41] = ""; 
