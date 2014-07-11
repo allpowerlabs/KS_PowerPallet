@@ -36,21 +36,26 @@ void AshAugerInit() {
 	ashAuger.pwm = &PWM1;
 	// Initialize ADC
 	ashAuger.adc = &ADC7;
-	// Reset control values
+	// Load configurable values
+	AshAugerConfig();
+	// Reset control
 	AshAugerReset();
-	// Switch to AUTO mode
-	AshAugerSwitchMode(AUTO);
 }
 
-void AshAugerReset() {
+void AshAugerConfig() {
 	ashAuger.low_current = getConfig(28) * ASH_AUGER_ONEAMP;
 	ashAuger.high_current = getConfig(29) * ASH_AUGER_ONEAMP;
 	ashAuger.limit_current = getConfig(30) * ASH_AUGER_ONEAMP;
 	ashAuger.run_period = getConfig(31) * 5000;
 	ashAuger.p_gain = ASH_AUGER_POWER_GAIN;
+}
+
+void AshAugerReset() {
+	vnh_reset(ashAuger.vnh);
 	timer_set(&ashAuger.run_timer, 0);
 	timer_set(&ashAuger.drive_timer, 0);
 	ashAuger.oc_accum = 0;
+	AshAugerSwitchMode(AUTO);
 }
 
 void AshAugerSwitchMode(int mode){
@@ -129,14 +134,14 @@ void DoAshAuger() {
 		Logln_p("Ash Auger: Auger is stuck!");
 		AshAugerSwitchMode(DISABLED);  // Disable the auger
 		// Ring the alarm, like Tenor Saw
+		setAlarm(ALARM_ASHAUGER_STUCK);
 		// alarm(ashAuger.oc_alarm);
 	}
 	// Check for H-bridge channel faults
 	if (vnh_mode != VNH_STANDBY && (!gpio_get_pin(ashAuger.vnh->ena) || !gpio_get_pin(ashAuger.vnh->enb))) {
 		Logln_p("Ash Auger: Auger drive fault!");
 		AshAugerSwitchMode(DISABLED);  // Disable the auger
-		vnh_reset(ashAuger.vnh);
-		// Alarm
+		setAlarm(ALARM_ASHAUGER_FAULT);
 		// alarm(ashAuger.fault_alarm);
 	}
 	

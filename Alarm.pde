@@ -214,6 +214,12 @@ void resetAlarm(int alarm_num){
   case ALARM_GRATE_FAULT:
 	GrateReset();
 	break;
+  case ALARM_ASHAUGER_STUCK:
+	AshAugerReset();
+	break;
+  case ALARM_ASHAUGER_FAULT:
+	AshAugerReset();
+	break;
   }
 }
 

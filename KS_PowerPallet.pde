@@ -573,10 +573,10 @@ char serial_buffer[20];
 boolean alarm = false;
 int pressureRatioAccumulator = 0;  
 
-#define ALARM_NUM 17
-unsigned long alarm_on[ALARM_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-unsigned long alarm_start[ALARM_NUM] = {240000, 480000, pratio_max, pfilter_alarm, 230, 0, 0, 0, 30000, 60000, 10, 0, 0, 3000, 15000, 0, 0};  //count or time in milliseconds when alarm goes off
-unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 60000, 0, 0, 180000, 0, 0, 3000, 7000, 15000, 60000, 0};  //time when engine will be shutdown
+#define ALARM_NUM 19
+unsigned long alarm_on[ALARM_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+unsigned long alarm_start[ALARM_NUM] = {240000, 480000, pratio_max, pfilter_alarm, 230, 0, 0, 0, 30000, 60000, 10, 0, 0, 3000, 15000, 0, 0, 0, 0};  //count or time in milliseconds when alarm goes off
+unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 60000, 0, 0, 180000, 0, 0, 3000, 7000, 15000, 60000, 0, 0, 0};  //time when engine will be shutdown
 int alarm_count = 0;
 int alarm_queue[ALARM_NUM] = {};
 int alarm_shown = 0;
@@ -598,6 +598,8 @@ int alarm_shown = 0;
 #define ALARM_TTRED_HIGH 14
 #define ALARM_TBRED_HIGH 15
 #define ALARM_GRATE_FAULT 16
+#define ALARM_ASHAUGER_STUCK 17
+#define ALARM_ASHAUGER_FAULT 18
 
 const char alarm_1[] PROGMEM = "Auger on too long   ";
 const char alarm_2[] PROGMEM = "Auger off too long  ";
@@ -616,8 +618,11 @@ const char alarm_14[] PROGMEM = "Reduction Temp Low  ";
 const char alarm_15[] PROGMEM = "Restriction Temp High ";
 const char alarm_16[] PROGMEM = "Reduction Temp High ";
 const char alarm_17[] PROGMEM = "Grate Motor Fault   ";
+const char alarm_18[] PROGMEM = "Ash Auger Stuck     ";
+const char alarm_19[] PROGMEM = "Ash Auger Fault     ";
 
-const char * const display_alarm[] PROGMEM = {alarm_1, alarm_2, alarm_3, alarm_4, alarm_5, alarm_6, alarm_7, alarm_8, alarm_9, alarm_10, alarm_11, alarm_12, alarm_13, alarm_14, alarm_15, alarm_16, alarm_17};
+
+const char * const display_alarm[] PROGMEM = {alarm_1, alarm_2, alarm_3, alarm_4, alarm_5, alarm_6, alarm_7, alarm_8, alarm_9, alarm_10, alarm_11, alarm_12, alarm_13, alarm_14, alarm_15, alarm_16, alarm_17, alarm_18, alarm_19};
 
 //line 2 on display.  If shutdown[] is greater than zero, countdown will be added to last 3 spaces.
 const char alarm2_1[] PROGMEM = "Check Fuel          ";
@@ -637,7 +642,7 @@ const char alarm2_12[] PROGMEM = "Check Air Intake    ";
 const char alarm2_15[] PROGMEM = "Reduce Load         ";
 //const char alarm2_16[] PROGMEM = "Reduce Load         ";
 
-const char * const display_alarm2[] PROGMEM = {alarm2_1, alarm2_2, alarm2_3, alarm2_4, alarm2_5, alarm2_6, alarm2_7, blank, blank, alarm2_1, alarm2_11, alarm2_12, blank, blank, alarm2_15, alarm2_15, blank};
+const char * const display_alarm2[] PROGMEM = {alarm2_1, alarm2_2, alarm2_3, alarm2_4, alarm2_5, alarm2_6, alarm2_7, blank, blank, alarm2_1, alarm2_11, alarm2_12, blank, blank, alarm2_15, alarm2_15, blank, blank, blank};
 
 //modbus
 long baud_rates[] = {2400, 4800, 9600, 19200, 38400, 57600, 115200};
