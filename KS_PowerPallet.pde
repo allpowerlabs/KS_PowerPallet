@@ -31,7 +31,7 @@
 #include "Version.h"
 
 #define RELEASE_CYCLE RELEASE_DEVELOPMENT
-#define V_BUILD "101"
+#define V_BUILD "102"
 
 /*
 EEPROM bytes used of 4k space:

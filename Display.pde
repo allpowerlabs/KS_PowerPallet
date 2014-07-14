@@ -26,11 +26,13 @@ void DoDisplay() {
     break;
   case DISPLAY_REACTOR:
     Disp_CursOff();
-    if ((cur_item > 0 || alarm) && alarm_count > 0) {
-      item_count = alarm_count;
-      if (cur_item>item_count || cur_item < 1) {  // Keep the cur_item within bounds
-        cur_item = 1;
-      } 
+	item_count = alarm_count;
+	if (cur_item < 1 && alarm && alarm_count > 0) cur_item = 1;
+	if (cur_item>item_count) {  // Keep the cur_item within bounds
+		if (alarm) cur_item = 1;
+		else cur_item = 0;
+	}
+    if (cur_item > 0) {
 	  alarm_shown = alarm_queue[cur_item - 1];
       //Row 0
       Disp_RC(0, 0);
@@ -56,14 +58,22 @@ void DoDisplay() {
       }
       //Row 3
       Disp_RC(3, 0);
-      Disp_PutStr(P("NEXT ADV QUIET      "));
+      Disp_PutStr(P("     ADV  "));
+	  Disp_RC(3, 9);
+	  if (alarm)
+		Disp_PutStr(P("QUIET"));
+	  else
+		Disp_PutStr(P("     "));
+	  Disp_RC(3, 15);
       if (millis() - alarm_on[alarm_shown] > 4000){ //Wait to show RESET button in case new alarm state has taken over screen.
-        Disp_RC(3, 15);
         Disp_PutStr(P("RESET"));
       }
+	  else Disp_PutStr(P("     "));
 	  if (key == 2) {
-		  alarm = false;
-		  cur_item = 0;
+		  if (alarm) {
+			alarm = false;
+			cur_item = 0;
+		  }
 	  }
 	  if (millis() - alarm_on[alarm_shown] > 4000){ //wait until RESET button shows up, a wait of 4 seconds is given so that 
 		if (key == 3) {
@@ -118,12 +128,12 @@ void DoDisplay() {
 		//Row 3
 		Disp_RC(3,0);
 		if ((alarm_count > 0) && (millis() % 1000 > 500))
-			sprintf(buf, "     ALARM", cur_item);
+			sprintf(buf, "NEXT ALARM", cur_item);
 		else
-			sprintf_P(buf, half_blank);
+			sprintf(buf, "NEXT      ");
 		Disp_PutStr(buf);
 		Disp_RC(3,10);
-		sprintf(buf, " %9lu", millis() / 1000);
+		sprintf(buf, " T:  %.5lu", millis() / 1000);
 		Disp_PutStr(buf);
 	}
     break;
@@ -591,13 +601,14 @@ void DoKeyInput() {
       TransitionDisplay(DISPLAY_REACTOR);
       break;
     case DISPLAY_REACTOR:
-      TransitionDisplay(DISPLAY_LAMBDA);
+	  if (cur_item < 1)
+		TransitionDisplay(DISPLAY_GRATE);
       break;
     case DISPLAY_ENGINE:
       TransitionDisplay(DISPLAY_REACTOR);
       break;
     case DISPLAY_LAMBDA:
-      TransitionDisplay(DISPLAY_GRATE);
+      TransitionDisplay(DISPLAY_INFO);
       break;
     case DISPLAY_GRATE:
 	  if(GrateGetMode() == MANUAL) {  // Grate shaker got left on
@@ -606,7 +617,7 @@ void DoKeyInput() {
       if (config_changed == true){
         TransitionDisplay(DISPLAY_REACTOR);
       } else {
-        TransitionDisplay(DISPLAY_INFO);
+        TransitionDisplay(DISPLAY_LAMBDA);
       }
       break;
     case DISPLAY_INFO:
@@ -683,6 +694,7 @@ void DoKeyInput() {
     cur_item += 1;
     if (cur_item > item_count) {
       switch (display_state) {
+		case DISPLAY_REACTOR:
         case DISPLAY_CONFIG:
         case DISPLAY_RELAY:
         case DISPLAY_ANA:
