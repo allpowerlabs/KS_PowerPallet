@@ -87,7 +87,7 @@ void DoAuger() {
     if (millis() - auger_direction_entered > aug_rev_time){
       TransitionAuger(AUGER_FORWARD);
     }
-    if (auger_rev_count > 20){  //catch oscillating auger from broken Fuel Switch
+    if (auger_rev_count > shutdown[ALARM_BOUND_AUGER]){  //catch oscillating auger from broken Fuel Switch
       Logln_p("Auger Bound or broken Fuel Switch, stopping Auger");
       TransitionAuger(AUGER_ALARM);
       if (engine_state == ENGINE_ON){
