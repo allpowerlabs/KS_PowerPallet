@@ -34,7 +34,7 @@ EEPROM bytes used of 4k space:
 //constant definitions
 #define ABSENT -500
 
-#define CODE_VERSION "v1.22-rc1" 
+#define CODE_VERSION "v1.22-rc2, build 001" 
 
 //PROGMEM string buffer
 char p_buffer[41] = ""; 
@@ -109,21 +109,27 @@ Servo Servo_Mixture;
 #define T_TRED 0
 #define T_BRED 1
 #define T_ENG_COOLANT 2
-#define T_REACTOR_GAS_OUT 3
-#define T_PYRO_IN ABSENT
-#define T_PYRO_OUT ABSENT
-#define T_COMB ABSENT
-#define T_DRYING_GAS_OUT ABSENT
-#define T_FILTER ABSENT
-#define T_LOW_FUEL ABSENT
+#define T_3 3
+#define T_4 4
+#define T_5 5
+#define T_6 6
+#define T_7 7
+#define T_8 8
+#define T_9 9
+#define T_10 10
+#define T_11 11
+#define T_12 12
+#define T_13 13
+#define T_14 14
+#define T_15 15
 
 //Pressure Mapping
 #define P_REACTOR 0
 #define P_FILTER 1
 #define P_COMB 2
-#define P_Q_AIR_ENG 3
-#define P_Q_AIR_RCT 4
-#define P_Q_GAS_ENG 5
+#define P_3 3
+#define P_4 4
+#define P_5 5
 
 //Interrupt Mapping
 // 2 - pin 21 - PD0

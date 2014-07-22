@@ -59,14 +59,6 @@ void DoAlarm() {
   else {
     removeAlarm(ALARM_BAD_FILTER);
   }
-#if T_LOW_FUEL != ABSENT
-  if (P_reactorLevel != OFF && Temp_Data[T_LOW_FUEL] > alarm_start[ALARM_LOW_FUEL_REACTOR]) {
-    setAlarm(ALARM_LOW_FUEL_REACTOR);
-  } 
-  else {
-    removeAlarm(ALARM_LOW_FUEL_REACTOR);
-  }
-#endif
 
 //Engine On Alarms
   //if (engine_state == ENGINE_ON && P_reactorLevel != OFF && T_tredLevel != HOT && T_tredLevel != EXCESSIVE) {

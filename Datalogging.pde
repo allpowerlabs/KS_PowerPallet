@@ -111,99 +111,59 @@ void LogFilter(boolean header = false) {
 void LogPressures(boolean header = false) {
   if (header) {
     //TODO: Handle half/full fill
-#if P_REACTOR != ABSENT
     PrintColumn(P("P_reactor"));
-#endif
-#if P_FILTER != ABSENT
     PrintColumn(P("P_filter"));
-#endif
-#if P_COMB != ABSENT
     PrintColumn(P("P_comb"));
-#endif
-#if P_Q_AIR_ENG != ABSENT
-    PrintColumn(P("P_Q_air_eng"));
-#endif
-#if P_Q_AIR_RCT != ABSENT
-    PrintColumn(P("P_Q_air_rct"));
-#endif
-#if P_Q_GAS_ENG != ABSENT
-    PrintColumn(P("P_Q_gas_eng"));
-#endif
+    PrintColumn(P("P_PS3"));
+    PrintColumn(P("P_PS4"));
+    PrintColumn(P("P_PS5"));
   } 
   else {
-#if P_REACTOR != ABSENT
     PrintColumnInt(Press[P_REACTOR]);
-#endif
-#if P_FILTER != ABSENT
     PrintColumnInt(Press[P_FILTER]);
-#endif
-#if P_COMB != ABSENT
     PrintColumnInt(Press[P_COMB]);
-#endif
-#if P_Q_AIR_ENG != ABSENT
-    PrintColumnInt(Press[P_Q_AIR_ENG]);
-#endif
-#if P_Q_AIR_RCT != ABSENT
-    PrintColumnInt(Press[P_Q_AIR_RCT]);
-#endif
-#if P_Q_GAS_ENG != ABSENT
-    PrintColumnInt(Press[P_Q_GAS_ENG]);
-#endif
+    PrintColumnInt(Press[P_3]);
+    PrintColumnInt(Press[P_4]);
+    PrintColumnInt(Press[P_5]);
   }
 }
 
 void LogTemps(boolean header = false) {
   if (header) {
-#if T_TRED != ABSENT
     PrintColumn(P("T_tred"));
-#endif
-#if T_BRED != ABSENT
     PrintColumn(P("T_bred"));
-#endif
-#if T_PYRO_IN != ABSENT
-    PrintColumn(P("T_pyro_in"));
-#endif
-#if T_PYRO_OUT != ABSENT
-    PrintColumn(P("T_pyro_out"));
-#endif
-#if T_ENG_COOLANT != ABSENT
     PrintColumn(P("T_eng_coolant"));
-#endif 
-#if T_DRYING_GAS_OUT != ABSENT
-    PrintColumn(P("T_drying_gas_out"));
-#endif
-#if T_REACTOR_GAS_OUT != ABSENT
-    PrintColumn(P("T_reactor_gas_out"));
-#endif
-#if T_FILTER != ABSENT
-    PrintColumn(P("T_filter"));
-#endif
+    PrintColumn(P("T_THERMO3"));
+    PrintColumn(P("T_THERMO4"));
+    PrintColumn(P("T_THERMO5"));
+    PrintColumn(P("T_THERMO6"));
+    PrintColumn(P("T_THERMO7"));
+	PrintColumn(P("T_THERMO8"));
+	PrintColumn(P("T_THERMO9"));
+	PrintColumn(P("T_THERMO10"));
+	PrintColumn(P("T_THERMO11"));
+	PrintColumn(P("T_THERMO12"));
+	PrintColumn(P("T_THERMO13"));
+	PrintColumn(P("T_THERMO14"));
+	PrintColumn(P("T_THERMO15"));
   } 
   else {
-#if T_TRED != ABSENT
     PrintColumnInt(Temp_Data[T_TRED]);
-#endif
-#if T_BRED != ABSENT
     PrintColumnInt(Temp_Data[T_BRED]);
-#endif
-#if T_PYRO_IN != ABSENT
-    PrintColumnInt(Temp_Data[T_PYRO_IN]);
-#endif
-#if T_PYRO_OUT != ABSENT
-    PrintColumnInt(Temp_Data[T_PYRO_OUT]);
-#endif
-#if T_ENG_COOLANT != ABSENT
     PrintColumnInt(Temp_Data[T_ENG_COOLANT]);
-#endif 
-#if T_DRYING_GAS_OUT != ABSENT
-    PrintColumnInt(Temp_Data[T_DRYING_GAS_OUT]);
-#endif
-#if T_REACTOR_GAS_OUT != ABSENT
-    PrintColumnInt(Temp_Data[T_REACTOR_GAS_OUT]);
-#endif
-#if T_FILTER != ABSENT
-    PrintColumnInt(Temp_Data[T_FILTER]);
-#endif
+    PrintColumnInt(Temp_Data[T_3]);
+    PrintColumnInt(Temp_Data[T_4]);
+	PrintColumnInt(Temp_Data[T_5]);
+	PrintColumnInt(Temp_Data[T_6]);
+	PrintColumnInt(Temp_Data[T_7]);
+	PrintColumnInt(Temp_Data[T_8]);
+	PrintColumnInt(Temp_Data[T_9]);
+	PrintColumnInt(Temp_Data[T_10]);
+	PrintColumnInt(Temp_Data[T_11]);
+	PrintColumnInt(Temp_Data[T_12]);
+	PrintColumnInt(Temp_Data[T_13]);
+	PrintColumnInt(Temp_Data[T_14]);
+	PrintColumnInt(Temp_Data[T_15]);
   }
 } 
 
