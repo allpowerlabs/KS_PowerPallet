@@ -53,8 +53,8 @@ void DoAuger() {
       if (AugerCurrentLevel == CURRENT_HIGH  && millis() - auger_state_entered > 500){
         TransitionAuger(AUGER_HIGH);
       } 
-      if (AugerCurrentLevel == CURRENT_LOW or AugerCurrentLevel == CURRENT_OFF && millis() - auger_state_entered > 500){
-        TransitionAuger(AUGER_CURRENT_LOW);
+      if (AugerCurrentLevel >= CURRENT_LOW && millis() - auger_state_entered > 500){
+		TransitionAuger(AUGER_CURRENT_LOW);
       } 
     }
     if ((millis() - auger_state_entered) > shutdown[ALARM_AUGER_ON_LONG]){  //turn engine and auger off if auger runs non-stop for too long, use auger_direction_entered???

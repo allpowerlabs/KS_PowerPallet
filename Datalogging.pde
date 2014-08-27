@@ -224,10 +224,10 @@ void LogAuger(boolean header = false) {
   else {
     if (relay_board){ 
       PrintColumnInt(AugerCurrentValue);
-      PrintColumn(AugerCurrentLevel[AugerCurrentLevelName]);
+      PrintColumn(AugerCurrentLevelName[AugerCurrentLevel]);
     }
 #if ANA_FUEL_SWITCH != ABSENT
-    PrintColumn(FuelSwitchLevel[FuelSwitchLevelName]);
+    PrintColumn(FuelSwitchLevelName[FuelSwitchLevel]);
 #endif
   }
 }
