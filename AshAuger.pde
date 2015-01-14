@@ -46,7 +46,7 @@ void AshAugerConfig() {
 	ashAuger.low_current = getConfig(28) * ASH_AUGER_ONEAMP;
 	ashAuger.high_current = getConfig(29) * ASH_AUGER_ONEAMP;
 	ashAuger.limit_current = getConfig(30) * ASH_AUGER_ONEAMP;
-	ashAuger.run_period = getConfig(31) * 5000;
+	ashAuger.run_period = (unsigned long) getConfig(31) * 5000;
 	ashAuger.p_gain = ASH_AUGER_POWER_GAIN;
 }
 
