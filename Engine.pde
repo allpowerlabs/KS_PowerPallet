@@ -10,7 +10,8 @@ struct {
 	unsigned ignition_pin;		// Pin number of ignition
 	unsigned starter_pin;		// Pin number of starter
 	unsigned grid_tie;			// 1 for grid-tie controller
-	unsigned control_state;		// Off, ON, START
+	unsigned ext_fuel;			// 1 for external fuel
+	unsigned control_state;		// OFF, ON, START
 	timer_s timer;				// Control timer
 	
 } engine;
@@ -171,42 +172,35 @@ void TransitionEngine(int new_state) {
 }
 
 void DoOilPressure() {
-  smoothAnalog(ANA_OIL_PRESSURE);
-  if (engine_type == 1){  //20k has analog oil pressure reader
-    //EngineOilPressureValue = getPSI(analogRead(ANA_OIL_PRESSURE));
-    EngineOilPressureValue = getPSI(smoothed[getAnaArray(ANA_OIL_PRESSURE)]); 
-    if (EngineOilPressureValue <= low_oil_psi && EngineOilPressureLevel != OIL_P_LOW){
-      EngineOilPressureLevel = OIL_P_LOW;
-      oil_pressure_state = millis();
-    } 
-    if (EngineOilPressureValue > low_oil_psi && EngineOilPressureLevel != OIL_P_NORMAL){
-      EngineOilPressureLevel = OIL_P_NORMAL;
-      oil_pressure_state = 0;
-    }
-  } else {
-    EngineOilPressureValue = analogRead(ANA_OIL_PRESSURE);
-    if (EngineOilPressureValue <= 500 && EngineOilPressureLevel != OIL_P_LOW){
-      EngineOilPressureLevel = OIL_P_LOW;
-      oil_pressure_state = millis();
-    }
-    if (EngineOilPressureValue > 500 && EngineOilPressureLevel != OIL_P_NORMAL){
-      EngineOilPressureLevel = OIL_P_NORMAL;
-      oil_pressure_state = 0;
-    }
-  }
-  
+	smoothAnalog(ANA_OIL_PRESSURE);
+	if (engine_type == 1){  //20k has analog oil pressure reader
+		//EngineOilPressureValue = getPSI(analogRead(ANA_OIL_PRESSURE));
+		EngineOilPressureValue = getPSI(smoothed[getAnaArray(ANA_OIL_PRESSURE)]); 
+			if (EngineOilPressureValue <= low_oil_psi && EngineOilPressureLevel != OIL_P_LOW){
+			EngineOilPressureLevel = OIL_P_LOW;
+			oil_pressure_state = millis();
+		} 
+		if (EngineOilPressureValue > low_oil_psi && EngineOilPressureLevel != OIL_P_NORMAL){
+		EngineOilPressureLevel = OIL_P_NORMAL;
+		oil_pressure_state = 0;
+	}
+	} else {
+		EngineOilPressureValue = analogRead(ANA_OIL_PRESSURE);
+		if (EngineOilPressureValue <= 500 && EngineOilPressureLevel != OIL_P_LOW){
+			EngineOilPressureLevel = OIL_P_LOW;
+			oil_pressure_state = millis();
+		}
+		if (EngineOilPressureValue > 500 && EngineOilPressureLevel != OIL_P_NORMAL){
+			EngineOilPressureLevel = OIL_P_NORMAL;
+			oil_pressure_state = 0;
+		}
+	}
+
 }
 
 int getPSI(int pressure_reading){  //returns oil pressure in PSI for 20k
-  return (pressure_reading-512)/-2;  //alternately use : analogRead(ANA_OIL_PRESSURE) instead of passing pressure_reading
+	return (pressure_reading-512)/-2;  //alternately use : analogRead(ANA_OIL_PRESSURE) instead of passing pressure_reading
 }
-
-void DoBattery() {
-  #if ANA_BATT_V != ABSENT
-  battery_voltage = 0.07528*(analogRead(ANA_BATT_V)-512);
-  #endif
-}
-
 
 boolean EngineShutdownFromAlarm() {
   boolean alarms = false; 
