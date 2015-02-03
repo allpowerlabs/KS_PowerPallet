@@ -13,130 +13,129 @@ void DoAlarmUpdate() {
 }
 
 void DoAlarm() {
-  if (auger_rev_count > alarm_start[ALARM_BOUND_AUGER]){
-    setAlarm(ALARM_BOUND_AUGER);
-  }
-  else {
-    if (auger_state != AUGER_ALARM){
-      removeAlarm(ALARM_BOUND_AUGER);
-    }
-  }
-  if (auger_state == AUGER_CURRENT_LOW and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_LOW_CURRENT])){
-    setAlarm(ALARM_AUGER_LOW_CURRENT);
-  }
-  else {
-    if (auger_state != AUGER_ALARM){
-      removeAlarm(ALARM_AUGER_LOW_CURRENT);
-    }
-  }
-//  if (auger_state == AUGER_FORWARD and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_ON_LONG])){
-//    setAlarm(ALARM_AUGER_ON_LONG);
-//  }
-  if ((FuelDemand == SWITCH_ON) and (millis() - fuel_state_entered > alarm_start[ALARM_AUGER_ON_LONG])){
-    setAlarm(ALARM_AUGER_ON_LONG);
-  }
-  else {
-    if (auger_state != AUGER_ALARM){
-      removeAlarm(ALARM_AUGER_ON_LONG);
-    }
-  }
-//Reactor On Alarms:
-  if (P_reactorLevel != OFF && auger_state == AUGER_OFF and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_OFF_LONG])){
-    setAlarm(ALARM_AUGER_OFF_LONG);
-  }
-  else {
-    if (auger_state != AUGER_ALARM){
-      removeAlarm(ALARM_AUGER_OFF_LONG);
-    }
-  }
-  if (P_reactorLevel != OFF && pressureRatioAccumulator > alarm_start[ALARM_BAD_REACTOR]) {
-    setAlarm(ALARM_BAD_REACTOR);
-  }
-  else {
-    removeAlarm(ALARM_BAD_REACTOR);
-  }
-  if (P_reactorLevel != OFF && filter_pratio_accumulator > alarm_start[ALARM_BAD_FILTER]) {
-    setAlarm(ALARM_BAD_FILTER);
-  }
-  else {
-    removeAlarm(ALARM_BAD_FILTER);
-  }
-#if T_LOW_FUEL != ABSENT
-  if (P_reactorLevel != OFF && Temp_Data[T_LOW_FUEL] > alarm_start[ALARM_LOW_FUEL_REACTOR]) {
-    setAlarm(ALARM_LOW_FUEL_REACTOR);
-  }
-  else {
-    removeAlarm(ALARM_LOW_FUEL_REACTOR);
-  }
-#endif
+/**************************************
+	Auger Alarms:
+**************************************/
+// "FuelSwitch/Auger Jam"
+	if (auger_rev_count > alarm_start[ALARM_BOUND_AUGER]){
+		setAlarm(ALARM_BOUND_AUGER);
+	}
+	else {
+		if (auger_state != AUGER_ALARM){
+			removeAlarm(ALARM_BOUND_AUGER);
+		}
+	}
+// "Auger Low Current"
+	if (auger_state == AUGER_CURRENT_LOW and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_LOW_CURRENT])){
+		setAlarm(ALARM_AUGER_LOW_CURRENT);
+	}
+	else {
+		if (auger_state != AUGER_ALARM){
+			removeAlarm(ALARM_AUGER_LOW_CURRENT);
+		}
+	}
+// "Auger on too long"
+	if ((FuelDemand == SWITCH_ON) and (millis() - fuel_state_entered > alarm_start[ALARM_AUGER_ON_LONG])){
+		setAlarm(ALARM_AUGER_ON_LONG);
+	}
+	else {
+		if (auger_state != AUGER_ALARM){
+			removeAlarm(ALARM_AUGER_ON_LONG);
+		}
+	}
+/**************************************
+	Reactor On Alarms:
+**************************************/
+	if (P_reactorLevel != OFF) {
+// "Auger off too long"
+		if (auger_state == AUGER_OFF and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_OFF_LONG])){
+			setAlarm(ALARM_AUGER_OFF_LONG);
+		}
+		else {
+			if (auger_state != AUGER_ALARM){
+				removeAlarm(ALARM_AUGER_OFF_LONG);
+			}
+		}
+// "Bad Reactor P_ratio"
+		if (pressureRatioAccumulator > alarm_start[ALARM_BAD_REACTOR]) {
+			//setAlarm(ALARM_BAD_REACTOR);
+		}
+		else {
+			removeAlarm(ALARM_BAD_REACTOR);
+		}
+// "Bad Filter P_ratio"
+		if (filter_pratio_accumulator > alarm_start[ALARM_BAD_FILTER]) {
+			setAlarm(ALARM_BAD_FILTER);
+		}
+		else {
+			removeAlarm(ALARM_BAD_FILTER);
+		}
+	}
+/**************************************
+	Engine On Alarms
+**************************************/
+	if (engine_state == ENGINE_ON && P_reactorLevel != OFF) {
+// "Trst low for engine"
+		if (Temp_Data[T_TRED] < ttred_warn - 10) {
+			setAlarm(ALARM_LOW_TRED);
+		}
+// "Tred high for engine"
+		if (T_bredLevel == EXCESSIVE) {
+			setAlarm(ALARM_HIGH_BRED);
+		}
+// "Reduction Temp Low"
+		if (Temp_Data[T_TRED] < tred_low_temp){
+			setAlarm(ALARM_TRED_LOW);
+		}
+// "Restriction Temp High"
+		if (Temp_Data[T_TRED] > ttred_high){
+			setAlarm(ALARM_TTRED_HIGH);
+		}
+// "Reduction Temp High"
+		if (Temp_Data[T_BRED] > tbred_high){
+			setAlarm(ALARM_TTRED_HIGH);
+		}
+// "No O2 Sensor Signal"
+		if (lambda_input < 0.52) {
+			setAlarm(ALARM_O2_NO_SIG);
+		}
+		if (millis() - lambda_state_entered > alarm_start[ALARM_O2_NO_SIG] && lambda_state_entered == LAMBDA_RESTART) {
+			setAlarm(ALARM_O2_NO_SIG);
+		}
+	}
 
-//Engine On Alarms
-  //if (engine_state == ENGINE_ON && P_reactorLevel != OFF && T_tredLevel != HOT && T_tredLevel != EXCESSIVE) {
-  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && Temp_Data[T_TRED] < ttred_warn - 10) {
-    setAlarm(ALARM_LOW_TRED);
-  } else {
-    if (Temp_Data[T_TRED] > ttred_warn) {
-      removeAlarm(ALARM_LOW_TRED);
-    }
-  }
-  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && T_bredLevel == EXCESSIVE) {
-    setAlarm(ALARM_HIGH_BRED);
-  } else {
-    removeAlarm(ALARM_HIGH_BRED);
-  }
-  if (engine_state == ENGINE_ON && Temp_Data[T_ENG_COOLANT] > high_coolant_temp){
-    setAlarm(ALARM_HIGH_COOLANT_TEMP);
-  }  else {
-    if (alarm_on[ALARM_HIGH_COOLANT_TEMP] <= shutdown[ALARM_HIGH_COOLANT_TEMP]){
-      removeAlarm(ALARM_HIGH_COOLANT_TEMP);
-    }
-  }
-  if (engine_state == ENGINE_ON && Temp_Data[T_TRED] < tred_low_temp){
-    setAlarm(ALARM_TRED_LOW);
-  }  else {
-    if (alarm_on[ALARM_TRED_LOW] <= shutdown[ALARM_TRED_LOW]){
-      removeAlarm(ALARM_TRED_LOW);
-    }
-  }
-  if (engine_state == ENGINE_ON && Temp_Data[T_TRED] > ttred_high){
-    setAlarm(ALARM_TTRED_HIGH);
-  }  else {
-    if (alarm_on[ALARM_TTRED_HIGH] <= shutdown[ALARM_TTRED_HIGH]){
-      removeAlarm(ALARM_TTRED_HIGH);
-    }
-  }
-  if (engine_state == ENGINE_ON && Temp_Data[T_BRED] > tbred_high){
-    setAlarm(ALARM_TTRED_HIGH);
-  }  else {
-    if (alarm_on[ALARM_TBRED_HIGH] <= shutdown[ALARM_TBRED_HIGH]){
-      removeAlarm(ALARM_TBRED_HIGH);
-    }
-  }
-//Low Oil Pressure alarm set in Engine state machine due to quick transition times.
-//#if ANA_OIL_PRESSURE != ABSENT
-//  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && EngineOilPressureLevel == OIL_P_LOW && millis() - oil_pressure_state > 500  && millis() - engine_state_entered > 3000) {
-//    setAlarm(ALARM_BAD_OIL_PRESSURE);
-//  }  //No else statement because user needs to acknowledge and remove with a RESET button.
-//#endif
-#if LAMBDA_SIGNAL_CHECK == TRUE
-  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && lambda_input < 0.52) {
-    setAlarm(ALARM_O2_NO_SIG);
-  } else {
-    if (engine_state == ENGINE_ON && lambda_input > 0.52){
-      removeAlarm(ALARM_O2_NO_SIG);
-    }
-  }
-  if (engine_state == ENGINE_ON && P_reactorLevel != OFF && millis() - lambda_state_entered > alarm_start[ALARM_O2_NO_SIG] && lambda_state_entered == LAMBDA_RESTART) {
-    setAlarm(ALARM_O2_NO_SIG);
-  }
-#endif
+/**************************************
+Engine warning alarm resets
+**************************************/
+	if (engine_state != ENGINE_ON || Temp_Data[T_TRED] > ttred_warn) {
+		removeAlarm(ALARM_LOW_TRED);
+	}
+	if (T_bredLevel < EXCESSIVE) {
+		removeAlarm(ALARM_HIGH_BRED);
+	}
+	if (alarm_on[ALARM_TRED_LOW] <= shutdown[ALARM_TRED_LOW]){
+		removeAlarm(ALARM_TRED_LOW);
+	}
+	if (alarm_on[ALARM_TTRED_HIGH] <= shutdown[ALARM_TTRED_HIGH]){
+		removeAlarm(ALARM_TTRED_HIGH);
+	}
+	if (alarm_on[ALARM_TBRED_HIGH] <= shutdown[ALARM_TBRED_HIGH]){
+		removeAlarm(ALARM_TBRED_HIGH);
+	}
+	if (lambda_input > 0.52){
+		removeAlarm(ALARM_O2_NO_SIG);
+	}
 
-  if (alarm == true) {
-    digitalWrite(FET_ALARM, HIGH);
-  }
-  else {
-    digitalWrite(FET_ALARM, LOW);
-  }
+/**************************************
+	Alarm sounder
+**************************************/
+	if (alarm == true) {
+		digitalWrite(FET_ALARM, HIGH);
+	}
+	else {
+		digitalWrite(FET_ALARM, LOW);
+	}
+>>>>>>> Cleaned up alarm code formatting and structure to make it easier to read.
 }
 
 void setAlarm(int alarm_num){
