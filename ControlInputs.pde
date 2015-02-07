@@ -25,24 +25,24 @@ void DoControlInputs() {
       }
       control_state = CONTROL_ON;
     }
-  } else {  //Controlled by Deapsea 
-    if (control_input > 515){ 
+  } else {  //Controlled by Deepsea
+    if (control_input > 515){
      if (control_state == CONTROL_OFF){
        control_state = CONTROL_START;
        control_state_entered = millis();
-       Logln_p("# Deap Sea controller set to: Start");
+       Logln_p("Deep Sea controller set to: Start");
      }
      if (control_state == CONTROL_START && (millis() - control_state_entered >= 500)){
        control_state = CONTROL_ON;
-       Logln_p("# Deap Sea controller set to: On");
+       Logln_p("Deep Sea controller set to: On");
      }
     } else {
       if (control_state != CONTROL_OFF) {
         control_state_entered = millis();
         control_state = CONTROL_OFF;
-        Logln_p("# Deap Sea controller set to:  Off");
+        Logln_p("Deep Sea controller set to:  Off");
       }
-    } 
+    }
   }
 }
 
