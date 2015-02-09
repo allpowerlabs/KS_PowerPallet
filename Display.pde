@@ -283,7 +283,7 @@ void DoDisplay() {
     sprintf(buf, "%-10s     %5s", serial_num, unique_number);
     Disp_PutStr(buf);
     Disp_RC(1,0);
-    sprintf(buf, "       Time:%8i", millis()/1000);
+    sprintf(buf, "       Time:%.8lu", millis()/1000);
     Disp_PutStr(buf);
     Disp_RC(2,0);
     sprintf(buf, "    %12s   ", sd_data_file_name);
