@@ -51,11 +51,13 @@ void DoAlarm() {
 		if (auger_state == AUGER_OFF and (millis() - auger_state_entered > alarm_start[ALARM_AUGER_OFF_LONG])){
 			setAlarm(ALARM_AUGER_OFF_LONG);
 		}
+		/*
 		else {
 			if (auger_state != AUGER_ALARM){
 				removeAlarm(ALARM_AUGER_OFF_LONG);
 			}
 		}
+		*/
 // "Bad Reactor P_ratio"
 		if (pressureRatioAccumulator > alarm_start[ALARM_BAD_REACTOR]) {
 			//setAlarm(ALARM_BAD_REACTOR);
@@ -64,12 +66,14 @@ void DoAlarm() {
 			removeAlarm(ALARM_BAD_REACTOR);
 		}
 // "Bad Filter P_ratio"
+		/*
 		if (filter_pratio_accumulator > alarm_start[ALARM_BAD_FILTER]) {
 			setAlarm(ALARM_BAD_FILTER);
 		}
 		else {
 			removeAlarm(ALARM_BAD_FILTER);
 		}
+		*/
 	}
 /**************************************
 	Engine On Alarms
@@ -135,7 +139,6 @@ Engine warning alarm resets
 	else {
 		digitalWrite(FET_ALARM, LOW);
 	}
->>>>>>> Cleaned up alarm code formatting and structure to make it easier to read.
 }
 
 void setAlarm(int alarm_num){

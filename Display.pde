@@ -58,12 +58,15 @@ void DoDisplay() {
       }
       //Row 3
       Disp_RC(3, 0);
-      Disp_PutStr(P("     ADV  "));
+	  if (alarm_count > 1 || !alarm)
+		Disp_PutStr(P("     ADV  "));
+	  else
+		Disp_PutStr(P("          "));
 	  Disp_RC(3, 9);
 	  if (alarm)
-		Disp_PutStr(P("QUIET"));
+		Disp_PutStr(P("QUIET "));
 	  else
-		Disp_PutStr(P("     "));
+		Disp_PutStr(P("      "));
 	  Disp_RC(3, 15);
       if (millis() - alarm_on[alarm_shown] > 4000){ //Wait to show RESET button in case new alarm state has taken over screen.
         Disp_PutStr(P("RESET"));

@@ -42,16 +42,11 @@ void DoEngine() {
 			if (grid_tie != 1) {
 				// Shut the engine off if the oil pressure is low
 				if ((EngineOilPressureLevel == OIL_P_LOW) && (millis() - oil_pressure_state > 500) && (millis() - engine_state_entered > 1000)){
-					Log_p("Low Oil Pressure, Shutting Down Engine at: ");
-					Logln(millis() - oil_pressure_state);
-					// Shut off the ignition IMMEDIATELY, instead of waiting for the intake to purge
-					// This is the wrong place to do this, but it will have to work for now...
-					digitalWrite(FET_IGNITION,LOW);
-					TransitionEngine(ENGINE_SHUTDOWN);
 					// If we've been running for more than 10 seconds and the oil pressure has gone low, raise an alarm
-					if ((millis() - engine_state_entered) >= 10000) {
-						setAlarm(ALARM_BAD_OIL_PRESSURE);
-					}
+					if ((millis() - engine_state_entered) > 10000) setAlarm(ALARM_BAD_OIL_PRESSURE);
+					Logln_p("Low Oil Pressure, Shutting Down Engine!");
+					// Shut off the ignition IMMEDIATELY, instead of waiting for the intake to purge
+					TransitionEngine(ENGINE_OFF);
 				}
 			}
 			if (Temp_Data[T_ENG_COOLANT] > high_coolant_temp){
@@ -74,6 +69,9 @@ void DoEngine() {
 			if (Press[P_COMB] < -7472) {
 				Log_p("Reactor Pressure too high (above 30 inch water)"); Logln(buf);
 				setAlarm(ALARM_HIGH_PCOMB);
+				TransitionEngine(ENGINE_SHUTDOWN);
+			}
+			if (auger_state == AUGER_ALARM) {
 				TransitionEngine(ENGINE_SHUTDOWN);
 			}
 			break;
