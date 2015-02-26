@@ -32,7 +32,7 @@ void DoControlInputs() {
        control_state_entered = millis();
        Logln_p("Deep Sea controller set to: Start");
      }
-     if (control_state == CONTROL_START && (millis() - control_state_entered >= 500)){
+     if (control_state == CONTROL_START && (millis() - control_state_entered >= 5000)){
        control_state = CONTROL_ON;
        Logln_p("Deep Sea controller set to: On");
      }

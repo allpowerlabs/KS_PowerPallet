@@ -99,7 +99,7 @@ void DoLambda() {
     if (lambda_input > 0.52 && millis() - lambda_state_entered > 1000) {
       if (engine_state == ENGINE_ON) {
         TransitionLambda(LAMBDA_CLOSEDLOOP);
-      }  
+      }
       else {
         TransitionLambda(LAMBDA_SEALED);
       }
@@ -109,11 +109,11 @@ void DoLambda() {
     if (lambda_input > 0.52) {
       if (engine_state == ENGINE_ON) {
         TransitionLambda(LAMBDA_CLOSEDLOOP);
-      }  
+      }
       else {
         TransitionLambda(LAMBDA_SEALED);
       }
-    } 
+    }
     else {
       if (millis() -  lambda_state_entered > 100) {
         TransitionLambda(LAMBDA_RESTART);
@@ -130,29 +130,16 @@ void DoLambda() {
     }
     break;
   case LAMBDA_STARTING:
-//    if ((lambda_input > 0.52) && (lambda_input <= lambda_rich/100)) { //Check that there is a signal, and then as soon as mixture gets rich switch to closed loop
-//      SetPremixServoAngle(premix_valve_center);
-//      //lambda_output = premix_valve_center;  //necessary? 
-//      TransitionLambda(LAMBDA_CLOSEDLOOP);
-//    }
-//    if (engine_state == ENGINE_OFF) {
-//      TransitionLambda(LAMBDA_SEALED);
-//    }
-//    if (serial_last_input == 'o') {
-//      TransitionLambda(LAMBDA_STEPTEST);
-//      serial_last_input = '\0';
-//    }
-//    if (serial_last_input == 'O') {
-//      TransitionLambda(LAMBDA_SPSTEPTEST);
-//      serial_last_input = '\0';
-//    }
-//    //        if (lambda_input < 0.52) {
-//    //          TransitionLambda(LAMBDA_NO_SIGNAL);
-//    //        }
-//    if (engine_state == ENGINE_SHUTDOWN) {
-//      TransitionLambda(LAMBDA_SHUTDOWN);
-//    }
-    TransitionLambda(LAMBDA_CLOSEDLOOP);
+	if (engine_state == ENGINE_ON) {
+        TransitionLambda(LAMBDA_CLOSEDLOOP);
+	}
+    if (engine_state == ENGINE_OFF) {
+		TransitionLambda(LAMBDA_SEALED);
+    }
+	if (engine_state == ENGINE_SHUTDOWN) {
+		TransitionLambda(LAMBDA_SHUTDOWN);
+	}
+	SetPremixServoAngle(premix_valve_center);
     break;
   }
 }
@@ -236,11 +223,11 @@ void TransitionLambda(int new_state) {
     break;
   case LAMBDA_STARTING:
     strcpy(lambda_state_name, P("Lambda Starting"));
-    SetPremixServoAngle(premix_valve_closed);
+    SetPremixServoAngle(premix_valve_center);
     lambda_PID.SetMode(MANUAL);
     break;
   }
-  Log_p(" to ");  
+  Log_p(" to ");
   Logln(lambda_state_name);
 }
 
@@ -276,7 +263,7 @@ void WriteLambda(double setpoint) {
 	eeprom_write_dword((uint32_t *)CFG_ADDR_LAMBDA_P_GAIN, dong.l);
 	dong.d = lambda_PID.GetI_Param();
 	eeprom_write_dword((uint32_t *)CFG_ADDR_LAMBDA_I_GAIN, dong.l);
-	
+
 }
 
 void LoadLambda() {
