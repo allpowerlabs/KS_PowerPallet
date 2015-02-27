@@ -133,7 +133,7 @@ void DoDisplay() {
 			sprintf(buf, "NEXT      ");
 		Disp_PutStr(buf);
 		Disp_RC(3,10);
-		sprintf(buf, " T: %.6lu", millis() / 1000);
+		sprintf(buf, " T: %6lu", millis() / 1000);
 		Disp_PutStr(buf);
 	}
     break;
@@ -283,13 +283,14 @@ void DoDisplay() {
     sprintf(buf, "%-10s     %5s", serial_num, unique_number);
     Disp_PutStr(buf);
     Disp_RC(1,0);
-    sprintf(buf, "       Time:%.8lu", millis()/1000);
+    sprintf(buf, blank);
     Disp_PutStr(buf);
     Disp_RC(2,0);
     sprintf(buf, "    %12s   ", sd_data_file_name);
     Disp_PutStr(buf);
     Disp_RC(3,0);
-    Disp_PutStr(P("NEXT                "));
+	sprintf_P(buf, PSTR("NEXT       T: %6lu"), millis()/1000);
+	Disp_PutStr(buf);
     break;
   case DISPLAY_SERVO:   //need to add constraints for min and max?
     item_count = 2;
