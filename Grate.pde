@@ -1,5 +1,5 @@
 
-// Maximum interval is 1270 sec (254 * 5).  Multiply by 100 for 10mS precision  
+// Maximum interval is 1270 sec (254 * 5).  Multiply by 100 for 10mS precision
 #define GRATE_SHAKE_CROSS (127000)
 
 struct {
@@ -25,10 +25,10 @@ void GrateInit() {
 	grate.hbr->ena = (gpio_s) {&PORTC, 6};
 	grate.hbr->enb = (gpio_s) {&PORTC, 6};
 	vnh_reset(grate.hbr);
-	
+
 	grate.pwm = &PWM2;
 	pwm_set_duty(grate.pwm, 0);
-	
+
 	GrateConfig();
 	GrateReset();
 }
@@ -38,10 +38,11 @@ void GrateConfig() {
 	if (grate.fwdtime > 10000 || grate.fwdtime < 100) grate.fwdtime = 3000;
 	grate.revtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_REV) * 100;
 	if (grate.revtime > 10000 || grate.revtime < 100) grate.revtime = 3000;
-	
+
 	grate.duty = (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_DUTY) * 2) + 55;
+	if (grate.duty > 255) grate.duty = 255;
 	pwm_set_duty(grate.pwm, grate.duty);
-	
+
 	//setup grate slopes
 	grate.m_good = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MAX) * 50);	//divide by longest total interval in seconds
 	grate.m_bad = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MIN) * 50);		//divide by shortest total interval in seconds
@@ -52,7 +53,7 @@ void GrateReset() {
 	grate.pr_accum = 0;
 	vnh_reset(grate.hbr);
 	pwm_set_duty(grate.pwm, grate.duty);
-	
+
 	GrateSwitchMode(AUTOMATIC); //set default starting state
 }
 
@@ -145,7 +146,7 @@ void DoGrate() {
 				} else {
 					grate.pr_accum = ul_addlim(grate.pr_accum, grate.m_good, GRATE_SHAKE_CROSS);
 				}
-				if (grate.pr_accum >= GRATE_SHAKE_CROSS) {			
+				if (grate.pr_accum >= GRATE_SHAKE_CROSS) {
 					GrateStart();		//time to shake
 					AshAugerStart();	// This is when we start the ash auger, too
 					grate.pr_accum = 0;	// Reset pressure ratio accumulator
