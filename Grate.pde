@@ -1,6 +1,7 @@
 
 // Maximum interval is 1270 sec (254 * 5).  Multiply by 100 for 10mS precision
 #define GRATE_SHAKE_CROSS (127000)
+#define GRATE_FWD_TIME (2000)
 
 struct {
 	vnh_s * hbr;
@@ -35,7 +36,7 @@ void GrateInit() {
 
 void GrateConfig() {
 	grate.fwdtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_FWD) * 100;
-	if (grate.fwdtime > 10000 || grate.fwdtime < 100) grate.fwdtime = 3000;
+	if (grate.fwdtime > 10000 || grate.fwdtime < 100) grate.fwdtime = GRATE_FWD_TIME;
 	grate.revtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_REV) * 100;
 	if (grate.revtime > 10000 || grate.revtime < 100) grate.revtime = 3000;
 
