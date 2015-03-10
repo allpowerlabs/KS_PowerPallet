@@ -14,7 +14,7 @@ void InitModbusSlave(){  //include in Setup() loop
     regs[MB_CONFIG11] = tred_low_temp;
     regs[MB_CONFIG12] = ttred_high;
     regs[MB_CONFIG13] = tbred_high;
-    regs[MB_CONFIG14] = pfilter_alarm;
+    regs[MB_CONFIG14] = 50;  // pfilter_alarm
     regs[MB_CONFIG15] = 0;  // Broken, will fix later
     regs[MB_CONFIG16] = 0;	// Broken, will fix later
     regs[MB_CONFIG17] = 0;	// Broken, will fix later

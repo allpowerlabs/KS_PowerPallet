@@ -821,9 +821,9 @@ void update_config_var(int var_num){
     regs[MB_CONFIG13] = tbred_high;
     break;
   case 14:
-    pfilter_alarm = getConfig(14);
-    alarm_start[ALARM_BAD_FILTER] = pfilter_alarm;
-    regs[MB_CONFIG14] = pfilter_alarm;
+    //pfilter_alarm = getConfig(14);
+    //alarm_start[ALARM_BAD_FILTER] = pfilter_alarm;
+    //regs[MB_CONFIG14] = pfilter_alarm;
     break;
   case 15:
     regs[MB_CONFIG15] = getConfig(15)*5;
