@@ -19,7 +19,7 @@ void InitModbusSlave(){  //include in Setup() loop
     regs[MB_CONFIG16] = 0;	// Broken, will fix later
     regs[MB_CONFIG17] = 0;	// Broken, will fix later
     regs[MB_CONFIG18] = servo_start;
-    regs[MB_CONFIG19] = lambda_rich;
+    regs[MB_CONFIG19] = 140; // lambda_rich
     regs[MB_CONFIG20] = use_modbus;
     regs[MB_CONFIG21] = m_baud;
     regs[MB_CONFIG22] = m_parity;

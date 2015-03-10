@@ -842,8 +842,8 @@ void update_config_var(int var_num){
     regs[MB_CONFIG18] = servo_start;
     break;
   case 19:
-    lambda_rich = getConfig(19);
-    regs[MB_CONFIG19] = lambda_rich;
+    //lambda_rich = getConfig(19);
+    //regs[MB_CONFIG19] = lambda_rich;
     break;
   case 20:
     use_modbus = getConfig(20);
