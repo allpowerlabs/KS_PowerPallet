@@ -37,12 +37,12 @@ void GrateInit() {
 void GrateConfig() {
 	grate.fwdtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_FWD) * 100;
 	if (grate.fwdtime > 10000 || grate.fwdtime < 100) grate.fwdtime = GRATE_FWD_TIME;
-	grate.revtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_REV) * 100;
-	if (grate.revtime > 10000 || grate.revtime < 100) grate.revtime = 3000;
+//	grate.revtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_REV) * 100;
+//	if (grate.revtime > 10000 || grate.revtime < 100) grate.revtime = 3000;
 
-	grate.duty = (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_DUTY) * 2) + 55;
-	if (grate.duty > 255) grate.duty = 255;
-	pwm_set_duty(grate.pwm, grate.duty);
+	//grate.duty = (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_DUTY) * 2) + 55;
+	//if (grate.duty > 255) grate.duty = 255;
+	pwm_set_duty(grate.pwm, 255);
 
 	//setup grate slopes
 	grate.m_good = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MAX) * 50);	//divide by longest total interval in seconds
@@ -53,7 +53,7 @@ void GrateReset() {
 	grate.direction = FORWARD;
 	grate.pr_accum = 0;
 	vnh_reset(grate.hbr);
-	pwm_set_duty(grate.pwm, grate.duty);
+	pwm_set_duty(grate.pwm, 255);
 
 	GrateSwitchMode(AUTOMATIC); //set default starting state
 }
@@ -69,11 +69,11 @@ void GrateStart (void) {
 			Logln("Grate: Motor on forward");
 			break;
 		case REVERSE:
-			if (vnh_get_mode(grate.hbr) != VNH_REVERSE)
-				vnh_reverse(grate.hbr);
-			timer_set(&grate.timer, grate.revtime);
-			timer_start(&grate.timer);
-			Logln("Grate: Motor on reverse");
+			//if (vnh_get_mode(grate.hbr) != VNH_REVERSE)
+			//	vnh_reverse(grate.hbr);
+			//timer_set(&grate.timer, grate.revtime);
+			//timer_start(&grate.timer);
+			//Logln("Grate: Motor on reverse");
 			break;
 	}
 }
