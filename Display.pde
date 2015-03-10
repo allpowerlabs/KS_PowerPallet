@@ -693,6 +693,7 @@ void DoKeyInput() {
       turnAllOff();
     }
     cur_item += 1;
+	while (display_state == DISPLAY_CONFIG && (char*)pgm_read_word(&Config_Choices[cur_item]) == reserved) cur_item ++;  // Skip over any reserved configs
     if (cur_item > item_count) {
       switch (display_state) {
 		case DISPLAY_REACTOR:

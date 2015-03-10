@@ -304,29 +304,30 @@ const char plus_minus[] PROGMEM = "+    -  ";
 const char no_yes[] PROGMEM = "NO  YES ";
 const char ten_twenty_k[] PROGMEM = "10k 20k ";
 const char plus_minus_five[] PROGMEM = "+5  -5  ";
+const char reserved[] PROGMEM = "Reserved";
 
 
 const char * const Config_Choices[CONFIG_COUNT] PROGMEM = {
 no_yes,
-ten_twenty_k,
-no_yes,
+reserved,	// Engine Type
+reserved,	//Relay Board
 plus_minus,
 plus_minus,
 plus_minus,
 plus_minus,
 no_yes,
+reserved,	// P_ratio Accum, pratio_max
+plus_minus,
+reserved,	// Display Per .1s
+plus_minus_five,
+plus_minus_five,
+plus_minus_five,
+reserved,	// P_filter Accum
+plus_minus_five,
 plus_minus_five,
 plus_minus,
 plus_minus,
-plus_minus_five,
-plus_minus_five,
-plus_minus_five,
-plus_minus,
-plus_minus_five,
-plus_minus_five,
-plus_minus,
-plus_minus,
-plus_minus,
+reserved,	// Lambda Rich
 no_yes,
 plus_minus,
 plus_minus,
@@ -334,13 +335,13 @@ plus_minus,
 no_yes,
 plus_minus,
 plus_minus_five,
-plus_minus,
+reserved,	// P_ratio High Boundary
 plus_minus,
 plus_minus,
 plus_minus,
 plus_minus_five,
-plus_minus,
-plus_minus
+reserved,	// Grate Reverse Time
+reserved	// Grate Power
 };
 
 //                              0    1    2    3    4   5    6   7    8    9    10   11   12   13   14   15   16   17   18  19   20  21  22  23   24   25   26   	27	28	29	30	31	32	33
