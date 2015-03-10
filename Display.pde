@@ -796,9 +796,9 @@ void update_config_var(int var_num){
     regs[MB_CONFIG7] = save_datalog_to_sd;
     break;
   case 8:
-    pratio_max = getConfig(8)*5;
-    alarm_start[ALARM_BAD_REACTOR] = pratio_max;
-    regs[MB_CONFIG8] = pratio_max;
+    //pratio_max = getConfig(8)*5;
+    //alarm_start[ALARM_BAD_REACTOR] = pratio_max;
+    //regs[MB_CONFIG8] = pratio_max;
     break;
   case 9:
     high_coolant_temp = getConfig(9);

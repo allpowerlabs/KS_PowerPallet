@@ -357,7 +357,7 @@ int current_low_boundary = getConfig(4);
 int current_high_boundary = getConfig(5);
 int low_oil_psi = getConfig(6);
 int save_datalog_to_sd = getConfig(7);
-int pratio_max = getConfig(8)*5;
+//int pratio_max = getConfig(8)*5;
 int high_coolant_temp = getConfig(9);
 int display_per = getConfig(10);
 int tred_low_temp = getConfig(11)*5;
@@ -567,7 +567,7 @@ int pressureRatioAccumulator = 0;
 
 #define ALARM_NUM 19
 unsigned long alarm_on[ALARM_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-unsigned long alarm_start[ALARM_NUM] = {240000, 480000, pratio_max, pfilter_alarm, 230, 0, 0, 0, 30000, 60000, 10, 0, 0, 3000, 15000, 0, 0, 0, 0};  //count or time in milliseconds when alarm goes off
+unsigned long alarm_start[ALARM_NUM] = {240000, 480000, 10, pfilter_alarm, 230, 0, 0, 0, 30000, 60000, 10, 0, 0, 3000, 15000, 0, 0, 0, 0};  //count or time in milliseconds when alarm goes off
 unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 60000, 0, 0, 180000, 20, 0, 3000, 7000, 15000, 60000, 0, 0, 0};  //time when engine will be shutdown
 int alarm_count = 0;
 int alarm_queue[ALARM_NUM] = {};

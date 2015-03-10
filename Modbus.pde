@@ -1,6 +1,6 @@
 void InitModbusSlave(){  //include in Setup() loop
     for (int i = 0; i < MB_REGS; ++i) { regs[i]=0; }  //preset all registers to zero
-    
+
     regs[MB_CONFIG1] = engine_type;
     regs[MB_CONFIG2] = relay_board;
     regs[MB_CONFIG3] = aug_rev_time;
@@ -8,7 +8,7 @@ void InitModbusSlave(){  //include in Setup() loop
     regs[MB_CONFIG5] = current_high_boundary;
     regs[MB_CONFIG6] = low_oil_psi;
     regs[MB_CONFIG7] = save_datalog_to_sd;
-    regs[MB_CONFIG8] = pratio_max;
+    regs[MB_CONFIG8] = 10;  // pratio_max
     regs[MB_CONFIG9] = high_coolant_temp;
     regs[MB_CONFIG10] = display_per;
     regs[MB_CONFIG11] = tred_low_temp;
@@ -24,7 +24,7 @@ void InitModbusSlave(){  //include in Setup() loop
     regs[MB_CONFIG21] = m_baud;
     regs[MB_CONFIG22] = m_parity;
     regs[MB_CONFIG23] = m_address;
-    
+
     init_mb_slave(baud_rates[m_baud], parity[m_parity], 16);  //baud, parity, tx_en_pin
     Serial.print("# Modbus Baud Rate:"); Serial.print(baud_rates[m_baud]); Serial.print(" Parity: "); Serial.print(m_parity);
     Serial.print(" Address: "); Serial.print(m_address); Serial.print(" Number of Registers: "); Serial.println(MB_REGS);
@@ -34,11 +34,11 @@ void InitModbusSlave(){  //include in Setup() loop
 
 void DoModbus() {
     start_mb_slave(m_address, regs, MB_REGS);
-    
+
     if (written.num_regs) {
    // Log_p("Modbus recieved Register update:");Logln(written.num_regs);
-   // Log_p("Lastwrite.start_addr"); Logln(written.start_addr);    
-    
+   // Log_p("Lastwrite.start_addr"); Logln(written.start_addr);
+
       for(int i = written.start_addr; i < (written.start_addr + written.num_regs); i++){
         Log_p("i = "); Log(i); Log_p(" "); Logln(regs[i]);
         switch (i) {
@@ -54,13 +54,13 @@ void DoModbus() {
         case MB_FLARE_STATE:
           flare_state = regs[MB_FLARE_STATE]; //???
           break;
-        case  MB_BLOWER_STATE:  
+        case  MB_BLOWER_STATE:
           break;
         case MB_LAMBDA_OUT:
           lambda_output = regs[MB_LAMBDA_OUT]/100.0;
           break;
         case MB_LAMBDA_SETPOINT:
-          lambda_setpoint = regs[MB_LAMBDA_SETPOINT]/1000.0;	
+          lambda_setpoint = regs[MB_LAMBDA_SETPOINT]/1000.0;
           break;
         case MB_LAMBDA_P:
         case MB_LAMBDA_I:
@@ -80,19 +80,19 @@ void DoModbus() {
         }
         written.num_regs=0;
     }
-    
-    regs[MB_ALARMS] = getAlarmBin();                
+
+    regs[MB_ALARMS] = getAlarmBin();
     regs[MB_FUELSWITCHLEVEL] = getFuelSwitch();
-    regs[MB_P_RATIO_FILTER_STATE] = -500;  //int(pRatioFilterHigh);  
-    regs[MB_P_RATIO_STATE_REACTOR] = (int)pRatioReactorLevel;	 //pRatioReactorLevel[pRatioReactorLevelName] 
-    regs[MB_P_REACTORLEVEL] = (int)pRatioReactorLevel;	 //pRatioReactorLevel[pRatioReactorLevelName]        
-    regs[MB_T_BREDLEVEL] = (int)T_bredLevel;//T_bredLevel[TempLevelName]	          
-    regs[MB_T_TREDLEVEL] = (int)T_tredLevel;//T_tredLevel[TempLevelName]           
-    regs[MB_LAMBDA_P] = int(100*lambda_PID.GetP_Param());	 
-    regs[MB_LAMBDA_I] = int(100*lambda_PID.GetI_Param());	 
-    //regs[MB_LAMBDA_D] = int(100*lambda_PID.GetD_Param());	 //Not used	             
-    regs[MB_LAMBDA_SETPOINT] = int(1000*lambda_setpoint);	     
-    regs[MB_P_COMB] = (int)Press[P_COMB]; 
+    regs[MB_P_RATIO_FILTER_STATE] = -500;  //int(pRatioFilterHigh);
+    regs[MB_P_RATIO_STATE_REACTOR] = (int)pRatioReactorLevel;	 //pRatioReactorLevel[pRatioReactorLevelName]
+    regs[MB_P_REACTORLEVEL] = (int)pRatioReactorLevel;	 //pRatioReactorLevel[pRatioReactorLevelName]
+    regs[MB_T_BREDLEVEL] = (int)T_bredLevel;//T_bredLevel[TempLevelName]
+    regs[MB_T_TREDLEVEL] = (int)T_tredLevel;//T_tredLevel[TempLevelName]
+    regs[MB_LAMBDA_P] = int(100*lambda_PID.GetP_Param());
+    regs[MB_LAMBDA_I] = int(100*lambda_PID.GetI_Param());
+    //regs[MB_LAMBDA_D] = int(100*lambda_PID.GetD_Param());	 //Not used
+    regs[MB_LAMBDA_SETPOINT] = int(1000*lambda_setpoint);
+    regs[MB_P_COMB] = (int)Press[P_COMB];
     regs[MB_P_FILTER] = (int)Press[P_FILTER];
     //regs[MB_P_Q_AIR_ENG] = (int)Press[P_Q_AIR_ENG]; //ABSENT;
     //regs[MB_P_Q_AIR_RCT] = (int)Press[P_Q_AIR_RCT];   //(ABSENT?)
@@ -112,10 +112,10 @@ void DoModbus() {
     //regs[MB_T_PYRO_OUT] = Temp_Data[T_PYRO_OUT]; //ABSENT;
     //regs[MB_T_REACTOR_GAS_OUT] = (int)Temp_Data[T_REACTOR_GAS_OUT];  //(ABSENT?)
     regs[MB_T_TRED] = (int)Temp_Data[T_TRED];
-    regs[MB_GRATE_VAL] = 0;	// Broken, will fix later;	
+    regs[MB_GRATE_VAL] = 0;	// Broken, will fix later;
     regs[MB_LAMBDA_IN] = int(100*lambda_input);
     regs[MB_LAMBDA_OUT] = int(100*lambda_output);
-    regs[MB_P_RATIO_FILTER] = int(pRatioFilter*100);	
+    regs[MB_P_RATIO_FILTER] = int(pRatioFilter*100);
     regs[MB_P_RATIO_REACTOR] = int(pRatioReactor*100);
 }
 
