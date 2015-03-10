@@ -376,14 +376,14 @@ int m_address = getConfig(23);
 int grid_tie = getConfig(24);
 int pratio_low_boundary = getConfig(25);
 int ttred_warn = getConfig(26)*5;
-int pratio_high_boundary = getConfig(27);
+//int pratio_high_boundary = getConfig(27);
 
 // Reactor pressure ratio
 float pRatioReactor;
 enum pRatioReactorLevels { PR_HIGH = 0, PR_CORRECT = 1, PR_LOW = 2} pRatioReactorLevel;
 static char *pRatioReactorLevelName[] = { "High", "Correct", "Low" };
 float pratio_low = pratio_low_boundary/100.0;
-float pratio_high = pratio_high_boundary/100.0;
+float pratio_high = 0.6; // 	pratio_high_boundary/100.0;
 float pRatioReactorLevelBoundary[3][2] = { { pratio_high, 1.0 }, { pratio_low, pratio_high }, {0.0, pratio_low} };
 
 // Filter pressure ratio

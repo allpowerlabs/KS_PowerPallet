@@ -875,10 +875,10 @@ void update_config_var(int var_num){
     ttred_warn = getConfig(26)*5;
     break;
   case 27:
-    pratio_high_boundary = getConfig(27);
-    pratio_high = pratio_high_boundary/100.0;
-    pRatioReactorLevelBoundary[0][0] = pratio_high;
-    pRatioReactorLevelBoundary[1][1] = pratio_high;
+//    pratio_high_boundary = getConfig(27);
+//    pratio_high = pratio_high_boundary/100.0;
+//    pRatioReactorLevelBoundary[0][0] = pratio_high;
+//    pRatioReactorLevelBoundary[1][1] = pratio_high;
     break;
   case 28:
     AshAugerReset();
