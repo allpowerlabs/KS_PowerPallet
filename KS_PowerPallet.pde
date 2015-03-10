@@ -28,6 +28,7 @@
 #include "Modes.h"
 #include "Alarm.h"
 #include "AshAuger.h"		// Ash auger typedefs.
+#include "Auger.h"
 #include "Version.h"
 
 #define RELEASE_CYCLE RELEASE_DEVELOPMENT
@@ -347,8 +348,8 @@ configurable Config[] = {
 //int engine_type = getConfig(1);
 //int relay_board = getConfig(2);
 int aug_rev_time = getConfig(3)*100;
-int current_low_boundary = getConfig(4);
-int current_high_boundary = getConfig(5);
+//int current_low_boundary = getConfig(4);
+//int current_high_boundary = getConfig(5);
 int low_oil_psi = getConfig(6);
 int save_datalog_to_sd = getConfig(7);
 //int pratio_max = getConfig(8)*5;
@@ -400,44 +401,6 @@ int T_bredLevelBoundary[TEMP_LEVEL_COUNT][2] = { { 0, 40 }, {50, 80}, {300,740},
 enum P_reactorLevels { OFF = 0, LITE = 1, MEDIUM = 2 , EXTREME = 3} P_reactorLevel;
 static char *P_reactorLevelName[] = { "Off", "Low", "Medium", "High"};
 int P_reactorLevelBoundary[4][2] = { { -100, 4000 }, {-500, -200}, {-2000,-750}, {-4000,-2000} };
-
-//Auger Switch Levels
-#if ANA_FUEL_SWITCH != ABSENT
-int FuelSwitchValue = 0;
-byte FuelDemand = false;
-enum FuelSwitchLevels { SWITCH_OFF = false, SWITCH_ON = true} FuelSwitchLevel;
-static char *FuelSwitchLevelName[] = { "Off","On"};
-//int FuelSwitchLevelBoundary[2][2] = {{ 0, 200 }, {800, 1024}}; //not currently used
-unsigned long fuel_state_entered;
-#endif
-
-//Auger states
-#define AUGER_OFF 0
-#define AUGER_STARTING 1
-#define AUGER_FORWARD 2
-#define AUGER_HIGH 3
-#define AUGER_REVERSE 4
-#define AUGER_REVERSE_HIGH 5
-#define AUGER_CURRENT_LOW 6
-#define AUGER_ALARM 7
-#define AUGER_PULSE 8
-#define AUGER_MANUAL_FORWARD 9
-
-int auger_state = 0;
-int auger_rev_count = 0;
-unsigned long auger_current_low = 0;
-unsigned long auger_state_entered;
-unsigned long auger_direction_entered;
-unsigned long auger_pulse_entered;
-unsigned long auger_pulse_time = 500;
-int auger_pulse_state = 0;
-
-//Auger Current Levels
-unsigned AugerCurrentValue = 0; // current level in .1A,  ADC Count = (120 * Current) + 1350
-enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;
-static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
-//Any changes to the following needs to be updated to update_config_var!!!   AugerCurrentLevel[AugerCurrentLevelName]
-unsigned AugerCurrentLevelBoundary[4][2] = { { 0, 10}, { 10, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 750} };  //.1A readings
 
 //oil pressure
 int EngineOilPressureValue;
@@ -717,6 +680,7 @@ void setup() {
   InitLambda();
   InitServos();
   GrateInit();
+  AugerInit();
   AshAugerInit();
   if (use_modbus == 1){
     InitModbusSlave();
