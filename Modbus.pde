@@ -8,9 +8,9 @@ void InitModbusSlave(){  //include in Setup() loop
     regs[MB_CONFIG5] = current_high_boundary;
     regs[MB_CONFIG6] = low_oil_psi;
     regs[MB_CONFIG7] = save_datalog_to_sd;
-    regs[MB_CONFIG8] = 10;  // pratio_max
+    regs[MB_CONFIG8] = 10;	// pratio_max
     regs[MB_CONFIG9] = high_coolant_temp;
-    regs[MB_CONFIG10] = display_per;
+    regs[MB_CONFIG10] = 10;	// display_per
     regs[MB_CONFIG11] = tred_low_temp;
     regs[MB_CONFIG12] = ttred_high;
     regs[MB_CONFIG13] = tbred_high;

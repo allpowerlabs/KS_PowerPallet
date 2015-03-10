@@ -805,8 +805,8 @@ void update_config_var(int var_num){
     regs[MB_CONFIG9] = high_coolant_temp;
     break;
   case 10:
-    display_per = getConfig(10);
-    regs[MB_CONFIG10] = display_per;
+    //display_per = getConfig(10);
+    //regs[MB_CONFIG10] = display_per;
     break;
   case 11:
     tred_low_temp = getConfig(11)*5;
