@@ -12,10 +12,10 @@ struct {
 	unsigned grid_tie;			// 1 for grid-tie controller
 	unsigned control_state;		// Off, ON, START
 	timer_s timer;				// Control timer
-	
+
 } engine;
 
-void DoEngine() {   
+void DoEngine() {
   strcpy_P(buf, engine_shutdown);
   switch (engine_state) {
     case ENGINE_OFF:
@@ -51,7 +51,7 @@ void DoEngine() {
         Logln(millis()-engine_state_entered);
         TransitionEngine(ENGINE_SHUTDOWN);
       }
-      if (Press[P_COMB] < -7472) {  
+      if (Press[P_COMB] < -7472) {
         Log_p("Reactor Pressure too high (above 30 inch water)"); Logln(buf);
         setAlarm(ALARM_HIGH_PCOMB);
         TransitionEngine(ENGINE_SHUTDOWN);
@@ -104,25 +104,25 @@ void TransitionEngine(int new_state) {
       case ENGINE_OFF:
         digitalWrite(FET_IGNITION,LOW);
         digitalWrite(FET_STARTER,LOW);
-        Log(p_buffer); Logln_p("Off"); 
+        Log(p_buffer); Logln_p("Off");
         //TransitionMessage("Engine: Off         ");
         break;
       case ENGINE_ON:
         digitalWrite(FET_IGNITION,HIGH);
         digitalWrite(FET_STARTER,LOW);
-        Log(p_buffer); Logln_p("On"); 
+        Log(p_buffer); Logln_p("On");
         //TransitionMessage("Engine: Running    ");
         break;
       case ENGINE_STARTING:
         digitalWrite(FET_IGNITION,HIGH);
         digitalWrite(FET_STARTER,HIGH);
-        Log(p_buffer); Logln_p("Starting"); 
+        Log(p_buffer); Logln_p("Starting");
         //TransitionMessage("Engine: Starting    ");
         break;
       case ENGINE_GOV_TUNING:
         digitalWrite(FET_IGNITION,HIGH);
         digitalWrite(FET_STARTER,LOW);
-        Log(p_buffer); Logln_p("Governor Tuning"); 
+        Log(p_buffer); Logln_p("Governor Tuning");
         //TransitionMessage("Engine: Gov Tuning  ");
         break;
       case ENGINE_SHUTDOWN:
@@ -130,8 +130,8 @@ void TransitionEngine(int new_state) {
   //      SetThrottleAngle(smoothedLambda);
   //      digitalWrite(FET_IGNITION,LOW);
   //      digitalWrite(FET_STARTER,LOW);
-        Log(p_buffer); Logln_p("SHUTDOWN"); 
-        //TransitionMessage("Engine: Shutting down");   
+        Log(p_buffer); Logln_p("SHUTDOWN");
+        //TransitionMessage("Engine: Shutting down");
         break;
     }
   } else { //Engine controlled by Derp Sea for Gridtie
@@ -160,10 +160,10 @@ void TransitionEngine(int new_state) {
         digitalWrite(FET_IGNITION,LOW);
         digitalWrite(FET_STARTER,LOW);
         break;
-      case ENGINE_SHUTDOWN: 
+      case ENGINE_SHUTDOWN:
         Log(p_buffer); Logln_p("Shutdown");
         digitalWrite(FET_IGNITION,LOW);
-        digitalWrite(FET_STARTER,LOW); 
+        digitalWrite(FET_STARTER,LOW);
         break;
     }
   }
@@ -172,29 +172,29 @@ void TransitionEngine(int new_state) {
 
 void DoOilPressure() {
   smoothAnalog(ANA_OIL_PRESSURE);
-  if (engine_type == 1){  //20k has analog oil pressure reader
+//  if (engine_type == 1){  //20k has analog oil pressure reader
     //EngineOilPressureValue = getPSI(analogRead(ANA_OIL_PRESSURE));
-    EngineOilPressureValue = getPSI(smoothed[getAnaArray(ANA_OIL_PRESSURE)]); 
+    EngineOilPressureValue = getPSI(smoothed[getAnaArray(ANA_OIL_PRESSURE)]);
     if (EngineOilPressureValue <= low_oil_psi && EngineOilPressureLevel != OIL_P_LOW){
       EngineOilPressureLevel = OIL_P_LOW;
       oil_pressure_state = millis();
-    } 
+    }
     if (EngineOilPressureValue > low_oil_psi && EngineOilPressureLevel != OIL_P_NORMAL){
       EngineOilPressureLevel = OIL_P_NORMAL;
       oil_pressure_state = 0;
     }
-  } else {
-    EngineOilPressureValue = analogRead(ANA_OIL_PRESSURE);
-    if (EngineOilPressureValue <= 500 && EngineOilPressureLevel != OIL_P_LOW){
-      EngineOilPressureLevel = OIL_P_LOW;
-      oil_pressure_state = millis();
-    }
-    if (EngineOilPressureValue > 500 && EngineOilPressureLevel != OIL_P_NORMAL){
-      EngineOilPressureLevel = OIL_P_NORMAL;
-      oil_pressure_state = 0;
-    }
-  }
-  
+//  } else {
+//    EngineOilPressureValue = analogRead(ANA_OIL_PRESSURE);
+//    if (EngineOilPressureValue <= 500 && EngineOilPressureLevel != OIL_P_LOW){
+//      EngineOilPressureLevel = OIL_P_LOW;
+//      oil_pressure_state = millis();
+//    }
+//    if (EngineOilPressureValue > 500 && EngineOilPressureLevel != OIL_P_NORMAL){
+//      EngineOilPressureLevel = OIL_P_NORMAL;
+//      oil_pressure_state = 0;
+//    }
+//  }
+
 }
 
 int getPSI(int pressure_reading){  //returns oil pressure in PSI for 20k
@@ -209,7 +209,7 @@ void DoBattery() {
 
 
 boolean EngineShutdownFromAlarm() {
-  boolean alarms = false; 
+  boolean alarms = false;
   for (int i=0; i< ALARM_NUM; i++){
     if ((shutdown[i]>0) && (alarm_on[i] >= shutdown[i])){
       alarms = true;

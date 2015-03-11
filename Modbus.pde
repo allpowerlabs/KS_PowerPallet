@@ -1,8 +1,8 @@
 void InitModbusSlave(){  //include in Setup() loop
     for (int i = 0; i < MB_REGS; ++i) { regs[i]=0; }  //preset all registers to zero
 
-    regs[MB_CONFIG1] = engine_type;
-    regs[MB_CONFIG2] = relay_board;
+    regs[MB_CONFIG1] = 1; // engine_type;
+    regs[MB_CONFIG2] = 1; // relay_board;
     regs[MB_CONFIG3] = aug_rev_time;
     regs[MB_CONFIG4] = current_low_boundary;
     regs[MB_CONFIG5] = current_high_boundary;

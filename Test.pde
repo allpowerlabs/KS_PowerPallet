@@ -15,7 +15,7 @@ void TransitionTesting(int new_state) {
     digitalWrite(FET_AUGER_REV, HIGH);
     break;
   case TESTING_GRATE:
-    turnAllOff(); 
+    turnAllOff();
     digitalWrite(FET_GRATE,HIGH);
     break;
   case TESTING_ENGINE_IGNITION:
@@ -25,7 +25,7 @@ void TransitionTesting(int new_state) {
   case TESTING_STARTER:
     turnAllOff();
     digitalWrite(FET_STARTER,HIGH);
-    break;	
+    break;
   case TESTING_FLARE_IGNITOR:
     turnAllOff();
     digitalWrite(FET_FLARE_IGNITOR,HIGH);
@@ -57,11 +57,11 @@ void GoToNextTestingState() {
     //DoTesting();
     break;
   case TESTING_FUEL_AUGER:
-    if (relay_board == 1){  //AUGER Reverse only on relay board
+//    if (relay_board == 1){  //AUGER Reverse only on relay board
       TransitionTesting(TESTING_FUEL_REV);
-    } else {
-      TransitionTesting(TESTING_GRATE);
-    }
+//    } else {
+//      TransitionTesting(TESTING_GRATE);
+//    }
     break;
   case TESTING_FUEL_REV:
     TransitionTesting(TESTING_GRATE);
@@ -74,7 +74,7 @@ void GoToNextTestingState() {
     break;
   case TESTING_STARTER:
     TransitionTesting(TESTING_FLARE_IGNITOR);
-    break;	
+    break;
   case TESTING_FLARE_IGNITOR:
     TransitionTesting(TESTING_O2_RESET);
     break;
@@ -83,7 +83,7 @@ void GoToNextTestingState() {
     break;
   case TESTING_ALARM:
     digitalWrite(FET_ALARM,LOW);
-    TransitionTesting(TESTING_ANA_LAMBDA); 
+    TransitionTesting(TESTING_ANA_LAMBDA);
     break;
   case TESTING_ANA_LAMBDA:
     TransitionTesting(TESTING_ANA_ENGINE_SWITCH);

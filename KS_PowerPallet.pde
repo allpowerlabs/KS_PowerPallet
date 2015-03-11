@@ -350,8 +350,8 @@ int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  
 int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15,  254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254,	254,3,	10,	15,	240,240,100	}; //maximum values allowed
 
 //Don't forget to add the following to update_config_var in Display!  The first Configuration, Reset Defaults, is skipped, so these start at 1, not 0.
-int engine_type = getConfig(1);
-int relay_board = getConfig(2);
+//int engine_type = getConfig(1);
+//int relay_board = getConfig(2);
 int aug_rev_time = getConfig(3)*100;
 int current_low_boundary = getConfig(4);
 int current_high_boundary = getConfig(5);
@@ -685,10 +685,10 @@ void setup() {
 
   LoadPressureSensorCalibration();
   LoadServo();
-  if (engine_type == 0) {
-    shutdown[ALARM_AUGER_OFF_LONG] = shutdown[ALARM_AUGER_OFF_LONG] * 2;
-    alarm_start[ALARM_AUGER_ON_LONG] = alarm_start[ALARM_AUGER_ON_LONG] * 2;
-  }
+//  if (engine_type == 0) {
+//    shutdown[ALARM_AUGER_OFF_LONG] = shutdown[ALARM_AUGER_OFF_LONG] * 2;
+//    alarm_start[ALARM_AUGER_ON_LONG] = alarm_start[ALARM_AUGER_ON_LONG] * 2;
+//  }
 
   Serial.begin(115200);
 

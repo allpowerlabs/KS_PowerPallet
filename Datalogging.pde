@@ -2,7 +2,7 @@
 void LogTime(boolean header = false) {
   if (header) {
     PrintColumn(P("Time"));
-  } 
+  }
   else {
     PrintColumn(millis()/1000); // Gonna fix the timestamp some day
   }
@@ -38,7 +38,7 @@ void LogPID(boolean header = false) {
     PrintColumn(P("Lambda_D"));
     PrintColumn(P("Servo_Pos"));
     PrintColumn(P("Throt_Pos"));
-  } 
+  }
   else {
     PrintColumn(lambda_input);
     PrintColumn(lambda_output);
@@ -61,7 +61,7 @@ void LogAnalogInputs(boolean header = false) {
     PrintColumn(P("ANA5"));
     PrintColumn(P("ANA6"));
     PrintColumn(P("ANA7"));
-  } 
+  }
   else {
     PrintColumnInt(analogRead(ANA0));
     PrintColumnInt(analogRead(ANA1));
@@ -80,7 +80,7 @@ void LogGrate(boolean header = false) {
     PrintColumn(P("P_ratio_reactor"));
     PrintColumn(P("P_ratio_state_reactor"));
     PrintColumn(P("Grate_Val"));
-  } 
+  }
   else {
     PrintColumnInt(GrateGetMotorState());
     PrintColumn(pRatioReactor);
@@ -93,13 +93,13 @@ void LogFilter(boolean header = false) {
   if (header) {
     PrintColumn(P("P_ratio_filter"));
     PrintColumn(P("P_ratio_filter_state"));
-  } 
+  }
   else {
     PrintColumn(pRatioFilter);
     //TODO: Move to enum
     if (pRatioFilterHigh) {
       PrintColumn(P("Bad"));
-    } 
+    }
     else {
       PrintColumn(P("Good"));
     }
@@ -127,7 +127,7 @@ void LogPressures(boolean header = false) {
 #if P_Q_GAS_ENG != ABSENT
     PrintColumn(P("P_Q_gas_eng"));
 #endif
-  } 
+  }
   else {
 #if P_REACTOR != ABSENT
     PrintColumnInt(Press[P_REACTOR]);
@@ -166,7 +166,7 @@ void LogTemps(boolean header = false) {
 #endif
 #if T_ENG_COOLANT != ABSENT
     PrintColumn(P("T_eng_coolant"));
-#endif 
+#endif
 #if T_DRYING_GAS_OUT != ABSENT
     PrintColumn(P("T_drying_gas_out"));
 #endif
@@ -179,7 +179,7 @@ void LogTemps(boolean header = false) {
 //PrintColumn(P("T_8"));
 PrintColumn(P("T_9"));
 PrintColumn(P("T_10"));
-  } 
+  }
   else {
 #if T_TRED != ABSENT
     PrintColumnInt(Temp_Data[T_TRED]);
@@ -195,7 +195,7 @@ PrintColumn(P("T_10"));
 #endif
 #if T_ENG_COOLANT != ABSENT
     PrintColumnInt(Temp_Data[T_ENG_COOLANT]);
-#endif 
+#endif
 #if T_DRYING_GAS_OUT != ABSENT
     PrintColumnInt(Temp_Data[T_DRYING_GAS_OUT]);
 #endif
@@ -209,23 +209,23 @@ PrintColumn(P("T_10"));
 PrintColumnInt(Temp_Data[9]);
 PrintColumnInt(Temp_Data[10]);
   }
-} 
+}
 
 void LogAuger(boolean header = false) {
   if (header) {
-    if (relay_board){ 
+    //if (relay_board){
       PrintColumn(P("AugerCurrent"));
       PrintColumn(P("AugerLevel"));
-    }
+    //}
 #if ANA_FUEL_SWITCH != ABSENT
     PrintColumn(P("FuelSwitchLevel"));
 #endif
-  } 
+  }
   else {
-    if (relay_board){ 
+    //if (relay_board){
       PrintColumnInt(AugerCurrentValue);
       PrintColumn(AugerCurrentLevelName[AugerCurrentLevel]);
-    }
+    //}
 #if ANA_FUEL_SWITCH != ABSENT
     PrintColumn(FuelSwitchLevelName[FuelSwitchLevel]);
 #endif
@@ -261,11 +261,11 @@ void LogAuger(boolean header = false) {
 void LogEngine(boolean header=false) {
   if (header) {
     PrintColumn(P("Engine"));
-  } 
+  }
   else {
     switch(engine_state){
     case ENGINE_OFF:
-      PrintColumn(P("Off")); 
+      PrintColumn(P("Off"));
       break;
     case ENGINE_ON:
       PrintColumn(P("On"));
@@ -297,13 +297,13 @@ void LogEngine(boolean header=false) {
 void LogOilPressure(boolean header=false){
   if (header){
     PrintColumn(P("OilPressureLevel"));
-    if (engine_type == 1){ //20k
+    //if (engine_type == 1){ //20k
       PrintColumn(P("OilPressurePSI"));
-    } 
-    else {
-      PrintColumn(P("OilPressureValue"));
-    }
-  } 
+    //}
+    //else {
+    //  PrintColumn(P("OilPressureValue"));
+    //}
+  }
   else {
     PrintColumn(EngineOilPressureLevel[EngineOilPressureName]);
     PrintColumn(EngineOilPressureValue);
@@ -315,7 +315,7 @@ void LogReactor(boolean header=false) {
     PrintColumn(P("P_reactorLevel"));
     PrintColumn(P("T_tredLevel"));
     PrintColumn(P("T_bredLevel"));
-  } 
+  }
   else {
     PrintColumn(P_reactorLevel[P_reactorLevelName]);
     PrintColumn(T_tredLevel[TempLevelName]);
@@ -330,7 +330,7 @@ void LogReactor(boolean header=false) {
 //  Log_p("Smoothed Signal: ");
 //  Serial.print(smoothed[getAnaArray(ANA_OIL_PRESSURE)]);
 //  Log_p(" Smoothed PSI: ");
-//  Logln(getPSI(smoothed[getAnaArray(ANA_OIL_PRESSURE)])); 
+//  Logln(getPSI(smoothed[getAnaArray(ANA_OIL_PRESSURE)]));
 //}
 
 
@@ -339,7 +339,7 @@ void PrintColumn(const char * str) {
     strncat(string_buffer, str, BUFFER_SIZE);
     strncat(string_buffer, comma, BUFFER_SIZE); //add comma
     buffer_size = strlen(string_buffer);  //add on size of comma
-  }  
+  }
   else {
     Serial.print(string_buffer);
     if (save_datalog_to_sd && sd_loaded){
@@ -357,7 +357,7 @@ void PrintColumn(float str) {
     strncat(string_buffer, float_buf, BUFFER_SIZE);
     strncat(string_buffer, comma, BUFFER_SIZE); //add comma
     buffer_size = strlen(string_buffer);
-  }  
+  }
   else {
     Serial.print(string_buffer);
     if (save_datalog_to_sd && sd_loaded){
@@ -374,7 +374,7 @@ void PrintColumnInt(long str) {
   if (buffer_size + strlen(float_buf) < BUFFER_SIZE){
     strncat(string_buffer, float_buf, BUFFER_SIZE);
     buffer_size = strlen(string_buffer);
-  }  
+  }
   else {
     Serial.print(string_buffer);
     if (save_datalog_to_sd && sd_loaded){
