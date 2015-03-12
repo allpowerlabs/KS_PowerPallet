@@ -1,29 +1,29 @@
 boolean InitSD() {
-  pinMode(SS_PIN, OUTPUT); 
-  pinMode(MOSI_PIN, OUTPUT); 
-  pinMode(MISO_PIN, INPUT); 
-  pinMode(SCK_PIN, OUTPUT); 
+  pinMode(SS_PIN, OUTPUT);
+  pinMode(MOSI_PIN, OUTPUT);
+  pinMode(MISO_PIN, INPUT);
+  pinMode(SCK_PIN, OUTPUT);
 
   putstring("#Initializing SD card...");
   if(!SD.begin(SS_PIN)){        // 2.004 seconds if no SD card (fail), 60msec if SD card (succeed).
     putstring("initialization failed.\r\n");
     sd_loaded = false;
-  } 
+  }
   else {
     putstring("card initialized.\r\n");
     sd_loaded = true;
     int data_log_num = EEPROMReadInt(30); //reads from EEPROM bytes 30 and 31
     if (data_log_num == 32767){  //TODO: unsigned??  --> 65,535
       data_log_num = 1;
-    } 
-    else { 
+    }
+    else {
       data_log_num++;
     }
-    sprintf(sd_data_file_name, "dat%05i.csv", data_log_num); 
-    sprintf(sd_log_file_name, "log%05i.txt", data_log_num); 
+    sprintf(sd_data_file_name, "dat%05i.csv", data_log_num);
+    sprintf(sd_log_file_name, "log%05i.txt", data_log_num);
     putstring("#Writing data to ");
     Serial.println(sd_data_file_name);
-    EEPROMWriteInt(30, data_log_num); 
+    EEPROMWriteInt(30, data_log_num);
   }
   return sd_loaded;
 }
@@ -35,28 +35,28 @@ void DatalogSD(char file_name[13], boolean newline) {    //file_name should be 8
   if (dataFile) {
     if (newline) {
       dataFile.println(string_buffer);
-    } 
+    }
     else {
       dataFile.print(string_buffer);
     }
     dataFile.close();
-  }  
+  }
   else {
     putstring("# Error loading ");
     Serial.println(file_name);
-  } 
+  }
 }
 
 //Logging Functions:
 
 void appendTimestamp(){
-  dtostrf(millis()/100, 5, 3, float_buf);
-  //sprintf(float_buf, "%07lu", millis()/1000);  Gonna fix the timestamp someday
+  //dtostrf(millis()/100, 5, 3, float_buf);
+  sprintf(float_buf, "%lu", millis()/1000);
   strncat(float_buf, comma, 15);
   strncat(string_buffer, "# ", BUFFER_SIZE);
   strncat(string_buffer, float_buf, BUFFER_SIZE);
   buffer_size = strlen(string_buffer);
-}  
+}
 
 void clearBuffer(){
   buffer_size = 0;
@@ -70,7 +70,7 @@ void Logln(const char * str) {
   strncat(string_buffer, str, BUFFER_SIZE);
   Serial.print(string_buffer); Serial.println();
   if (save_datalog_to_sd && sd_loaded){
-    DatalogSD(sd_log_file_name, true);  
+    DatalogSD(sd_log_file_name, true);
   }
   clearBuffer();
 }
@@ -142,8 +142,8 @@ void Log(unsigned long str){
   sprintf(float_buf, "%d", str);
   Log(float_buf);
 }
-  
-void EEPROMWriteInt(int p_address, int p_value){  
+
+void EEPROMWriteInt(int p_address, int p_value){
   byte lowByte = ((p_value >> 0) & 0xFF);
   byte highByte = ((p_value >> 8) & 0xFF);
 
@@ -156,7 +156,7 @@ unsigned int EEPROMReadInt(int p_address){
   byte highByte = EEPROM.read(p_address + 1);
 
   return ((lowByte << 0) & 0xFF) + ((highByte << 8) & 0xFF00);
-}    
+}
 
 void EEPROMReadAlpha(int address, int length, char* buffer){
   for (int i=0; i < length; i++){
@@ -173,7 +173,7 @@ void EEPROMWriteAlpha(int address, int length, char* buffer){
 }
 
 //unsigned int uniqueNumber(){
-//  if (EEPROM.read(35) == 255){ 
+//  if (EEPROM.read(35) == 255){
 //    for (int y=0; y<=1; y++){
 //      byte uniqueByte;
 //      for (int x=0; x<8; x++){
@@ -293,7 +293,7 @@ void EEPROMWriteAlpha(int address, int length, char* buffer){
 
 
 //void checkSDconfig(){
-//  int line = 0;  
+//  int line = 0;
 //  if (SD.exists("config.ini")){
 //    File config = SD.open("config.ini");
 //    config_count = config.size() / sizeof(config_entry);

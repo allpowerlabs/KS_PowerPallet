@@ -4,7 +4,7 @@ void LogTime(boolean header = false) {
     PrintColumn(P("Time"));
   }
   else {
-    PrintColumn(millis()/1000); // Gonna fix the timestamp some day
+    PrintColumnInt(millis()/1000); // Gonna fix the timestamp some day
   }
 }
 
