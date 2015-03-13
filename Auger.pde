@@ -7,7 +7,7 @@ void DoAuger() {
         TransitionAuger(AUGER_STARTING);
  //     }
  //     else {
-        TransitionAuger(AUGER_FORWARD);
+        //TransitionAuger(AUGER_FORWARD);
  //     }
     }
     if (P_reactorLevel == OFF) {
