@@ -17,23 +17,23 @@
 #include <util.h>           // part of KSlibs, utility functions, GCU_Setup
 #include <intmath.h>		// part of KSlibs, integer math convenience functions
 #include <vnh_bridge.h>		// part of KSlibs, VNHxxx H-bridge driver
-#include <avr/io.h>         // advanced: provides port definitions for the microcontroller (ATmega1280, http://www.atmel.com/dyn/resources/prod_documents/doc2549.PDF)   
-#include <SD.h>             // SD card  
+#include <avr/io.h>         // advanced: provides port definitions for the microcontroller (ATmega1280, http://www.atmel.com/dyn/resources/prod_documents/doc2549.PDF)
+#include <SD.h>             // SD card
 #include <avr/pgmspace.h>
 #include <string.h>
 #include <ModbusSlave.h>
-//#include <MCP2515.h> 
+//#include <MCP2515.h>
 //#include <SPI.h>
 #include "Config.h"
 #include "Modes.h"
 #include "Alarm.h"
 #include "AshAuger.h"		// Ash auger typedefs.
 
-#define RELEASE_CYCLE RELEASE_PRODUCTION
+#define RELEASE_CYCLE RELEASE_TESTING
 #define V_MAJOR "1"
 #define V_MINOR "3"
-#define V_MAINT "0"
-#define V_BUILD "000"
+#define V_MAINT "1"
+#define V_BUILD "beta 1"
 #include "Version.h"
 
 /*
@@ -47,7 +47,7 @@ EEPROM bytes used of 4k space:
 #define ABSENT -500
 
 //PROGMEM string buffer
-char p_buffer[41] = ""; 
+char p_buffer[41] = "";
 // remove excess macro parameter:
 #define P(str) (strcpy_P(p_buffer, PSTR(str)))
 #define putstring(x) SerialPrint_P(PSTR(x))
@@ -55,7 +55,7 @@ char p_buffer[41] = "";
 #define Logln_p(x) Logln(P(x))
 
 const char co_product[] PROGMEM = "# http:\\\\AllPowerlabs.org  Power Pallet ";
-const char help[] PROGMEM = { 
+const char help[] PROGMEM = {
   "#All Power Labs Power Pallet Serial Help:\r\n"
   "# ?: device info\r\n"
   "# #: Serial Number (follow with number if changing)\r\n"
@@ -111,7 +111,7 @@ int analog_inputs[] = {ANA0, ANA1, ANA2, ANA3, ANA4, ANA5, ANA6, ANA7};
 //#define SERVO_CALIB SERVO1
 //#define SERVO_THROTTLE SERVO2
 
-Servo Servo_Mixture; 
+Servo Servo_Mixture;
 //Servo Servo_Calib;
 //Servo Servo_Throttle;
 
@@ -254,7 +254,7 @@ const char testing_state_12[] PROGMEM = "ANA_Oil";
 const char testing_state_13[] PROGMEM = "ANA_Auger_current";
 const char testing_state_14[] PROGMEM = "ANA_Throttle_Pos";
 const char testing_state_15[] PROGMEM = "ANA_Coolant_Temp";
-const char testing_state_16[] PROGMEM = "Unused"; 
+const char testing_state_16[] PROGMEM = "Unused";
 
 const char * const TestingStateName[] PROGMEM = {testing_state_1, testing_state_2, testing_state_3, testing_state_4, testing_state_5, testing_state_6, testing_state_7, testing_state_8, testing_state_9, testing_state_10, testing_state_11, testing_state_12, testing_state_13, testing_state_14, testing_state_15, testing_state_16};
 
@@ -267,30 +267,30 @@ int config_var;
 byte config_changed = false;
 
 const char config_0[] PROGMEM = "Reset Defaults?";
-const char config_1[] PROGMEM = "Engine Type    "; 
-const char config_2[] PROGMEM = "Relay Board    "; 
-const char config_3[] PROGMEM = "Auger Rev (.1s)"; 
-const char config_4[] PROGMEM = "Auger Low (.1A)"; 
-const char config_5[] PROGMEM = "Auger High(.1A)"; 
-const char config_6[] PROGMEM = "Low Oil (PSI)  "; 
-const char config_7[] PROGMEM = "Datalog SD card"; 
-const char config_8[] PROGMEM = "Pratio Accum#  "; 
-const char config_9[] PROGMEM = "High Coolant T "; 
-const char config_10[] PROGMEM = "Display Per .1s"; 
-const char config_11[] PROGMEM = "Trst low temp?"; 
-const char config_12[] PROGMEM = "Trst High Temp"; 
+const char config_1[] PROGMEM = "Engine Type    ";
+const char config_2[] PROGMEM = "Relay Board    ";
+const char config_3[] PROGMEM = "Auger Rev (.1s)";
+const char config_4[] PROGMEM = "Auger Low (.1A)";
+const char config_5[] PROGMEM = "Auger High(.1A)";
+const char config_6[] PROGMEM = "Low Oil (PSI)  ";
+const char config_7[] PROGMEM = "Datalog SD card";
+const char config_8[] PROGMEM = "Pratio Accum#  ";
+const char config_9[] PROGMEM = "High Coolant T ";
+const char config_10[] PROGMEM = "Display Per .1s";
+const char config_11[] PROGMEM = "Trst low temp?";
+const char config_12[] PROGMEM = "Trst High Temp";
 const char config_13[] PROGMEM = "Tred High Temp";
-const char config_14[] PROGMEM = "Pfilter Accum# "; 
-const char config_15[] PROGMEM = "Grate Max Inter"; 
-const char config_16[] PROGMEM = "Grate Min Inter"; 
+const char config_14[] PROGMEM = "Pfilter Accum# ";
+const char config_15[] PROGMEM = "Grate Max Inter";
+const char config_16[] PROGMEM = "Grate Min Inter";
 const char config_17[] PROGMEM = "Grate Shake .1s";
 const char config_18[] PROGMEM = "Servo Start Pos";
 const char config_19[] PROGMEM = "Lambda Rich    ";
 const char config_20[] PROGMEM = "Modbus Enabled?";  //Set to Modbus baud of zero and remove this configuration?
-const char config_21[] PROGMEM = "Modbus Baud    ";  //0:2400, 1:4800, 2:9600, 3:19200, 4:38400, 5:57600, 6:115200 
+const char config_21[] PROGMEM = "Modbus Baud    ";  //0:2400, 1:4800, 2:9600, 3:19200, 4:38400, 5:57600, 6:115200
 const char config_22[] PROGMEM = "Modbus Parity  ";  //0:None, 1:Odd, 2:Even
 const char config_23[] PROGMEM = "Modbus Address ";  //1-127
-const char config_24[] PROGMEM = "Grid tie?      "; 
+const char config_24[] PROGMEM = "Grid tie?      ";
 const char config_25[] PROGMEM = "Pratio Low     ";
 const char config_26[] PROGMEM = "Trst Warn Temp ";
 const char config_27[] PROGMEM = "Pratio High    ";
@@ -307,70 +307,71 @@ const char plus_minus[] PROGMEM = "+    -  ";
 const char no_yes[] PROGMEM = "NO  YES ";
 const char ten_twenty_k[] PROGMEM = "10k 20k ";
 const char plus_minus_five[] PROGMEM = "+5  -5  ";
+const char reserved[] PROGMEM = "Reserved";
 
 
 const char * const Config_Choices[CONFIG_COUNT] PROGMEM = {
-no_yes, 
-ten_twenty_k,
 no_yes,
-plus_minus, 
-plus_minus, 
-plus_minus, 
-plus_minus, 
-no_yes, 
-plus_minus_five, 
-plus_minus, 
-plus_minus, 
-plus_minus_five, 
-plus_minus_five, 
-plus_minus_five,
-plus_minus, 
-plus_minus_five, 
-plus_minus_five, 
+reserved,	// Engine Type
+reserved,	//Relay Board
+plus_minus,
 plus_minus,
 plus_minus,
 plus_minus,
 no_yes,
+reserved,	// P_ratio Accum, pratio_max
+plus_minus,
+reserved,	// Display Per .1s
+plus_minus_five,
+plus_minus_five,
+plus_minus_five,
+reserved,	// P_filter Accum
+plus_minus_five,
+plus_minus_five,
+plus_minus,
+plus_minus,
+reserved,	// Lambda Rich
+no_yes,
 plus_minus,
 plus_minus,
 plus_minus,
 no_yes,
 plus_minus,
 plus_minus_five,
-plus_minus,
+reserved,	// P_ratio High Boundary
 plus_minus,
 plus_minus,
 plus_minus,
 plus_minus_five,
-plus_minus,
-plus_minus
-}; 
+reserved,	// Grate Reverse Time
+reserved	// Grate Power
+};
 
 //                              0    1    2    3    4   5    6   7    8    9    10   11   12   13   14   15   16   17   18  19   20  21  22  23   24   25   26   	27	28	29	30	31	32	33
-int defaults[CONFIG_COUNT]   = {0,   0,   1,   10,  35, 100, 6,  1,   10,  98,  10,  130, 210, 195, 50,  60,  12,  30,  30, 140, 0,  3,  0,  1,   0,   30,  150,	60,	1,	8,	12,	36,	10,	100	};  //default values to be saved to EEPROM for the following getConfig variables
-int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   1,   1,   1,   0,  0,   0,  0,  0,  1,   0,   0,   0,		0,	1,	3,  5,	0,	1,	0	};  //minimum values allowed 
-int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15,  254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254,	254,3,	10,	15,	240,240,100	}; //maximum values allowed  
+int defaults[CONFIG_COUNT]   = {0,   0,   1,   5,  35, 100, 6,  1,   10,  98,  10,  135, 210, 195, 50,  60,  12,  30,  30, 140, 0,  3,  0,  1,   0,   30,  150,	60,	1,	8,	12,	18,	10,	100	};  //default values to be saved to EEPROM for the following getConfig variables
+int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   1,   1,   1,   0,  0,   0,  0,  0,  1,   0,   0,   0,		0,	1,	3,  5,	0,	1,	0	};  //minimum values allowed
+int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15,  254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254,	254,3,	10,	15,	240,240,100	}; //maximum values allowed
 
-//Don't forget to add the following to update_config_var in Display!  The first Configuration, Reset Defaults, is skipped, so these start at 1, not 0. 
-int engine_type = getConfig(1);  
-int relay_board = getConfig(2);
+//Don't forget to add the following to update_config_var in Display!  The first Configuration, Reset Defaults, is skipped, so these start at 1, not 0.
+//int engine_type = getConfig(1);
+//int relay_board = getConfig(2);
 int aug_rev_time = getConfig(3)*100;
-int current_low_boundary = getConfig(4);  
+int current_low_boundary = getConfig(4);
 int current_high_boundary = getConfig(5);
 int low_oil_psi = getConfig(6);
 int save_datalog_to_sd = getConfig(7);
-int pratio_max = getConfig(8)*5;
+//int pratio_max = getConfig(8)*5;
 int high_coolant_temp = getConfig(9);
-int display_per = getConfig(10);
+//int display_per = getConfig(10);
 int tred_low_temp = getConfig(11)*5;
 int ttred_high = getConfig(12)*5;
 int tbred_high = getConfig(13)*5;
-int pfilter_alarm = getConfig(14);
+//int pfilter_alarm = getConfig(14);
 //int grate_max_interval = getConfig(15)*5;  //longest total interval in seconds
 //int grate_min_interval = getConfig(16)*5;
 //int grate_on_interval = getConfig(17);
 int servo_start = getConfig(18);
-int lambda_rich = getConfig(19);
+//int lambda_rich = getConfig(19);
 int use_modbus = getConfig(20);
 int m_baud = getConfig(21);
 int m_parity = getConfig(22);
@@ -378,14 +379,14 @@ int m_address = getConfig(23);
 int grid_tie = getConfig(24);
 int pratio_low_boundary = getConfig(25);
 int ttred_warn = getConfig(26)*5;
-int pratio_high_boundary = getConfig(27);
+//int pratio_high_boundary = getConfig(27);
 
 // Reactor pressure ratio
 float pRatioReactor;
 enum pRatioReactorLevels { PR_HIGH = 0, PR_CORRECT = 1, PR_LOW = 2} pRatioReactorLevel;
 static char *pRatioReactorLevelName[] = { "High", "Correct", "Low" };
 float pratio_low = pratio_low_boundary/100.0;
-float pratio_high = pratio_high_boundary/100.0;
+float pratio_high = 0.6; // 	pratio_high_boundary/100.0;
 float pRatioReactorLevelBoundary[3][2] = { { pratio_high, 1.0 }, { pratio_low, pratio_high }, {0.0, pratio_low} };
 
 // Filter pressure ratio
@@ -442,16 +443,16 @@ int auger_pulse_state = 0;
 
 //Auger Current Levels
 unsigned AugerCurrentValue = 0; // current level in .1A,  ADC Count = (120 * Current) + 1350
-enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;  
+enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;
 static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
 //Any changes to the following needs to be updated to update_config_var!!!   AugerCurrentLevel[AugerCurrentLevelName]
 unsigned AugerCurrentLevelBoundary[4][2] = { { 0, 10}, { 10, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 750} };  //.1A readings
 
 //oil pressure
 int EngineOilPressureValue;
-enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_NORMAL = 1, OIL_P_HIGH = 2} EngineOilPressureLevel;  
+enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_NORMAL = 1, OIL_P_HIGH = 2} EngineOilPressureLevel;
 static char *EngineOilPressureName[] = { "Low", "Normal", "High"};
-//int EngineOilPressureLevelBoundary[2][2] = { { 0, low_oil_psi}, {600, 1024} };  
+//int EngineOilPressureLevelBoundary[2][2] = { { 0, low_oil_psi}, {600, 1024} };
 unsigned long oil_pressure_state = 0;
 
 
@@ -477,7 +478,7 @@ boolean ignitor_on;
 //double blower_output;
 //double blower_value;
 //double blower_P[1] = {2}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
-//double blower_I[1] = {.2}; //Make I_Param about the same as your manual response time (in Seconds)/4 
+//double blower_I[1] = {.2}; //Make I_Param about the same as your manual response time (in Seconds)/4
 //double blower_D[1] = {0.0}; //Unless you know what it's for, don't use D
 //PID blower_PID(&blower_input, &blower_output, &blower_setpoint,blower_P[0],blower_I[0],blower_D[0]);
 
@@ -488,7 +489,7 @@ unsigned long engine_end_cranking;
 int engine_crank_period = 10000; //length of time to crank engine before stopping (milliseconds)
 double battery_voltage;
 
-//Display 
+//Display
 int display_state = DISPLAY_SPLASH;
 unsigned long display_state_entered;
 unsigned long transition_entered;
@@ -506,13 +507,13 @@ double premix_valve_closed = 5;
 
 double premix_valve_max = 1.0;  //minimum of range for closed loop operation (percent open)
 double premix_valve_min = 0.00; //maximum of range for closed loop operation (percent open)
-double premix_valve_center = servo_start/100; //initial value when entering closed loop operation (percent open)
+double premix_valve_center = (double) servo_start/100; //initial value when entering closed loop operation (percent open)
 double lambda_setpoint = LAMBDA_SETPOINT_DEFAULT;
 double lambda_input;
 double lambda_output;
 double lambda_value;
 double lambda_P[1] = {0.13}; //Adjust P_Param to get more aggressive or conservative control, change sign if moving in the wrong direction
-double lambda_I[1] = {1.0}; //Make I_Param about the same as your manual response time (in Seconds)/4 
+double lambda_I[1] = {1.0}; //Make I_Param about the same as your manual response time (in Seconds)/4
 double lambda_D[1] = {0.0}; //Unless you know what it's for, don't use D
 PID lambda_PID(&lambda_input, &lambda_output, &lambda_setpoint, lambda_P[0], lambda_I[0], lambda_D[0]);
 unsigned long lamba_updated_time;
@@ -565,17 +566,17 @@ char serial_buffer[20];
 
 // Alarm
 boolean alarm = false;
-int pressureRatioAccumulator = 0;  
+int pressureRatioAccumulator = 0;
 
 #define ALARM_NUM 19
 unsigned long alarm_on[ALARM_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-unsigned long alarm_start[ALARM_NUM] = {240000, 480000, pratio_max, pfilter_alarm, 230, 0, 0, 0, 30000, 60000, 10, 0, 0, 3000, 15000, 0, 0, 0, 0};  //count or time in milliseconds when alarm goes off
+unsigned long alarm_start[ALARM_NUM] = {240000, 480000, 10, 50, 230, 0, 0, 0, 30000, 60000, 10, 0, 0, 3000, 15000, 0, 0, 0, 0};  //count or time in milliseconds when alarm goes off
 unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 60000, 0, 0, 180000, 20, 0, 3000, 7000, 15000, 60000, 0, 0, 0};  //time when engine will be shutdown
 int alarm_count = 0;
 int alarm_queue[ALARM_NUM] = {};
 int alarm_shown = 0;
 
-#define ALARM_AUGER_ON_LONG 0  
+#define ALARM_AUGER_ON_LONG 0
 #define ALARM_AUGER_OFF_LONG 1
 #define ALARM_BAD_REACTOR 2
 #define ALARM_BAD_FILTER 3
@@ -588,7 +589,7 @@ int alarm_shown = 0;
 #define ALARM_BOUND_AUGER 10
 #define ALARM_HIGH_PCOMB 11
 #define ALARM_HIGH_COOLANT_TEMP 12
-#define ALARM_TRED_LOW 13 
+#define ALARM_TRED_LOW 13
 #define ALARM_TTRED_HIGH 14
 #define ALARM_TBRED_HIGH 15
 #define ALARM_GRATE_FAULT 16
@@ -640,8 +641,8 @@ const char * const display_alarm2[] PROGMEM = {alarm2_1, alarm2_2, alarm2_3, ala
 
 //modbus
 long baud_rates[] = {2400, 4800, 9600, 19200, 38400, 57600, 115200};
-char parity[] = {'n', 'o', 'e'}; 
-    
+char parity[] = {'n', 'o', 'e'};
+
 // SD Card
 boolean sd_loaded;
 
@@ -660,16 +661,16 @@ boolean sd_loaded;
 //SdFile sd_root;
 //SdFile sd_file;
 char sd_data_file_name[] = "No SD Card  ";  //Create an array that contains the name of our datalog file, updated upon reboot
-char sd_log_file_name[] = "No SD Card  "; 
+char sd_log_file_name[] = "No SD Card  ";
 //char sd_in_char=0;
-//int sd_index=0;  
+//int sd_index=0;
 
 timer_s control_timer;
 
 void setup() {
   GCU_Setup(V3,FULLFILL,P777722);
-  DDRJ |= 0x80;      
-  PORTJ |= 0x80;  
+  DDRJ |= 0x80;
+  PORTJ |= 0x80;
 
   //set all FET pins to output
   pinMode(FET0,OUTPUT);
@@ -680,21 +681,21 @@ void setup() {
   pinMode(FET5,OUTPUT);
   pinMode(FET6,OUTPUT);
   pinMode(FET7,OUTPUT);
-  
+
   // timer initialization
   nextTime1 = millis() + loopPeriod1;
   nextTime2 = millis() + loopPeriod2;
-  
+
   LoadPressureSensorCalibration();
   LoadServo();
-  if (engine_type == 0) {
-    shutdown[ALARM_AUGER_OFF_LONG] = shutdown[ALARM_AUGER_OFF_LONG] * 2;
-    alarm_start[ALARM_AUGER_ON_LONG] = alarm_start[ALARM_AUGER_ON_LONG] * 2;
-  }
-  
+//  if (engine_type == 0) {
+//    shutdown[ALARM_AUGER_OFF_LONG] = shutdown[ALARM_AUGER_OFF_LONG] * 2;
+//    alarm_start[ALARM_AUGER_ON_LONG] = alarm_start[ALARM_AUGER_ON_LONG] * 2;
+//  }
+
   Serial.begin(115200);
-  
- //Library initializations                    
+
+ //Library initializations
   Disp_Init();
   Kpd_Init();
   ADC_Init();
@@ -712,20 +713,20 @@ void setup() {
   Press_Reset();
   Fet_Reset();
   Servo_Reset();
-  
+
   if(EEPROM.read(35) != 255){
     EEPROMReadAlpha(35, 4, unique_number);
   }
   if(EEPROM.read(40) != 255){
     EEPROMReadAlpha(40, 10, serial_num);
   }
-  
+
   InitSD();
   DoDatalogging();
   InitLambda();
   InitServos();
   GrateInit();
-  AshAugerInit();  
+  AshAugerInit();
   if (use_modbus == 1){
     InitModbusSlave();
   }

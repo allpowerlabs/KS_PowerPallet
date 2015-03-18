@@ -10,6 +10,10 @@
 
 #if RELEASE_CYCLE == RELEASE_PRODUCTION
 #define CODE_VERSION "v" V_MAJOR "." V_MINOR "." V_MAINT
-#else
+#endif
+#if RELEASE_CYCLE == RELEASE_TESTING
+#define CODE_VERSION "v" V_MAJOR "." V_MINOR "." V_MAINT ", " V_BUILD
+#endif
+#if RELEASE_CYCLE == RELEASE_DEVELOPMENT
 #define CODE_VERSION "v" V_MAJOR "." V_MINOR "-dev, build " V_BUILD
 #endif

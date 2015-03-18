@@ -1,7 +1,7 @@
 void DoDisplay() {
   char config_buffer[] = "               ";
   char config_choice_buffer[] = "        ";
-  
+
   switch (display_state) {
   case DISPLAY_SPLASH:
     //Row 0
@@ -37,10 +37,10 @@ void DoDisplay() {
       //Row 0
       Disp_RC(0, 0);
       if (shutdown[alarm_shown]> 0){
-        sprintf(buf, "SHUTDOWN ALARM %2i/%2i", cur_item, alarm_count); 
-      } 
+        sprintf(buf, "SHUTDOWN ALARM %2i/%2i", cur_item, alarm_count);
+      }
       else {
-        sprintf(buf, "      ALARM   %2i/%2i ", cur_item, alarm_count); 
+        sprintf(buf, "      ALARM   %2i/%2i ", cur_item, alarm_count);
       }
       Disp_PutStr(buf);
       //Row 1
@@ -51,19 +51,22 @@ void DoDisplay() {
       Disp_RC(2, 0);
       strcpy_P(p_buffer, (char*)pgm_read_word(&(display_alarm2[alarm_shown])));
       Disp_PutStr(p_buffer);
-      if (shutdown[alarm_shown] > 999 && engine_state == ENGINE_ON){     //anything less than 999 is a count and not a shutdown time in millisecond so don't show. 
+      if (shutdown[alarm_shown] > 999 && engine_state == ENGINE_ON){     //anything less than 999 is a count and not a shutdown time in millisecond so don't show.
         Disp_RC(2, 13);
         sprintf(buf, "OFF:%3i", (shutdown[alarm_shown] - alarm_start[alarm_shown] - (millis() - alarm_on[alarm_shown]))/1000);
         Disp_PutStr(buf);
       }
       //Row 3
       Disp_RC(3, 0);
-      Disp_PutStr(P("     ADV  "));
+	  if (alarm_count > 1 || !alarm)
+		Disp_PutStr(P("     ADV  "));
+	  else
+		Disp_PutStr(P("          "));
 	  Disp_RC(3, 9);
 	  if (alarm)
-		Disp_PutStr(P("QUIET"));
+		Disp_PutStr(P("QUIET "));
 	  else
-		Disp_PutStr(P("     "));
+		Disp_PutStr(P("      "));
 	  Disp_RC(3, 15);
       if (millis() - alarm_on[alarm_shown] > 4000){ //Wait to show RESET button in case new alarm state has taken over screen.
         Disp_PutStr(P("RESET"));
@@ -75,18 +78,18 @@ void DoDisplay() {
 			cur_item = 0;
 		  }
 	  }
-	  if (millis() - alarm_on[alarm_shown] > 4000){ //wait until RESET button shows up, a wait of 4 seconds is given so that 
+	  if (millis() - alarm_on[alarm_shown] > 4000){ //wait until RESET button shows up, a wait of 4 seconds is given so that
 		if (key == 3) {
 			removeAlarm(alarm_shown);
 			resetAlarm(alarm_shown);
 			cur_item = 1; //start at beginning of alarm queue
 		}
 	  }
-    } 
+    }
     else {
 		//Row 0
 		Disp_RC(0, 0);
-        sprintf(buf, "Trst %4i  ", Temp_Data[T_TRED]); 
+        sprintf(buf, "Trst %4i  ", Temp_Data[T_TRED]);
         Disp_PutStr(buf);
         Disp_RC(0, 11);
         sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
@@ -107,19 +110,19 @@ void DoDisplay() {
 		//the value only means anything if the pressures are high enough, otherwise it is just noise
 		sprintf(buf, "Pratio%3i  ", int(pRatioReactor*100)); //pressure ratio
 		Disp_PutStr(buf);
-		} 
+		}
 		else {
 		Disp_PutStr(P("Pratio --  "));
 		}
 		Disp_RC(2, 11);
 		if (true) {
 		sprintf(buf, "Pfilt%4i", Press[P_FILTER] / 25);
-		} 
+		}
 		else {
 		//TO DO: Implement filter warning
 		if (pRatioFilterHigh) {
 		  sprintf(buf, "Pfilt Bad");
-		} 
+		}
 		else {
 		  sprintf(buf, "PfiltGood");
 		}
@@ -133,7 +136,7 @@ void DoDisplay() {
 			sprintf(buf, "NEXT      ");
 		Disp_PutStr(buf);
 		Disp_RC(3,10);
-		sprintf(buf, " T:  %.5lu", millis() / 1000);
+		sprintf(buf, " T: %6lu", millis() / 1000);
 		Disp_PutStr(buf);
 	}
     break;
@@ -146,14 +149,14 @@ void DoDisplay() {
     sprintf(buf, "Tcool  NA  ");
 #endif
     Disp_PutStr(buf);
-    Disp_RC(0,11); 
+    Disp_RC(0,11);
     Disp_PutStr(P("           "));
     //Row 1
-    Disp_RC(1,0); 
+    Disp_RC(1,0);
     strcpy_P(buf, blank);
     Disp_PutStr(buf);
     //Row 2
-    Disp_RC(2,0); 
+    Disp_RC(2,0);
     strcpy_P(buf, blank);
     Disp_PutStr(buf);
     //Row 3
@@ -167,8 +170,8 @@ void DoDisplay() {
     item_count = 1;
     //Row 0
     Disp_RC(0,0);
-    Disp_PutStr(P("Testing             ")); 
-    //Row 1			
+    Disp_PutStr(P("Testing             "));
+    //Row 1
     Disp_RC(1,0);
     strcpy_P(config_buffer, (char*)pgm_read_word(&(TestingStateName[testing_state])));
     sprintf(buf, "%-20s", config_buffer);
@@ -196,7 +199,7 @@ void DoDisplay() {
     Disp_PutStr(buf);
     //Row 3
     switch (cur_item) {
-    case 1: // Testing 
+    case 1: // Testing
       if (key == 2) {
         GoToNextTestingState(); //first testing state
       }
@@ -240,7 +243,7 @@ void DoDisplay() {
       if (key == 3) {
         lambda_setpoint -= LAMBDA_SETPOINT_ADJUSTMENT;
         WriteLambda();
-      }          
+      }
       Disp_RC(1,0);
       Disp_CursOn();
       break;
@@ -274,7 +277,7 @@ void DoDisplay() {
       break;
     }
     break;
-  case DISPLAY_GRATE: 
+  case DISPLAY_GRATE:
 	displayManualMode();
     break;
   case DISPLAY_INFO:
@@ -282,14 +285,15 @@ void DoDisplay() {
     Disp_RC(0,0);
     sprintf(buf, "%-10s     %5s", serial_num, unique_number);
     Disp_PutStr(buf);
-    Disp_RC(1,0);
-    sprintf(buf, "       Time:%8i", millis()/1000);
+    Disp_RC(1,(20-strlen(CODE_VERSION))/2);
+    sprintf(buf, "%s", CODE_VERSION);
     Disp_PutStr(buf);
     Disp_RC(2,0);
     sprintf(buf, "    %12s   ", sd_data_file_name);
     Disp_PutStr(buf);
     Disp_RC(3,0);
-    Disp_PutStr(P("NEXT                "));
+	sprintf_P(buf, PSTR("NEXT       T: %6lu"), millis()/1000);
+	Disp_PutStr(buf);
     break;
   case DISPLAY_SERVO:   //need to add constraints for min and max?
     item_count = 2;
@@ -302,7 +306,7 @@ void DoDisplay() {
     Disp_PutStr(buf);
     //Row 1
     Disp_RC(1,0);
-    Disp_PutStr(P(" Careful of Sides!  ")); 
+    Disp_PutStr(P(" Careful of Sides!  "));
     Disp_RC(2,0);
     Disp_PutStr("                    ");
     switch (cur_item) {
@@ -322,7 +326,7 @@ void DoDisplay() {
       Disp_RC(0,0);
       Disp_CursOn();
       break;
-    case 2: //Servo Max 
+    case 2: //Servo Max
       Servo_Mixture.write(premix_valve_open);
       if (key == 2) {
         premix_valve_open += 1;
@@ -373,7 +377,7 @@ void DoDisplay() {
     Disp_RC(2,0);
     if (config_changed == true){
       Disp_PutStr(P("State: ON           "));
-    } else { 
+    } else {
       Disp_PutStr(P("State: OFF          "));
     }
     Disp_RC(3,0);
@@ -406,10 +410,10 @@ void DoDisplay() {
     strcpy_P(config_choice_buffer, (char*)pgm_read_word(&(Config_Choices[cur_item])));
     if (strcmp(config_choice_buffer, "+    -  ") == 0){
       sprintf(buf, "%s:%3i ", config_buffer, config_var);
-    } 
+    }
     else if (strcmp(config_choice_buffer, "+5  -5  ") == 0){
       sprintf(buf, "%s:%4i ", config_buffer, config_var*5);
-    } 
+    }
     else {
       if (config_var == 0){
         choice[0] = config_choice_buffer[0];
@@ -417,7 +421,7 @@ void DoDisplay() {
         choice[2] = config_choice_buffer[2];
         choice[3] = config_choice_buffer[3];
         choice[4] = '\0';
-      } 
+      }
       else {
         choice[0] = config_choice_buffer[4];
         choice[1] = config_choice_buffer[5];
@@ -446,7 +450,7 @@ void DoDisplay() {
           config_changed = true;
         }
       }
-    } 
+    }
     else if (strcmp(config_choice_buffer, "+5  -5  ") == 0){
       if (key == 2) {
         if (config_max[cur_item] >= config_var + 1){
@@ -460,9 +464,9 @@ void DoDisplay() {
           config_changed = true;
         }
       }
-    } 
+    }
     else {
-      if (key == 2) {  
+      if (key == 2) {
         config_var = 0;
         config_changed = true;
       }
@@ -484,7 +488,7 @@ void DoDisplay() {
     //    Disp_PutStr("NEXT            TEST");
     //    if (key == 3 and cur_item == 1) {  //only allow the button to be pressed once
     //      testSD();
-    //      cur_item++;  
+    //      cur_item++;
     //    }
     //    break;
 //  case DISPLAY_PHIDGET:
@@ -497,7 +501,7 @@ void DoDisplay() {
 ////    Disp_PutStr(buf);
 ////    Disp_RC(2,0);
 ////    sprintf(buf, "CoolT%4i Aux%4i   ", analogRead(ANA6),analogRead(ANA7));
-////    Disp_PutStr(buf);  
+////    Disp_PutStr(buf);
 ////    Disp_RC(3,0);
 ////    Disp_PutStr("NEXT                ");
 //    Disp_RC(0,0);
@@ -508,7 +512,7 @@ void DoDisplay() {
 //    Disp_PutStr(buf);
 //    Disp_RC(2,0);
 //    sprintf(buf, "4:%4i 5:%4i 6:%4i", analogRead(ANA4),analogRead(ANA5),analogRead(ANA6));
-//    Disp_PutStr(buf);  
+//    Disp_PutStr(buf);
 //    Disp_RC(3,0);
 //    sprintf(buf, "NEXT          7:%4i", analogRead(ANA7));
 //    Disp_PutStr(buf);
@@ -531,7 +535,7 @@ void DoDisplay() {
     Disp_RC(3,0);
     Disp_PutStr("NEXT  ADV           ");
     break;
-         
+
     //    case DISPLAY_TEMP2:
     //      break;
     //    case DISPLAY_FETS:
@@ -573,12 +577,12 @@ void TransitionDisplay(int new_state) {
     turnAllOff();
     TransitionAuger(AUGER_ALARM);  //stop the auger control
     cur_item = 0;
-    break; 
-  case DISPLAY_CONFIG: 
+    break;
+  case DISPLAY_CONFIG:
     cur_item = 0;
     config_changed = false;
     break;
-    //  case DISPLAY_PHIDGET: 
+    //  case DISPLAY_PHIDGET:
     //    break;
   case DISPLAY_SD:
     cur_item = 1;
@@ -623,7 +627,7 @@ void DoKeyInput() {
     case DISPLAY_INFO:
       if (engine_state == ENGINE_OFF) {
         TransitionDisplay(DISPLAY_RELAY);
-      } 
+      }
       else {
         TransitionDisplay(DISPLAY_REACTOR);
       }
@@ -632,7 +636,7 @@ void DoKeyInput() {
       turnAllOff();
       if (engine_state == ENGINE_OFF){
         TransitionDisplay(DISPLAY_SERVO);
-      } 
+      }
       else {
         TransitionTesting(TESTING_OFF);
         TransitionDisplay(DISPLAY_REACTOR);
@@ -643,7 +647,7 @@ void DoKeyInput() {
 	  TransitionAuger(AUGER_OFF);
       if (engine_state == ENGINE_OFF) {
         TransitionDisplay(DISPLAY_ANA);
-      } 
+      }
       else {
         TransitionDisplay(DISPLAY_REACTOR);
       }
@@ -651,7 +655,7 @@ void DoKeyInput() {
     case DISPLAY_ANA:
       if (engine_state == ENGINE_OFF) {
         TransitionDisplay(DISPLAY_SERVO);
-      } 
+      }
       else {
         TransitionDisplay(DISPLAY_REACTOR);
       }
@@ -692,6 +696,7 @@ void DoKeyInput() {
       turnAllOff();
     }
     cur_item += 1;
+	while (display_state == DISPLAY_CONFIG && (char*)pgm_read_word(&Config_Choices[cur_item]) == reserved) cur_item ++;  // Skip over any reserved configs
     if (cur_item > item_count) {
       switch (display_state) {
 		case DISPLAY_REACTOR:
@@ -704,7 +709,7 @@ void DoKeyInput() {
           cur_item = 1;
           break;
       }
-    } 
+    }
     key = -1; //key caught
   }
 }
@@ -712,7 +717,7 @@ void DoKeyInput() {
 void DoHeartBeat() {
   if (millis() % 50 > 5) {
     bitSet(PORTJ, 7);
-  } 
+  }
   else {
     bitClear(PORTJ, 7);
   }
@@ -728,7 +733,7 @@ void saveConfig(int item, int state){  //EEPROM:  0-499 for internal states, 500
   if (item == 0  and state == 1){
     resetConfig();
   }
-  if (item > 0){  //skip first config 
+  if (item > 0){  //skip first config
     int old_state = EEPROM.read(499+item);
     if(state != old_state){
       EEPROM.write(499+item, state);
@@ -759,29 +764,29 @@ void update_config_var(int var_num){
     }
     break;
   case 1:
-    engine_type = getConfig(1);
-    regs[MB_CONFIG1] = engine_type;
-    if (engine_type == 0){
-        shutdown[ALARM_AUGER_OFF_LONG] = shutdown[ALARM_AUGER_OFF_LONG] * 2;  //10k power pallet goes through fuel slower, give it more time.
-    }
+    //engine_type = getConfig(1);
+    //regs[MB_CONFIG1] = engine_type;
+    //if (engine_type == 0){
+    //    shutdown[ALARM_AUGER_OFF_LONG] = shutdown[ALARM_AUGER_OFF_LONG] * 2;  //10k power pallet goes through fuel slower, give it more time.
+    //}
     break;
   case 2:
-    relay_board = getConfig(2);
-    regs[MB_CONFIG2] = relay_board;
+    //relay_board = getConfig(2);
+    //regs[MB_CONFIG2] = relay_board;
     break;
   case 3:
     aug_rev_time = getConfig(3)*100;
     regs[MB_CONFIG3] = aug_rev_time;
     break;
   case 4:
-    current_low_boundary = getConfig(4); 
-    AugerCurrentLevelBoundary[CURRENT_LOW][1] = current_low_boundary; 
+    current_low_boundary = getConfig(4);
+    AugerCurrentLevelBoundary[CURRENT_LOW][1] = current_low_boundary;
     AugerCurrentLevelBoundary[CURRENT_ON][0] = current_low_boundary+5;
     regs[MB_CONFIG4] = current_low_boundary;
     break;
   case 5:
     current_high_boundary = getConfig(5);
-    AugerCurrentLevelBoundary[CURRENT_ON][1] = current_high_boundary - 5; 
+    AugerCurrentLevelBoundary[CURRENT_ON][1] = current_high_boundary - 5;
     AugerCurrentLevelBoundary[CURRENT_HIGH][0] = current_high_boundary;
     regs[MB_CONFIG5] = current_high_boundary;
     break;
@@ -794,17 +799,17 @@ void update_config_var(int var_num){
     regs[MB_CONFIG7] = save_datalog_to_sd;
     break;
   case 8:
-    pratio_max = getConfig(8)*5;
-    alarm_start[ALARM_BAD_REACTOR] = pratio_max;
-    regs[MB_CONFIG8] = pratio_max;
+    //pratio_max = getConfig(8)*5;
+    //alarm_start[ALARM_BAD_REACTOR] = pratio_max;
+    //regs[MB_CONFIG8] = pratio_max;
     break;
   case 9:
     high_coolant_temp = getConfig(9);
     regs[MB_CONFIG9] = high_coolant_temp;
     break;
   case 10:
-    display_per = getConfig(10);
-    regs[MB_CONFIG10] = display_per;
+    //display_per = getConfig(10);
+    //regs[MB_CONFIG10] = display_per;
     break;
   case 11:
     tred_low_temp = getConfig(11)*5;
@@ -819,9 +824,9 @@ void update_config_var(int var_num){
     regs[MB_CONFIG13] = tbred_high;
     break;
   case 14:
-    pfilter_alarm = getConfig(14);
-    alarm_start[ALARM_BAD_FILTER] = pfilter_alarm;
-    regs[MB_CONFIG14] = pfilter_alarm;
+    //pfilter_alarm = getConfig(14);
+    //alarm_start[ALARM_BAD_FILTER] = pfilter_alarm;
+    //regs[MB_CONFIG14] = pfilter_alarm;
     break;
   case 15:
     regs[MB_CONFIG15] = getConfig(15)*5;
@@ -840,8 +845,8 @@ void update_config_var(int var_num){
     regs[MB_CONFIG18] = servo_start;
     break;
   case 19:
-    lambda_rich = getConfig(19);
-    regs[MB_CONFIG19] = lambda_rich;
+    //lambda_rich = getConfig(19);
+    //regs[MB_CONFIG19] = lambda_rich;
     break;
   case 20:
     use_modbus = getConfig(20);
@@ -873,10 +878,10 @@ void update_config_var(int var_num){
     ttred_warn = getConfig(26)*5;
     break;
   case 27:
-    pratio_high_boundary = getConfig(27);
-    pratio_high = pratio_high_boundary/100.0;
-    pRatioReactorLevelBoundary[0][0] = pratio_high;
-    pRatioReactorLevelBoundary[1][1] = pratio_high;
+//    pratio_high_boundary = getConfig(27);
+//    pratio_high = pratio_high_boundary/100.0;
+//    pRatioReactorLevelBoundary[0][0] = pratio_high;
+//    pRatioReactorLevelBoundary[1][1] = pratio_high;
     break;
   case 28:
     AshAugerReset();
@@ -933,7 +938,7 @@ void displayManualMode() {
 	//Disp_Clear();
 	Disp_CursOff();
 	Disp_RC(0,0);
-	Disp_PutStr(P("   Manual Control   ")); 
+	Disp_PutStr(P("   Manual Control   "));
 	Disp_RC(1,0);
 	switch (currentFunction) {
 		case 0:

@@ -1,6 +1,7 @@
 
-// Maximum interval is 1270 sec (254 * 5).  Multiply by 100 for 10mS precision  
+// Maximum interval is 1270 sec (254 * 5).  Multiply by 100 for 10mS precision
 #define GRATE_SHAKE_CROSS (127000)
+#define GRATE_FWD_TIME (2000)
 
 struct {
 	vnh_s * hbr;
@@ -25,23 +26,24 @@ void GrateInit() {
 	grate.hbr->ena = (gpio_s) {&PORTC, 6};
 	grate.hbr->enb = (gpio_s) {&PORTC, 6};
 	vnh_reset(grate.hbr);
-	
+
 	grate.pwm = &PWM2;
 	pwm_set_duty(grate.pwm, 0);
-	
+
 	GrateConfig();
 	GrateReset();
 }
 
 void GrateConfig() {
 	grate.fwdtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_FWD) * 100;
-	if (grate.fwdtime > 10000 || grate.fwdtime < 100) grate.fwdtime = 3000;
-	grate.revtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_REV) * 100;
-	if (grate.revtime > 10000 || grate.revtime < 100) grate.revtime = 3000;
-	
-	grate.duty = (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_DUTY) * 2) + 55;
-	pwm_set_duty(grate.pwm, grate.duty);
-	
+	if (grate.fwdtime > 10000 || grate.fwdtime < 100) grate.fwdtime = GRATE_FWD_TIME;
+//	grate.revtime = eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_REV) * 100;
+//	if (grate.revtime > 10000 || grate.revtime < 100) grate.revtime = 3000;
+
+	//grate.duty = (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_DUTY) * 2) + 55;
+	//if (grate.duty > 255) grate.duty = 255;
+	pwm_set_duty(grate.pwm, 255);
+
 	//setup grate slopes
 	grate.m_good = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MAX) * 50);	//divide by longest total interval in seconds
 	grate.m_bad = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MIN) * 50);		//divide by shortest total interval in seconds
@@ -51,8 +53,8 @@ void GrateReset() {
 	grate.direction = FORWARD;
 	grate.pr_accum = 0;
 	vnh_reset(grate.hbr);
-	pwm_set_duty(grate.pwm, grate.duty);
-	
+	pwm_set_duty(grate.pwm, 255);
+
 	GrateSwitchMode(AUTOMATIC); //set default starting state
 }
 
@@ -67,11 +69,11 @@ void GrateStart (void) {
 			Logln("Grate: Motor on forward");
 			break;
 		case REVERSE:
-			if (vnh_get_mode(grate.hbr) != VNH_REVERSE)
-				vnh_reverse(grate.hbr);
-			timer_set(&grate.timer, grate.revtime);
-			timer_start(&grate.timer);
-			Logln("Grate: Motor on reverse");
+			//if (vnh_get_mode(grate.hbr) != VNH_REVERSE)
+			//	vnh_reverse(grate.hbr);
+			//timer_set(&grate.timer, grate.revtime);
+			//timer_start(&grate.timer);
+			//Logln("Grate: Motor on reverse");
 			break;
 	}
 }
@@ -145,7 +147,7 @@ void DoGrate() {
 				} else {
 					grate.pr_accum = ul_addlim(grate.pr_accum, grate.m_good, GRATE_SHAKE_CROSS);
 				}
-				if (grate.pr_accum >= GRATE_SHAKE_CROSS) {			
+				if (grate.pr_accum >= GRATE_SHAKE_CROSS) {
 					GrateStart();		//time to shake
 					AshAugerStart();	// This is when we start the ash auger, too
 					grate.pr_accum = 0;	// Reset pressure ratio accumulator
