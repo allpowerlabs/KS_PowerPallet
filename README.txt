@@ -90,6 +90,26 @@ March 23, 2015 - v1.3.1 Maintenance release
 	Bug #58,	Message log time stamp format is confusing
 		Log time is now in seconds with no trailing decimals.
 
+	ECR-000331, Excessive wear rates of gears, auger, scrolls, and motor
+		See bugs #40 and #56
+		
+	ECR-000354, Engine starting on producer gas is slow
+		See bug #26
+	
+	SCR-000007, Remove high Pratio alarm
+	
+	SCR-000010, Rename Tred to Trst
+	
+	SCR-000012, Remove flashing temp status
+	
+	SCR-000016, Auger off too long alarm goes off when auger "off".
+	
+	SCR-000020, Auger low current triggered when auger is off
+		See bug #1
+	
+	SCR-000022, Add external fuel mode
+		Support for external fuels has been added by refactoring the engine control logic to
+		use oil pressure as an indication of a running engine instead of reactor vacuum.  
 
 July 21, 2014 - v1.3.0 release
 
