@@ -8,7 +8,7 @@ static char *FuelSwitchLevelName[] = { "Off","On"};
 //int FuelSwitchLevelBoundary[2][2] = {{ 0, 200 }, {800, 1024}}; //not currently used
 unsigned long fuel_state_entered;
 unsigned long fuel_last_fill;
-#define FUEL_SWITCH_HYSTERESIS (60000)  // Number of seconds before we allow the auger to come on again
+#define FUEL_SWITCH_HYSTERESIS (1000)  // Number of milliseconds before we allow the auger to come on again
 
 //Auger states
 #define AUGER_OFF 0
