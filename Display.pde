@@ -401,13 +401,13 @@ void DoDisplay() {
       config_var = 0;
     }
     if (config_var == -1){  //keeps values from being negative
-      config_var = config_max[cur_item];
+      config_var = Config[cur_item].max;
     }
     Disp_RC(0,0);
     Disp_PutStr(P("   Configurations   "));
     Disp_RC(1,0);
-    strcpy_P(config_buffer, (char*)pgm_read_word(&(Configuration[cur_item])));
-    strcpy_P(config_choice_buffer, (char*)pgm_read_word(&(Config_Choices[cur_item])));
+    strcpy_P(config_buffer, Config[cur_item].label);
+    strcpy_P(config_choice_buffer, Config[cur_item].choices);
     if (strcmp(config_choice_buffer, "+    -  ") == 0){
       sprintf(buf, "%s:%3i ", config_buffer, config_var);
     }
@@ -439,13 +439,13 @@ void DoDisplay() {
     Disp_PutStr(buf);
     if (strcmp(config_choice_buffer, "+    -  ") == 0){
       if (key == 2) {
-        if (config_max[cur_item] >= config_var + 1){
+        if (Config[cur_item].max >= config_var + 1){
           config_var += 1;
           config_changed = true;
         }
       }
       if (key == 3) {
-        if (config_min[cur_item] <= config_var - 1){
+        if (Config[cur_item].min <= config_var - 1){
           config_var -= 1;
           config_changed = true;
         }
@@ -453,13 +453,13 @@ void DoDisplay() {
     }
     else if (strcmp(config_choice_buffer, "+5  -5  ") == 0){
       if (key == 2) {
-        if (config_max[cur_item] >= config_var + 1){
+        if (Config[cur_item].max >= config_var + 1){
           config_var += 1;
           config_changed = true;
         }
       }
       if (key == 3) {
-        if (config_min[cur_item] <= config_var - 1){
+        if (Config[cur_item].min <= config_var - 1){
           config_var -= 1;
           config_changed = true;
         }
@@ -696,7 +696,7 @@ void DoKeyInput() {
       turnAllOff();
     }
     cur_item += 1;
-	while (display_state == DISPLAY_CONFIG && (char*)pgm_read_word(&Config_Choices[cur_item]) == reserved) cur_item ++;  // Skip over any reserved configs
+	while (display_state == DISPLAY_CONFIG && Config[cur_item].choices == reserved) cur_item ++;  // Skip over any reserved configs
     if (cur_item > item_count) {
       switch (display_state) {
 		case DISPLAY_REACTOR:
@@ -747,7 +747,7 @@ int getConfig(int item){
   if (item > 0){  //Config item zero is 'Reset to Defaults?' so skip
     value = int(EEPROM.read(499+item));
     if (value == 255){  //values hasn't been saved yet to EEPROM, go with default value saved in defaults[]
-      value = defaults[item];
+      value = Config[item].def;
       EEPROM.write(499+item, value);
       config_changed = true;
     }
@@ -907,10 +907,12 @@ void update_config_var(int var_num){
 }
 
 void resetConfig() {  //sets EEPROM configs back to untouched state
-  int default_count = sizeof(defaults)/sizeof(int);
-  for (int i=1; i < default_count; i++){
-    EEPROM.write(499+i, defaults[i]);
-  }
+  unsigned i;
+  while (!(Config[i].label == 0 && Config[i].choices == 0))
+	{
+		saveConfig(i, Config[i].def);
+		i++;
+	}
 }
 
 void displayManualMode() {

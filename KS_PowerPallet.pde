@@ -31,7 +31,7 @@
 #include "Version.h"
 
 #define RELEASE_CYCLE RELEASE_DEVELOPMENT
-#define V_BUILD "105"
+#define V_BUILD "200"
 
 /*
 EEPROM bytes used of 4k space:
@@ -258,11 +258,6 @@ const char * const TestingStateName[] PROGMEM = {testing_state_1, testing_state_
 // Datalogging variables
 int lineCount = 0;
 
-//Configuration Variables
-#define CONFIG_COUNT 34
-int config_var;
-byte config_changed = false;
-
 const char config_0[] PROGMEM = "Reset Defaults?";
 const char config_1[] PROGMEM = "Engine Type    ";
 const char config_2[] PROGMEM = "Relay Board    ";
@@ -298,56 +293,55 @@ const char config_31[] PROGMEM = "Ash Aug Period ";
 const char config_32[] PROGMEM = "Grate Rev Time ";
 const char config_33[] PROGMEM = "Grate Power    ";
 
-const char * const Configuration[CONFIG_COUNT] PROGMEM = {config_0, config_1, config_2, config_3, config_4, config_5, config_6, config_7, config_8, config_9, config_10, config_11, config_12, config_13, config_14, config_15, config_16, config_17, config_18, config_19, config_20, config_21, config_22, config_23, config_24, config_25, config_26, config_27, config_28, config_29, config_30, config_31, config_32, config_33};
-
 const char plus_minus[] PROGMEM = "+    -  ";
 const char no_yes[] PROGMEM = "NO  YES ";
 const char ten_twenty_k[] PROGMEM = "10k 20k ";
 const char plus_minus_five[] PROGMEM = "+5  -5  ";
 const char reserved[] PROGMEM = "Reserved";
 
+//Configuration Variables
+#define CONFIG_COUNT 34
+int config_var;
+byte config_changed = false;
 
-const char * const Config_Choices[CONFIG_COUNT] PROGMEM = {
-no_yes,
-reserved,	// Engine Type
-reserved,	//Relay Board
-plus_minus,
-plus_minus,
-plus_minus,
-plus_minus,
-no_yes,
-reserved,	// P_ratio Accum, pratio_max
-plus_minus,
-reserved,	// Display Per .1s
-plus_minus_five,
-plus_minus_five,
-plus_minus_five,
-reserved,	// P_filter Accum
-plus_minus_five,
-plus_minus_five,
-plus_minus,
-plus_minus,
-reserved,	// Lambda Rich
-no_yes,
-plus_minus,
-plus_minus,
-plus_minus,
-no_yes,
-plus_minus,
-plus_minus_five,
-reserved,	// P_ratio High Boundary
-plus_minus,
-plus_minus,
-plus_minus,
-plus_minus_five,
-reserved,	// Grate Reverse Time
-reserved	// Grate Power
+// Configurables - Label, choices, min, max, def
+configurable Config[] = {
+	{config_0, no_yes, 0, 254, 0},				// Reset values to default
+	{config_1, reserved, 0, 254, 0},			// RESERVED - Engine type
+	{config_2, reserved, 0, 254, 1},			// RESERVED - Relay board
+	{config_3, plus_minus, 0, 254, 5},			// Auger Reverse Time
+	{config_4, plus_minus, 0, 40, 35},			// Auger Low Current
+	{config_5, plus_minus, 41, 135, 100},		// Auger High Current
+	{config_6, plus_minus, 1, 10, 6},			// Oil Low Pressure
+	{config_7, no_yes, 0, 254, 1},				// Data Log to SD Card
+	{config_8, reserved, 0, 15, 10},			// RESERVED - Pratio Accum Max
+	{config_9, plus_minus, 10, 254, 98},		// Coolant High Temperature
+	{config_10, reserved, 0, 199, 10},			// RESERVED - Display Changes Per Second
+	{config_11, plus_minus_five, 0, 254, 135},	// T_RST Low Temperature
+	{config_12, plus_minus_five, 0, 254, 210},	// T_RST High Temperature
+	{config_13, plus_minus_five, 20, 254, 195},	// T_RED High Temperature
+	{config_14, reserved, 0, 254, 50},			// RESERVED - P_Filter High
+	{config_15, plus_minus_five, 2, 254, 60},	// Grate Max Interval
+	{config_16, plus_minus_five, 0, 254, 12},	// Grate Min Interval
+	{config_17, plus_minus, 1, 254, 20},		// Grate Shake Time
+	{config_18, plus_minus, 0, 90, 30},			// Servo Start Position
+	{config_19, reserved, 0, 150, 140},			// Lambda Rich
+	{config_20, no_yes, 0, 1, 0},				// Modbus Enable
+	{config_21, plus_minus, 0, 6, 3},			// Modbus Baud
+	{config_22, plus_minus, 0, 3, 0},			// Modbus Parity
+	{config_23, plus_minus, 0, 127, 1},			// Modbus Address
+	{config_24, no_yes, 0, 254, 0},				// Grid-Tie Enable
+	{config_25, plus_minus, 0, 100, 30},		// Pratio Low
+	{config_26, plus_minus_five, 0, 254, 150},	// T_RST Warn Temperature
+	{config_27, reserved, 0, 100, 60},			// P_ratio High
+	{config_28, plus_minus, 0, 254, 50},		// Ash Auger Low Current
+	{config_29, plus_minus, 30, 254, 130},		// Ash Auger High Current
+	{config_30, plus_minus, 50, 254, 150},		// Ash Auger Limit Current
+	{config_31, plus_minus_five, 0, 254, 60},	// Ash Auger Period
+	{config_32, reserved, 1, 254, 30},			// Grate Reverse Time
+	{config_33, reserved, 1, 100, 100},			// Grate % Duty Cycle
+	{0, 0, 0, 0, 0}								// NULL terminator
 };
-
-//                              0    1    2    3    4   5    6   7    8    9    10   11   12   13   14   15   16   17   18  19   20  21  22  23   24   25   26   	27	28	29	30	31	32	33
-int defaults[CONFIG_COUNT]   = {0,   0,   1,   5,  35, 100, 6,  1,   10,  98,  10,  135, 210, 195, 50,  60,  12,  30,  30, 140, 0,  3,  0,  1,   0,   30,  150,	60,	1,	8,	12,	18,	10,	100	};  //default values to be saved to EEPROM for the following getConfig variables
-int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   1,   1,   1,   0,  0,   0,  0,  0,  1,   0,   0,   0,		0,	1,	3,  5,	0,	1,	0	};  //minimum values allowed
-int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15,  254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254,	254,3,	10,	15,	240,240,100	}; //maximum values allowed
 
 //Don't forget to add the following to update_config_var in Display!  The first Configuration, Reset Defaults, is skipped, so these start at 1, not 0.
 //int engine_type = getConfig(1);
