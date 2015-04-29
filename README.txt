@@ -22,7 +22,7 @@ KSlibs and the modified versions of various Arduino libraries from:
 
 === Change Log ===
 
-March 23, 2015 - v1.3.1 Maintenance release
+April 28, 2015 - v1.3.1 Maintenance release
 
 	Bug #1, Frequent auger low current alarms
 		"Auger Low Current" alarms were being generated while the auger

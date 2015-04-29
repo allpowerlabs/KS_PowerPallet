@@ -29,11 +29,11 @@
 #include "Alarm.h"
 #include "AshAuger.h"		// Ash auger typedefs.
 
-#define RELEASE_CYCLE RELEASE_TESTING
+#define RELEASE_CYCLE RELEASE_PRODUCTION
 #define V_MAJOR "1"
 #define V_MINOR "3"
 #define V_MAINT "1"
-#define V_BUILD "beta 1"
+#define V_BUILD ""
 #include "Version.h"
 
 /*
