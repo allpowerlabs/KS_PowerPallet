@@ -901,6 +901,9 @@ void update_config_var(int var_num){
   case 33:
 	GrateConfig();
 	break;
+  case 34:
+	fuel_switch_hysteresis = getConfig(34) * 1000;
+	break;
   default:
 	break;
   }

@@ -293,6 +293,7 @@ const char config_30[] PROGMEM = "Ash Aug Max (A)";
 const char config_31[] PROGMEM = "Ash Aug Period ";
 const char config_32[] PROGMEM = "Grate Rev Time ";
 const char config_33[] PROGMEM = "Grate Power    ";
+const char config_34[] PROGMEM = "Fuel Sw Delay  ";
 
 const char plus_minus[] PROGMEM = "+    -  ";
 const char no_yes[] PROGMEM = "NO  YES ";
@@ -301,7 +302,7 @@ const char plus_minus_five[] PROGMEM = "+5  -5  ";
 const char reserved[] PROGMEM = "Reserved";
 
 //Configuration Variables
-#define CONFIG_COUNT 34
+#define CONFIG_COUNT 35
 int config_var;
 byte config_changed = false;
 
@@ -341,6 +342,7 @@ configurable Config[] = {
 	{config_31, plus_minus_five, 0, 254, 60},	// Ash Auger Period
 	{config_32, reserved, 1, 254, 30},			// Grate Reverse Time
 	{config_33, reserved, 1, 100, 100},			// Grate % Duty Cycle
+	{config_34, plus_minus, 1, 60, 30},			// Fuel Switch Delay
 	{0, 0, 0, 0, 0}								// NULL terminator
 };
 

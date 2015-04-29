@@ -12,6 +12,7 @@ void AugerInit() {
 	AugerCurrentLevelBoundary[CURRENT_HIGH][1] = 750;
 
 	fuel_last_fill = 0;
+	fuel_switch_hysteresis = getConfig(34) * 1000;
 }
 
 void DoAuger() {
@@ -206,7 +207,7 @@ void TransitionAuger(int new_state) {
 void checkAuger(){
 	FuelSwitchValue = analogRead(ANA_FUEL_SWITCH); // switch voltage, 1024 if on, 0 if off
 	if (FuelSwitchValue > 600){
-		if (FuelDemand == SWITCH_OFF && (fuel_last_fill + FUEL_SWITCH_HYSTERESIS < millis())){
+		if (FuelDemand == SWITCH_OFF && (fuel_last_fill + fuel_switch_hysteresis < millis())){
 			fuel_state_entered = millis();
 			FuelDemand = SWITCH_ON;
 		}
