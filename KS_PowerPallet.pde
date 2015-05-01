@@ -339,7 +339,7 @@ configurable Config[] = {
 	{config_28, plus_minus, 0, 254, 50},		// Ash Auger Low Current
 	{config_29, plus_minus, 30, 254, 130},		// Ash Auger High Current
 	{config_30, plus_minus, 50, 254, 150},		// Ash Auger Limit Current
-	{config_31, plus_minus_five, 0, 254, 200},	// Ash Auger Period
+	{config_31, plus_minus_five, 0, 254, 40},	// Ash Auger Period
 	{config_32, reserved, 1, 254, 30},			// Grate Reverse Time
 	{config_33, reserved, 1, 100, 100},			// Grate % Duty Cycle
 	{config_34, plus_minus, 1, 60, 30},			// Fuel Switch Delay
