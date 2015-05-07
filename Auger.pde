@@ -148,7 +148,7 @@ void TransitionAuger(int new_state) {
     auger_pulse_state = 0;
     break;
   case AUGER_STARTING:
-    AugerReverse(); //start in reverse for a few moments to reduce bridging
+    AugerForward();
     Log(p_buffer);
     Logln_p("Starting Forward");
     break;
