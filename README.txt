@@ -35,6 +35,9 @@ April 28, 2015 - v1.3.1 Maintenance release
 	
 	Bug #7, Message uses pound symbol: # Deap Sea controller set to:
 	
+	Bug #9, Added a minimum off time to the fuel switch logic to extend the life of the 
+		fuel auger relays.  The default is 30 seconds, but is adjustable from 1 to 60 seconds.
+	
 	Bug #11, Grate motor power output low.
 		Null EEPROM value wasn't handled correctly, so grate power level was 
 		defaulting to 0 instead of 100.
@@ -70,25 +73,30 @@ April 28, 2015 - v1.3.1 Maintenance release
 		grate.revtime - Unused
 		grate.duty - Unused
 		
-	Bug #54,	Update configuration default for restriction temperature shutdown
+	Bug #54, Update configuration default for restriction temperature shutdown
 		Restriction low temperature shutdown default was changed from 650C to 675C.
-	
-	Bug #55,	Reduce default grate shake time to 2 seconds
+		
+	Bug #55, Reduce default grate shake time to 2 seconds
 		This was decided as the new default during a meeting with the reactor team.
 		The intent was to reduce lofting of fines during a grate shake.
 		
-	Bug #56,	Update configuration default for ash auger run time to 90 seconds.
+	Bug #56, Update configuration default for ash auger run time to 200 seconds.
 		This was decided as the new default during a meeting with the reactor team.
 		The intent was to reduce wear on the ash auger mechanism.
 		
-	Bug #57,	Auger starts in reverse mode when powered up
+	Bug #57, Auger starts in reverse mode when powered up
 		Testing has shown this behavior, which is intentional, to be a non-issue.  
 		One modification has been made: the initial reverse pulse before going forward will 
 		get its time setting from aug_rev_time, which sets the length of time the auger goes 
 		backwards when an obstruction is encountered.
 	
-	Bug #58,	Message log time stamp format is confusing
+	Bug #58, Message log time stamp format is confusing
 		Log time is now in seconds with no trailing decimals.
+		
+	Bug #60, ALARM_LOW_TRED and ALARM_TRED_LOW now each have a delay before activating.
+		ALARM_LOW_TRED will not be raised until 120 seconds after the engine has gone into 
+		the ON state.  ALARM_TRED_LOW will not be raised until the engine has been on for 
+		180 seconds and coincides with an engine shutdown.
 
 	ECR-000331, Excessive wear rates of gears, auger, scrolls, and motor
 		See bugs #40 and #56

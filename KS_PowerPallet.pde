@@ -29,10 +29,13 @@
 #include "Alarm.h"
 #include "AshAuger.h"		// Ash auger typedefs.
 #include "Auger.h"
-#include "Version.h"
 
-#define RELEASE_CYCLE RELEASE_DEVELOPMENT
+#define RELEASE_CYCLE RELEASE_PRODUCTION
+#define V_MAJOR "1"
+#define V_MINOR "3"
+#define V_MAINT "2"
 #define V_BUILD "200"
+#include "Version.h"
 
 /*
 EEPROM bytes used of 4k space:
