@@ -17,3 +17,9 @@ xcuserdata
 # svn & cvs
 .svn
 CVS
+=======
+.DS_Store
+.o
+applet/
+data/
+*~
