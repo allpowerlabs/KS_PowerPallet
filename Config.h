@@ -46,7 +46,10 @@
 
 
 
-typedef struct configurable_s {
+typedef struct configurable {
 	const char * label;
-	
-} configurable_s;
+	const char * choices;
+	unsigned char min;
+	unsigned char max;
+	unsigned char def;
+} configurable;

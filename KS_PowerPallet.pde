@@ -28,12 +28,13 @@
 #include "Modes.h"
 #include "Alarm.h"
 #include "AshAuger.h"		// Ash auger typedefs.
+#include "Auger.h"
 
 #define RELEASE_CYCLE RELEASE_PRODUCTION
 #define V_MAJOR "1"
 #define V_MINOR "3"
-#define V_MAINT "1"
-#define V_BUILD ""
+#define V_MAINT "2"
+#define V_BUILD "200"
 #include "Version.h"
 
 /*
@@ -261,11 +262,6 @@ const char * const TestingStateName[] PROGMEM = {testing_state_1, testing_state_
 // Datalogging variables
 int lineCount = 0;
 
-//Configuration Variables
-#define CONFIG_COUNT 34
-int config_var;
-byte config_changed = false;
-
 const char config_0[] PROGMEM = "Reset Defaults?";
 const char config_1[] PROGMEM = "Engine Type    ";
 const char config_2[] PROGMEM = "Relay Board    ";
@@ -300,8 +296,7 @@ const char config_30[] PROGMEM = "Ash Aug Max (A)";
 const char config_31[] PROGMEM = "Ash Aug Period ";
 const char config_32[] PROGMEM = "Grate Rev Time ";
 const char config_33[] PROGMEM = "Grate Power    ";
-
-const char * const Configuration[CONFIG_COUNT] PROGMEM = {config_0, config_1, config_2, config_3, config_4, config_5, config_6, config_7, config_8, config_9, config_10, config_11, config_12, config_13, config_14, config_15, config_16, config_17, config_18, config_19, config_20, config_21, config_22, config_23, config_24, config_25, config_26, config_27, config_28, config_29, config_30, config_31, config_32, config_33};
+const char config_34[] PROGMEM = "Fuel Sw Delay  ";
 
 const char plus_minus[] PROGMEM = "+    -  ";
 const char no_yes[] PROGMEM = "NO  YES ";
@@ -309,55 +304,57 @@ const char ten_twenty_k[] PROGMEM = "10k 20k ";
 const char plus_minus_five[] PROGMEM = "+5  -5  ";
 const char reserved[] PROGMEM = "Reserved";
 
+//Configuration Variables
+#define CONFIG_COUNT 35
+int config_var;
+byte config_changed = false;
 
-const char * const Config_Choices[CONFIG_COUNT] PROGMEM = {
-no_yes,
-reserved,	// Engine Type
-reserved,	//Relay Board
-plus_minus,
-plus_minus,
-plus_minus,
-plus_minus,
-no_yes,
-reserved,	// P_ratio Accum, pratio_max
-plus_minus,
-reserved,	// Display Per .1s
-plus_minus_five,
-plus_minus_five,
-plus_minus_five,
-reserved,	// P_filter Accum
-plus_minus_five,
-plus_minus_five,
-plus_minus,
-plus_minus,
-reserved,	// Lambda Rich
-no_yes,
-plus_minus,
-plus_minus,
-plus_minus,
-no_yes,
-plus_minus,
-plus_minus_five,
-reserved,	// P_ratio High Boundary
-plus_minus,
-plus_minus,
-plus_minus,
-plus_minus_five,
-reserved,	// Grate Reverse Time
-reserved	// Grate Power
+// Configurables - Label, choices, min, max, def
+configurable Config[] = {
+	{config_0, no_yes, 0, 254, 0},				// Reset values to default
+	{config_1, reserved, 0, 254, 0},			// RESERVED - Engine type
+	{config_2, reserved, 0, 254, 1},			// RESERVED - Relay board
+	{config_3, plus_minus, 0, 254, 5},			// Auger Reverse Time
+	{config_4, plus_minus, 0, 40, 35},			// Auger Low Current
+	{config_5, plus_minus, 41, 135, 100},		// Auger High Current
+	{config_6, plus_minus, 1, 10, 6},			// Oil Low Pressure
+	{config_7, no_yes, 0, 254, 1},				// Data Log to SD Card
+	{config_8, reserved, 0, 15, 10},			// RESERVED - Pratio Accum Max
+	{config_9, plus_minus, 10, 254, 98},		// Coolant High Temperature
+	{config_10, reserved, 0, 199, 10},			// RESERVED - Display Changes Per Second
+	{config_11, plus_minus_five, 0, 254, 135},	// T_RST Low Temperature
+	{config_12, plus_minus_five, 0, 254, 210},	// T_RST High Temperature
+	{config_13, plus_minus_five, 20, 254, 195},	// T_RED High Temperature
+	{config_14, reserved, 0, 254, 50},			// RESERVED - P_Filter High
+	{config_15, plus_minus_five, 2, 254, 60},	// Grate Max Interval
+	{config_16, plus_minus_five, 0, 254, 12},	// Grate Min Interval
+	{config_17, plus_minus, 1, 254, 20},		// Grate Shake Time
+	{config_18, plus_minus, 0, 90, 30},			// Servo Start Position
+	{config_19, reserved, 0, 150, 140},			// Lambda Rich
+	{config_20, no_yes, 0, 1, 0},				// Modbus Enable
+	{config_21, plus_minus, 0, 6, 3},			// Modbus Baud
+	{config_22, plus_minus, 0, 3, 0},			// Modbus Parity
+	{config_23, plus_minus, 0, 127, 1},			// Modbus Address
+	{config_24, no_yes, 0, 254, 0},				// Grid-Tie Enable
+	{config_25, plus_minus, 0, 100, 30},		// Pratio Low
+	{config_26, plus_minus_five, 0, 254, 150},	// T_RST Warn Temperature
+	{config_27, reserved, 0, 100, 60},			// P_ratio High
+	{config_28, plus_minus, 0, 254, 50},		// Ash Auger Low Current
+	{config_29, plus_minus, 30, 254, 130},		// Ash Auger High Current
+	{config_30, plus_minus, 50, 254, 150},		// Ash Auger Limit Current
+	{config_31, plus_minus_five, 0, 254, 40},	// Ash Auger Period
+	{config_32, reserved, 1, 254, 30},			// Grate Reverse Time
+	{config_33, reserved, 1, 100, 100},			// Grate % Duty Cycle
+	{config_34, plus_minus, 1, 60, 30},			// Fuel Switch Delay
+	{0, 0, 0, 0, 0}								// NULL terminator
 };
-
-//                              0    1    2    3    4   5    6   7    8    9    10   11   12   13   14   15   16   17   18  19   20  21  22  23   24   25   26   	27	28	29	30	31	32	33
-int defaults[CONFIG_COUNT]   = {0,   0,   1,   5,  35, 100, 6,  1,   10,  98,  10,  135, 210, 195, 50,  60,  12,  30,  30, 140, 0,  3,  0,  1,   0,   30,  150,	60,	1,	8,	12,	18,	10,	100	};  //default values to be saved to EEPROM for the following getConfig variables
-int config_min[CONFIG_COUNT] = {0,   0,   0,   0,   5,  41,  1,  0,   0,   10,  0,   0,   0,   20,  0,   1,   1,   1,   0,  0,   0,  0,  0,  1,   0,   0,   0,		0,	1,	3,  5,	0,	1,	0	};  //minimum values allowed
-int config_max[CONFIG_COUNT] = {254, 254, 254, 254, 40, 135, 10, 254, 15,  254, 199, 254, 254, 254, 254, 254, 254, 254, 90, 150, 1,  6,  3,  127, 254, 100, 254,	254,3,	10,	15,	240,240,100	}; //maximum values allowed
 
 //Don't forget to add the following to update_config_var in Display!  The first Configuration, Reset Defaults, is skipped, so these start at 1, not 0.
 //int engine_type = getConfig(1);
 //int relay_board = getConfig(2);
 int aug_rev_time = getConfig(3)*100;
-int current_low_boundary = getConfig(4);
-int current_high_boundary = getConfig(5);
+//int current_low_boundary = getConfig(4);
+//int current_high_boundary = getConfig(5);
 int low_oil_psi = getConfig(6);
 int save_datalog_to_sd = getConfig(7);
 //int pratio_max = getConfig(8)*5;
@@ -409,44 +406,6 @@ int T_bredLevelBoundary[TEMP_LEVEL_COUNT][2] = { { 0, 40 }, {50, 80}, {300,740},
 enum P_reactorLevels { OFF = 0, LITE = 1, MEDIUM = 2 , EXTREME = 3} P_reactorLevel;
 static char *P_reactorLevelName[] = { "Off", "Low", "Medium", "High"};
 int P_reactorLevelBoundary[4][2] = { { -100, 4000 }, {-500, -200}, {-2000,-750}, {-4000,-2000} };
-
-//Auger Switch Levels
-#if ANA_FUEL_SWITCH != ABSENT
-int FuelSwitchValue = 0;
-byte FuelDemand = false;
-enum FuelSwitchLevels { SWITCH_OFF = false, SWITCH_ON = true} FuelSwitchLevel;
-static char *FuelSwitchLevelName[] = { "Off","On"};
-//int FuelSwitchLevelBoundary[2][2] = {{ 0, 200 }, {800, 1024}}; //not currently used
-unsigned long fuel_state_entered;
-#endif
-
-//Auger states
-#define AUGER_OFF 0
-#define AUGER_STARTING 1
-#define AUGER_FORWARD 2
-#define AUGER_HIGH 3
-#define AUGER_REVERSE 4
-#define AUGER_REVERSE_HIGH 5
-#define AUGER_CURRENT_LOW 6
-#define AUGER_ALARM 7
-#define AUGER_PULSE 8
-#define AUGER_MANUAL_FORWARD 9
-
-int auger_state = 0;
-int auger_rev_count = 0;
-unsigned long auger_current_low = 0;
-unsigned long auger_state_entered;
-unsigned long auger_direction_entered;
-unsigned long auger_pulse_entered;
-unsigned long auger_pulse_time = 500;
-int auger_pulse_state = 0;
-
-//Auger Current Levels
-unsigned AugerCurrentValue = 0; // current level in .1A,  ADC Count = (120 * Current) + 1350
-enum AugerCurrentLevels { CURRENT_OFF = 0, CURRENT_LOW = 1, CURRENT_ON = 2, CURRENT_HIGH = 3} AugerCurrentLevel;
-static char *AugerCurrentLevelName[] = { "Off", "Low", "On", "High"};
-//Any changes to the following needs to be updated to update_config_var!!!   AugerCurrentLevel[AugerCurrentLevelName]
-unsigned AugerCurrentLevelBoundary[4][2] = { { 0, 10}, { 10, current_low_boundary}, {current_low_boundary, current_high_boundary}, {current_high_boundary, 750} };  //.1A readings
 
 //oil pressure
 int EngineOilPressureValue;
@@ -570,8 +529,8 @@ int pressureRatioAccumulator = 0;
 
 #define ALARM_NUM 19
 unsigned long alarm_on[ALARM_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-unsigned long alarm_start[ALARM_NUM] = {240000, 480000, 10, 50, 230, 0, 0, 0, 30000, 60000, 10, 0, 0, 3000, 15000, 0, 0, 0, 0};  //count or time in milliseconds when alarm goes off
-unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 60000, 0, 0, 180000, 20, 0, 3000, 7000, 15000, 60000, 0, 0, 0};  //time when engine will be shutdown
+unsigned long alarm_start[ALARM_NUM] = {240000, 480000, 10, 50, 230, 120000, 0, 0, 30000, 60000, 10, 0, 0, 0, 15000, 0, 0, 0, 0};  //count or time in milliseconds when alarm goes off
+unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 60000, 0, 0, 180000, 20, 0, 3000, 180000, 15000, 60000, 0, 0, 0};  //time when engine will be shutdown
 int alarm_count = 0;
 int alarm_queue[ALARM_NUM] = {};
 int alarm_shown = 0;
@@ -726,6 +685,7 @@ void setup() {
   InitLambda();
   InitServos();
   GrateInit();
+  AugerInit();
   AshAugerInit();
   if (use_modbus == 1){
     InitModbusSlave();

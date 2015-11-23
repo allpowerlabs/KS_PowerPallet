@@ -80,16 +80,12 @@ void DoAlarm() {
 **************************************/
 	if (engine_state == ENGINE_ON && P_reactorLevel != OFF) {
 // "Trst low for engine"
-		if (Temp_Data[T_TRED] < ttred_warn - 10) {
+		if ((Temp_Data[T_TRED] < ttred_warn - 10) && (engine_state_entered + alarm_start[ALARM_LOW_TRED] < millis())) {
 			setAlarm(ALARM_LOW_TRED);
 		}
 // "Tred high for engine"
 		if (T_bredLevel == EXCESSIVE) {
 			setAlarm(ALARM_HIGH_BRED);
-		}
-// "Reduction Temp Low"
-		if (Temp_Data[T_TRED] < tred_low_temp){
-			setAlarm(ALARM_TRED_LOW);
 		}
 // "Restriction Temp High"
 		if (Temp_Data[T_TRED] > ttred_high){
