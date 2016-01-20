@@ -14,9 +14,9 @@ void TransitionTesting(int new_state) {
     turnAllOff();
     digitalWrite(FET_AUGER_REV, HIGH);
     break;
-  case TESTING_GRATE:
+  case TESTING_RUN_ENABLE:
     turnAllOff();
-    digitalWrite(FET_GRATE,HIGH);
+    digitalWrite(FET_RUN_ENABLE,HIGH);
     break;
   case TESTING_ENGINE_IGNITION:
     turnAllOff();
@@ -64,9 +64,9 @@ void GoToNextTestingState() {
 //    }
     break;
   case TESTING_FUEL_REV:
-    TransitionTesting(TESTING_GRATE);
+    TransitionTesting(TESTING_RUN_ENABLE);
     break;
-  case TESTING_GRATE:
+  case TESTING_RUN_ENABLE:
     TransitionTesting(TESTING_ENGINE_IGNITION);
     break;
   case TESTING_ENGINE_IGNITION:
@@ -102,7 +102,7 @@ void GoToNextTestingState() {
 
 void turnAllOff(){
     digitalWrite(FET_AUGER,LOW);
-    digitalWrite(FET_GRATE,LOW);
+    digitalWrite(FET_RUN_ENABLE,LOW);
     digitalWrite(FET_IGNITION,LOW);
     digitalWrite(FET_STARTER,LOW);
     digitalWrite(FET_FLARE_IGNITOR,LOW);
