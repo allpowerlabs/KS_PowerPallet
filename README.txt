@@ -22,6 +22,32 @@ KSlibs and the modified versions of various Arduino libraries from:
 
 === Change Log ===
 
+January 20, 2016 - v1.3.3 Maintenance release
+  
+  Added SHUTDOWN to screen during engine shutdown state
+  
+  “GRATE”/FET1 output remapped for governor Run Enable shutdown
+  
+  Testing screen shows remapped Run Enable correctly
+  
+  Testing screen shows that FET3 is used for shutdown (GT)
+  
+  Mapped reduction high to correct alarm
+  
+  Fixed Oil Pressure shutdown alarm persistence bug
+  
+  Added alarm shutdown diagnostics to log (GT)
+
+May 27, 2015 - v1.3.2 Maintenance release
+
+  Bug 9 - Frequency of switching from new "flex" switch may exceed automotive relay life
+
+  Bug 60 - Allow engine to run with reactor at low temperature for up to 3 minutes.
+
+  Bug 64 - Update configuration default for ash auger run time to 200 seconds.
+
+  ECR-000249 - Flex Switch reduce frequency starts + flex paddle shape quest
+
 April 28, 2015 - v1.3.1 Maintenance release
 
 	Bug #1, Frequent auger low current alarms
