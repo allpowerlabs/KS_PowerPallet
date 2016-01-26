@@ -93,7 +93,7 @@ void DoAlarm() {
 		}
 // "Reduction Temp High"
 		if (Temp_Data[T_BRED] > tbred_high){
-			setAlarm(ALARM_TTRED_HIGH);
+			setAlarm(ALARM_TBRED_HIGH);
 		}
 // "No O2 Sensor Signal"
 		if (lambda_input < 0.52) {
@@ -220,7 +220,7 @@ void resetAlarm(int alarm_num){
 	break;
   }
 }
-
+ 
 int getAlarmBin(){
   int bin = 0;
   if (alarm_count>0){

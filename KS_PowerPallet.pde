@@ -33,8 +33,8 @@
 #define RELEASE_CYCLE RELEASE_PRODUCTION
 #define V_MAJOR "1"
 #define V_MINOR "3"
-#define V_MAINT "2"
-#define V_BUILD "200"
+#define V_MAINT "3"
+#define V_BUILD "300"
 #include "Version.h"
 
 /*
@@ -97,7 +97,8 @@ int analog_inputs[] = {ANA0, ANA1, ANA2, ANA3, ANA4, ANA5, ANA6, ANA7};
 
 // FET Mappings
 #define FET_AUGER FET0
-#define FET_GRATE FET1
+#define FET_GRATE ABSENT
+#define FET_RUN_ENABLE FET1
 #define FET_IGNITION FET2
 #define FET_STARTER FET3
 #define FET_FLARE_IGNITOR FET4
@@ -213,7 +214,7 @@ char unique_number[5] = "#";
 //Testing States
 #define TESTING_OFF 0
 #define TESTING_FUEL_AUGER 1
-#define TESTING_GRATE 2
+#define TESTING_RUN_ENABLE 2
 #define TESTING_ENGINE_IGNITION 3
 #define TESTING_STARTER 4
 #define TESTING_FLARE_IGNITOR 5
@@ -240,9 +241,9 @@ int analog_input[] = {ANA0, ANA1, ANA2, ANA3, ANA4, ANA5, ANA6, ANA7};
 
 //const char testing_state_0[] PROGMEM = "Off";
 const char testing_state_1[] PROGMEM = "FET0 Fuel Auger Fwd";
-const char testing_state_2[] PROGMEM = "FET1 Grate";
+const char testing_state_2[] PROGMEM = "FET1 Run Enable";
 const char testing_state_3[] PROGMEM = "FET2 Engine/Governor";
-const char testing_state_4[] PROGMEM = "FET3 Starter";
+const char testing_state_4[] PROGMEM = "FET3 Starter/Shutdwn";
 const char testing_state_5[] PROGMEM = "FET4 Flare";
 const char testing_state_6[] PROGMEM = "FET5 Ash Auger";
 const char testing_state_7[] PROGMEM = "FET6 Alarm";
@@ -529,8 +530,49 @@ int pressureRatioAccumulator = 0;
 
 #define ALARM_NUM 19
 unsigned long alarm_on[ALARM_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-unsigned long alarm_start[ALARM_NUM] = {240000, 480000, 10, 50, 230, 120000, 0, 0, 30000, 60000, 10, 0, 0, 0, 15000, 0, 0, 0, 0};  //count or time in milliseconds when alarm goes off
-unsigned long shutdown[ALARM_NUM] = {360000, 600000, 0, 0, 0, 0, 60000, 0, 0, 180000, 20, 0, 3000, 180000, 15000, 60000, 0, 0, 0};  //time when engine will be shutdown
+
+//count or time in milliseconds when alarm goes off
+unsigned long alarm_start[ALARM_NUM] = {240000, //ALARM_AUGER_ON_LONG
+                                        480000, //ALARM_AUGER_OFF_LONG
+                                        10, //ALARM_BAD_REACTOR
+                                        50, //ALARM_BAD_FILTER
+                                        230, //ALARM_LOW_FUEL_REACTOR
+                                        120000, //ALARM_LOW_TRED
+                                        0, //ALARM_HIGH_BRED
+                                        1000, //ALARM_BAD_OIL_PRESSURE
+                                        30000, //ALARM_O2_NO_SIG
+                                        60000, //ALARM_AUGER_LOW_CURRENT
+                                        10, //ALARM_BOUND_AUGER
+                                        0, //ALARM_HIGH_PCOMB
+                                        0, //ALARM_HIGH_COOLANT_TEMP
+                                        0, //ALARM_TRED_LOW
+                                        15000, //ALARM_TTRED_HIGH
+                                        0, //ALARM_TBRED_HIGH
+                                        0, //ALARM_GRATE_FAULT
+                                        0, //ALARM_ASHAUGER_STUCK
+                                        0 //ALARM_ASHAUGER_FAULT
+                                        };  
+//time when engine will be shutdown
+unsigned long shutdown[ALARM_NUM] = {360000, //ALARM_AUGER_ON_LONG
+                                     600000, //ALARM_AUGER_OFF_LONG
+                                     0, //ALARM_BAD_REACTOR
+                                     0, //ALARM_BAD_FILTER
+                                     0, //ALARM_LOW_FUEL_REACTOR
+                                     0, //ALARM_LOW_TRED
+                                     60000, //ALARM_HIGH_BRED
+                                     1000, //ALARM_BAD_OIL_PRESSURE
+                                     0, //ALARM_O2_NO_SIG
+                                     180000, //ALARM_AUGER_LOW_CURRENT
+                                     20, //ALARM_BOUND_AUGER
+                                     0, //ALARM_HIGH_PCOMB
+                                     3000, //ALARM_HIGH_COOLANT_TEMP
+                                     180000, //ALARM_TRED_LOW
+                                     15000, //ALARM_TTRED_HIGH
+                                     60000, //ALARM_TBRED_HIGH
+                                     0, //ALARM_GRATE_FAULT
+                                     0, //ALARM_ASHAUGER_STUCK
+                                     0 //ALARM_ASHAUGER_FAULT
+                                     };
 int alarm_count = 0;
 int alarm_queue[ALARM_NUM] = {};
 int alarm_shown = 0;

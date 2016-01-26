@@ -129,15 +129,20 @@ void DoDisplay() {
 		}
 		Disp_PutStr(buf);
 		//Row 3
-		Disp_RC(3,0);
-		if ((alarm_count > 0) && (millis() % 1000 > 500))
-			sprintf(buf, "NEXT ALARM", cur_item);
-		else
-			sprintf(buf, "NEXT      ");
-		Disp_PutStr(buf);
-		Disp_RC(3,10);
-		sprintf(buf, " T: %6lu", millis() / 1000);
-		Disp_PutStr(buf);
+    if (engine_state == ENGINE_SHUTDOWN) {
+      Disp_RC(3,0);
+      Disp_PutStr("      SHUTDOWN      ");
+    } else {
+      Disp_RC(3,0);
+      if ((alarm_count > 0) && (millis() % 1000 > 500))
+        sprintf(buf, "NEXT ALARM", cur_item);
+      else
+        sprintf(buf, "NEXT      ");
+      Disp_PutStr(buf);
+      Disp_RC(3,10);
+      sprintf(buf, " T: %6lu", millis() / 1000);
+      Disp_PutStr(buf);
+    }
 	}
     break;
   case DISPLAY_ENGINE:
