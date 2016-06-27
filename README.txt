@@ -21,6 +21,9 @@ KSlibs and the modified versions of various Arduino libraries from:
 	https://github.com/allpowerlabs/libraries
 
 === Change Log ===
+June 27, 2016 - v1.3.4 Maintenance release
+  
+  Fixed grate interval bug 
 
 January 20, 2016 - v1.3.3 Maintenance release
   

@@ -33,8 +33,8 @@
 #define RELEASE_CYCLE RELEASE_PRODUCTION
 #define V_MAJOR "1"
 #define V_MINOR "3"
-#define V_MAINT "3"
-#define V_BUILD "300"
+#define V_MAINT "4"
+#define V_BUILD "400"
 #include "Version.h"
 
 /*

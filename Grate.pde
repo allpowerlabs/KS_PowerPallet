@@ -12,6 +12,7 @@ struct {
 	unsigned revtime;
 	timer_s timer;
 	unsigned mode;
+  unsigned long last_dograte; //Last millis() that DoGrate was run
 	unsigned long pr_accum;	// Pressure ratio accumulator
 	unsigned m_good;	// Good pressure ratio accumulator rise rate
 	unsigned m_bad;		// Bad pressure ratio accumulator rise rate
@@ -45,8 +46,8 @@ void GrateConfig() {
 	pwm_set_duty(grate.pwm, 255);
 
 	//setup grate slopes
-	grate.m_good = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MAX) * 50);	//divide by longest total interval in seconds
-	grate.m_bad = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MIN) * 50);		//divide by shortest total interval in seconds
+	grate.m_good = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MAX) * 5);	//divide by longest total interval in seconds, scale appropriately
+	grate.m_bad = GRATE_SHAKE_CROSS / (eeprom_read_byte((uint8_t *) CFG_ADDR_GRATE_MIN) * 5);		//divide by shortest total interval in seconds, scale appropriately
 }
 
 void GrateReset() {
@@ -142,10 +143,11 @@ void DoGrate() {
 			// shake only if reactor is on
 			if (P_reactorLevel > OFF && T_tredLevel > COOL) {
 				//condition above will leave pr_accum in the last state until conditions are met (not continuing to cycle)
+				//decrease is calculated based on the time between last DoGrate call in case the call is skipped (e.g. by SD card write lag)
 				if (pRatioReactorLevel == PR_LOW) {
-					grate.pr_accum = ul_addlim(grate.pr_accum, grate.m_bad, GRATE_SHAKE_CROSS);
+					grate.pr_accum = ul_addlim(grate.pr_accum, (millis()-grate.last_dograte)*grate.m_bad/1000, GRATE_SHAKE_CROSS);
 				} else {
-					grate.pr_accum = ul_addlim(grate.pr_accum, grate.m_good, GRATE_SHAKE_CROSS);
+					grate.pr_accum = ul_addlim(grate.pr_accum, (millis()-grate.last_dograte)*grate.m_good/1000, GRATE_SHAKE_CROSS);
 				}
 				if (grate.pr_accum >= GRATE_SHAKE_CROSS) {
 					GrateStart();		//time to shake
@@ -159,4 +161,6 @@ void DoGrate() {
 			}
 			break;
 	}
+	//Store this as the last time that DoGrate was called
+  grate.last_dograte = millis();
 }
