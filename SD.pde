@@ -1,31 +1,27 @@
 boolean InitSD() {
-  pinMode(SS_PIN, OUTPUT);
-  pinMode(MOSI_PIN, OUTPUT);
-  pinMode(MISO_PIN, INPUT);
-  pinMode(SCK_PIN, OUTPUT);
+	unsigned data_log_num = EEPROMReadInt(30); //reads from EEPROM bytes 30 and 31
 
-  putstring("#Initializing SD card...");
-  if(!SD.begin(SS_PIN)){        // 2.004 seconds if no SD card (fail), 60msec if SD card (succeed).
-    putstring("initialization failed.\r\n");
-    sd_loaded = false;
-  }
-  else {
-    putstring("card initialized.\r\n");
-    sd_loaded = true;
-    int data_log_num = EEPROMReadInt(30); //reads from EEPROM bytes 30 and 31
-    if (data_log_num == 32767){  //TODO: unsigned??  --> 65,535
-      data_log_num = 1;
-    }
-    else {
-      data_log_num++;
-    }
-    sprintf(sd_data_file_name, "dat%05i.csv", data_log_num);
-    sprintf(sd_log_file_name, "log%05i.txt", data_log_num);
-    putstring("#Writing data to ");
-    Serial.println(sd_data_file_name);
-    EEPROMWriteInt(30, data_log_num);
-  }
-  return sd_loaded;
+	pinMode(SS_PIN, OUTPUT);
+	pinMode(MOSI_PIN, OUTPUT);
+	pinMode(MISO_PIN, INPUT);
+	pinMode(SCK_PIN, OUTPUT);
+
+	putstring("#Initializing SD card...");
+	if(!SD.begin(SS_PIN)){        // 2.004 seconds if no SD card (fail), 60msec if SD card (succeed).
+		putstring("initialization failed.\n");
+		sd_loaded = false;
+	}
+	else {
+		putstring("card initialized.\n");
+		sd_loaded = true;
+		data_log_num++;
+		sprintf(sd_data_file_name, "dat%05i.csv", data_log_num);
+		sprintf(sd_log_file_name, "log%05i.txt", data_log_num);
+		putstring("#Writing data to ");
+		Serial.println(sd_data_file_name);
+		EEPROMWriteInt(30, data_log_num);
+	}
+return sd_loaded;
 }
 
 void DatalogSD(char file_name[13], boolean newline) {    //file_name should be 8.3 format names
@@ -69,7 +65,7 @@ void Logln(const char * str) {
   }
   strncat(string_buffer, str, BUFFER_SIZE);
   Serial.print(string_buffer); Serial.println();
-  if (save_datalog_to_sd && sd_loaded){
+  if (sd_loaded){
     DatalogSD(sd_log_file_name, true);
   }
   clearBuffer();
