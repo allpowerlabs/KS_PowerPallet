@@ -1,23 +1,28 @@
 
+int disp_putchar(char c, FILE * stream) {
+	if (buffer_size == BUFFER_SIZE - 1) return -1;
+	string_buffer[buffer_size++] = c;
+	string_buffer[buffer_size] = 0;
+	return 0;
+}
+
 void DoDisplay() {
 	unsigned j;
 	switch (display_state) {
 		case DISPLAY_SPLASH:
+			Disp_CursOff();
 			//Row 0
 			Disp_RC(0,0);
-			Disp_PutStr(P("    Datalogging    "));
+			Disp_PutStr(PSTR("    Datalogging    "));
 			//Row 1
 			Disp_RC(1,0);
-			Disp_PutStr(P("www.allpowerlabs.org"));
+			Disp_PutStr(PSTR("www.allpowerlabs.org"));
 			//Row 2
 			Disp_RC(2,(20-strlen(CODE_VERSION))/2);
 			sprintf(buf, "%s", CODE_VERSION);
 			Disp_PutStr(buf);
 			//Row 3
 			Disp_RC(3,0);
-			sprintf(buf, "%-10s     %5s", serial_num, unique_number);
-			Disp_PutStr(buf);
-			Disp_CursOff();
 			//Transition out after delay
 			if (millis()-display_state_entered>2000) {
 				TransitionDisplay(DISPLAY_PRESS);
@@ -35,6 +40,9 @@ void DoDisplay() {
 					Disp_PutStr(buf);
 				}
 			}
+			Disp_RC(3, 11);
+			sprintf(buf, "%9lu", millis()/1000);
+			Disp_PutStr(buf);
 			break;
 		case DISPLAY_TEMP0:
 			Disp_CursOff();

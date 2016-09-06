@@ -63,17 +63,20 @@ void DoDatalogging() {
 	boolean header = false;
 	if (lineCount == 0) {
 		header = true;
-		clearBuffer(); //guarantee no extra chars in buffer first time through
 	}
 	LogTime(header);
 	LogTemps(header);
 	LogPressures(header);
 	LogAnalogInputs(header);
+	// Output to serial
 	Serial.println(string_buffer);
+	// Output to SD card
 	if (sd_loaded){
 		DatalogSD(sd_data_file_name, true);
 	}
-	clearBuffer();
+	// Clear the string buffer
+	buffer_size = 0;
+	string_buffer[0] = (char) 0;
 	lineCount++;
 }
 
