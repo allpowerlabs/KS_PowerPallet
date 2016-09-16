@@ -2,26 +2,28 @@
 // Library used to run APL Power Pallet
 // Developed for the APL GCU/PCU: http://gekgasifier.pbworks.com/Gasifier-Control-Unit
 
+// AVR LibC Includes
 #include <avr/eeprom.h>
-#include <EEPROM.h>         // included with Arduino, can read/writes to non-volatile memory
-#include <adc.h>            // part of KSlibs, for reading analog inputs
-#include <display.h>        // part of KSlibs, write to display
-#include <keypad.h>         // part of KSlibs, read buttons and keypad
-//#include <pressure.h>       // part of KSlibs, read pressure sensors
-#include <temp.h>           // part of KSlibs, read thermocouples
-#include <timer.h>          // part of KSlibs, hardware timer functions
-#include <util.h>           // part of KSlibs, utility functions, GCU_Setup
 #include <avr/io.h>         // advanced: provides port definitions for the microcontroller (ATmega1280, http://www.atmel.com/dyn/resources/prod_documents/doc2549.PDF)
-#include <SD.h>             // SD card
 #include <avr/pgmspace.h>
 #include <string.h>
 #include <stdio.h>
+
+// Local includes
+#include <adc.h>            // part of KSlibs, for reading analog inputs
+#include <display.h>        // part of KSlibs, write to display
+#include <keypad.h>         // part of KSlibs, read buttons and keypad
+#include <temp.h>           // part of KSlibs, read thermocouples
+#include <timer.h>          // part of KSlibs, hardware timer functions
+#include <util.h>           // part of KSlibs, utility functions, GCU_Setup
+#include <SD.h>             // SD card
+
 
 #define RELEASE_CYCLE RELEASE_PRODUCTION
 #define V_MAJOR "6"
 #define V_MINOR "6"
 #define V_MAINT "6"
-#define V_BUILD "300"
+#define V_BUILD "187"
 #include "Version.h"
 
 /*
@@ -46,6 +48,8 @@ int loopPeriod1 = 1000;
 unsigned long nextTime1;
 int loopPeriod2 = 100;
 unsigned long nextTime2;
+int loopPeriod3 = 500;
+unsigned long nextTime3;
 
 //Display
 //Display States
@@ -60,16 +64,17 @@ char buf[21];
 
 // Pressure variables
 #define NPRESS (6)
-// rough offset in counts
-#define OFFSET (-512l)
+#define NSAMPLES (32)
 // result in Pa
-#define ADC_UV (4888) // ADC resolution in microvolts
-// fine offset in Pa
-long Press_Data[NPRESS];
-long Press_Calib[NPRESS];
-long Press[NPRESS]; //values corrected for sensor offset (calibration)
+#define ADC_REF_mV (5010)
+#define ADC_MAX (1023)
+#define ADC_COEF (ADC_REF_mV / ADC_MAX) // ADC resolution in millivolts
+unsigned Press_Calib[NPRESS];
+unsigned Press_Data[NPRESS];
+//unsigned Press_Smooth[NPRESS];
+int Press[NPRESS]; //values in hPa, smoothed and corrected for sensor offset (calibration)
 // uV / Pa
-long sensitivity[] = {286, 286, 1000, 1000, 100, 100};
+long sensitivity[] = {286, 286, 286, 286, 90, 90};
 
 // SD Card
 boolean sd_loaded;
@@ -79,7 +84,7 @@ char sd_log_file_name[] = "No SD Card  ";
 
 
 #define BUFFER_SIZE 256
-int buffer_size = 0;
+unsigned buffer_size = 0;
 char string_buffer[BUFFER_SIZE] = "";
 
 FILE data_log;
@@ -123,13 +128,16 @@ void loop() {
 	DoPressure();
 	DoKeyInput();
 	if (millis() >= nextTime2) {
-	nextTime2 += loopPeriod2;
-	DoDisplay();
-	DoHeartBeat(); // blink heartbeat LED
-		if (millis() >= nextTime1) {
-			nextTime1 += loopPeriod1;
-			DoDatalogging(); // No SD card: 27msec peak, 22msec normal. With SD card: 325msec at first, 288msec normal
-		}
+		nextTime2 += loopPeriod2;
+		DoHeartBeat(); // blink heartbeat LED
+	}
+	if (millis() >= nextTime1) {
+		nextTime1 += loopPeriod1;
+		DoDatalogging(); // No SD card: 27msec peak, 22msec normal. With SD card: 325msec at first, 288msec normal
+	}
+	if (millis() >= nextTime3) {
+		nextTime3 += loopPeriod3;
+		DoDisplay();
 	}
 	switch (Serial.read()) {
 		case 'c':

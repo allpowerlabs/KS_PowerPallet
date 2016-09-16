@@ -61,6 +61,9 @@ void LogTemps(boolean header = false) {
 
 void DoDatalogging() {
 	boolean header = false;
+	// Clear the string buffer
+	buffer_size = 0;
+	string_buffer[0] = (char) 0;
 	if (lineCount == 0) {
 		header = true;
 	}
@@ -68,15 +71,14 @@ void DoDatalogging() {
 	LogTemps(header);
 	LogPressures(header);
 	LogAnalogInputs(header);
+	// Add a newline
+	log_putchar('\n', &data_log);
 	// Output to serial
-	Serial.println(string_buffer);
+	Serial.print(string_buffer);
 	// Output to SD card
 	if (sd_loaded){
 		DatalogSD(sd_data_file_name, true);
 	}
-	// Clear the string buffer
-	buffer_size = 0;
-	string_buffer[0] = (char) 0;
 	lineCount++;
 }
 
