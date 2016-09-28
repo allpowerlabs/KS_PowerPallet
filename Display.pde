@@ -32,13 +32,13 @@ void DoDisplay() {
 			Disp_CursOff();
 			for (j=0; j<4; j++) {
 				Disp_RC(j, 0);
-				sprintf(buf, "P%-2i %5i", j, Press[j]);
+				sprintf(buf, "P%-2i %5i", j, MPXV7007_TO_DECI_INH2O(Press[j]));
 				Disp_PutStr(buf);
-				if ((j + 4) < NPRESS) {
-					Disp_RC(j, 11);
-					sprintf(buf, "P%-2i %5i", j+4, Press[j+4]);
-					Disp_PutStr(buf);
-				}
+			}
+			for (j=0; j<2; j++) {
+				Disp_RC(j, 10);
+				sprintf(buf, "P%-2i %5i", j+4, MPXV7025_TO_DECI_INH2O(Press[j+4]));
+				Disp_PutStr(buf);
 			}
 			Disp_RC(3, 11);
 			sprintf(buf, "%9lu", millis()/1000);
@@ -64,12 +64,12 @@ void DoDisplay() {
 			for (j=0; j<4; j++) {
 				if ((j+8) < NTEMP) {
 					Disp_RC(j, 0);
-					sprintf(buf, "T%-2u %5u", j+8, Temp_Data[j]);
+					sprintf(buf, "T%-2u %5u", j+8, Temp_Data[j+8]);
 					Disp_PutStr(buf);
 				}
 				if ((j+12) < NTEMP) {
 					Disp_RC(j, 11);
-					sprintf(buf, "T%-2u %5u", j+12, Temp_Data[j+4]);
+					sprintf(buf, "T%-2u %5u", j+12, Temp_Data[j+12]);
 					Disp_PutStr(buf);
 				}
 			}

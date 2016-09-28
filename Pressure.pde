@@ -2,10 +2,7 @@
 void DoPressure() {
 	Press_ReadAll();
 	for (int i = 0; i<NPRESS; i++) {
-		//Press_Smooth[i] = (((NSAMPLES - 1) * (long) Press_Smooth[i]) + Press_Data[i]) / NSAMPLES;
-		// Calculate averaged pressure in hPa
-		Press[i] = (((long) Press_Data[i] - Press_Calib[i]) * ADC_REF_mV * 10 / (ADC_MAX * (long) sensitivity[i]));
-		//Press[i] = (((long) Press_Smooth[i] - Press_Calib[i]) * ADC_REF_mV * 10 / (ADC_MAX * (long) sensitivity[i]));
+		Press[i] = (Press_Data[i] - Press_Calib[i]);
 	}
 }
 

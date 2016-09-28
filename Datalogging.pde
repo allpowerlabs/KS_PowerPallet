@@ -32,17 +32,19 @@ void LogAnalogInputs(boolean header = false) {
 
 void LogPressures(boolean header = false) {
 	unsigned j;
-  if (header) {
-	for(j=0; j<NPRESS; j++) {
-		fprintf(&data_log, "P%i, ", j);
+	if (header) {
+		for(j=0; j<NPRESS; j++) {
+			fprintf(&data_log, "P%i, ", j);
+		}
 	}
-  }
-  else {
-
-	for(j=0; j<NPRESS; j++) {
-		fprintf(&data_log, "%4i, ", Press[j]);
+	else {
+		for(j=0; j<4; j++) {
+			fprintf(&data_log, "%4i, ", MPXV7007_TO_PA(Press[j]));
+		}
+		for(j=4; j<NPRESS; j++) {
+			fprintf(&data_log, "%4i, ", MPXV7025_TO_PA(Press[j]));
+		}
 	}
-  }
 }
 
 void LogTemps(boolean header = false) {

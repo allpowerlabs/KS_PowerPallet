@@ -65,16 +65,16 @@ char buf[21];
 // Pressure variables
 #define NPRESS (6)
 #define NSAMPLES (32)
-// result in Pa
-#define ADC_REF_mV (5010)
-#define ADC_MAX (1023)
-#define ADC_COEF (ADC_REF_mV / ADC_MAX) // ADC resolution in millivolts
+#define MPXV7007_TO_DECI_INH2O(x) ((x * 200910) / 292578)
+#define MPXV7025_TO_DECI_INH2O(x) ((x * 200910) / 92070)
+#define MPXV7007_TO_PA(x) (((long long) x * 5000000) / 292578)
+#define MPXV7025_TO_PA(x) (((long long) x * 5000000) / 92070)
+#define MPXV7007_TO_HPA(x) ((x * 50000) / 292578)
+#define MPXV7025_TO_HPA(x) ((x * 50000) / 92070)
 unsigned Press_Calib[NPRESS];
 unsigned Press_Data[NPRESS];
 //unsigned Press_Smooth[NPRESS];
-int Press[NPRESS]; //values in hPa, smoothed and corrected for sensor offset (calibration)
-// uV / Pa
-long sensitivity[] = {286, 286, 286, 286, 90, 90};
+int Press[NPRESS]; //values in ADC units and corrected for sensor offset (calibration)
 
 // SD Card
 boolean sd_loaded;
