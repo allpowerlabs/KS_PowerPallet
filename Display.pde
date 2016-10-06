@@ -10,13 +10,12 @@ void DoDisplay() {
 	unsigned j;
 	switch (display_state) {
 		case DISPLAY_SPLASH:
-			Disp_CursOff();
 			//Row 0
 			Disp_RC(0,0);
-			Disp_PutStr(PSTR("    Datalogging    "));
+			Disp_PutStr("    Datalogging    ");
 			//Row 1
 			Disp_RC(1,0);
-			Disp_PutStr(PSTR("www.allpowerlabs.org"));
+			Disp_PutStr("www.allpowerlabs.org");
 			//Row 2
 			Disp_RC(2,(20-strlen(CODE_VERSION))/2);
 			sprintf(buf, "%s", CODE_VERSION);
@@ -29,7 +28,6 @@ void DoDisplay() {
 			}
 			break;
 		case DISPLAY_PRESS:
-			Disp_CursOff();
 			for (j=0; j<4; j++) {
 				Disp_RC(j, 0);
 				sprintf(buf, "P%-2i %5i", j, MPXV7007_TO_DECI_INH2O(Press[j]));
@@ -45,7 +43,6 @@ void DoDisplay() {
 			Disp_PutStr(buf);
 			break;
 		case DISPLAY_TEMP0:
-			Disp_CursOff();
 			for (j=0; j<4; j++) {
 				if (j < NTEMP) {
 					Disp_RC(j, 0);
@@ -60,7 +57,6 @@ void DoDisplay() {
 			}
 			break;
 		case DISPLAY_TEMP1:
-			Disp_CursOff();
 			for (j=0; j<4; j++) {
 				if ((j+8) < NTEMP) {
 					Disp_RC(j, 0);
@@ -74,6 +70,23 @@ void DoDisplay() {
 				}
 			}
 			break;
+		case DISPLAY_ANA:
+			TransitionDisplay(++display_state);
+		case DISPLAY_LOGFILE:
+			if (sd_loaded) {
+				Disp_RC(0,0);
+				Disp_PutStr("Datalogging Enabled");
+			}
+			else {
+				Disp_RC(0,0);
+				Disp_PutStr("Datalogging Disabled");
+			}
+			Disp_RC(1,0);
+			Disp_PutStr(sd_data_file_name);
+			Disp_RC(2,0);
+			Disp_PutStr(sd_log_file_name);
+			break;
+
 		default:
 			TransitionDisplay(0);
 			break;
@@ -81,10 +94,10 @@ void DoDisplay() {
 }
 
 void TransitionDisplay(int new_state) {
-  //Enter
-  display_state_entered = millis();
-  display_state=new_state;
-  Disp_Clear(); // Clear display between menus
+	//Enter
+	display_state_entered = millis();
+	display_state = new_state;
+	Disp_Clear(); // Clear display between menus
 }
 
 void DoKeyInput() {

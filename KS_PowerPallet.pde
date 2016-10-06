@@ -15,7 +15,6 @@
 #include <keypad.h>         // part of KSlibs, read buttons and keypad
 #include <temp.h>           // part of KSlibs, read thermocouples
 #include <timer.h>          // part of KSlibs, hardware timer functions
-#include <util.h>           // part of KSlibs, utility functions, GCU_Setup
 #include <SD.h>             // SD card
 
 
@@ -48,7 +47,7 @@ int loopPeriod1 = 1000;
 unsigned long nextTime1;
 int loopPeriod2 = 100;
 unsigned long nextTime2;
-int loopPeriod3 = 500;
+int loopPeriod3 = 250;
 unsigned long nextTime3;
 
 //Display
@@ -58,7 +57,8 @@ unsigned long nextTime3;
 #define DISPLAY_TEMP0 1
 #define DISPLAY_TEMP1 2
 #define DISPLAY_ANA 3
-unsigned display_state;
+#define DISPLAY_LOGFILE 4
+unsigned display_state = -1;
 unsigned long display_state_entered;
 char buf[21];
 
@@ -79,9 +79,10 @@ int Press[NPRESS]; //values in ADC units and corrected for sensor offset (calibr
 // SD Card
 boolean sd_loaded;
 
-char sd_data_file_name[] = "No SD Card  ";  //Create an array that contains the name of our datalog file, updated upon reboot
-char sd_log_file_name[] = "No SD Card  ";
+char sd_data_file_name[16] = "No SD Card";  //Create an array that contains the name of our datalog file, updated upon reboot
+char sd_log_file_name[16] = "No SD Card";
 
+unsigned data_log_num;
 
 #define BUFFER_SIZE 256
 unsigned buffer_size = 0;
@@ -92,18 +93,21 @@ FILE event_log;
 FILE display;
 
 void setup() {
-	GCU_Setup(V3,FULLFILL,P777722);
 	DDRJ |= 0x80;
 	PORTJ |= 0x80;
 
 	// timer initialization
 	nextTime1 = millis() + loopPeriod1;
 	nextTime2 = millis() + loopPeriod2;
+	nextTime3 = millis() + loopPeriod3;
 
 	// Start the logging functions early on
 	fdev_setup_stream(&data_log, log_putchar, NULL, _FDEV_SETUP_WRITE);
 	fdev_setup_stream(&event_log, log_putchar, NULL, _FDEV_SETUP_WRITE);
 	Serial.begin(115200);
+
+	data_log_num = eeprom_read_word((uint16_t *)(30)); //reads from EEPROM bytes 30 and 31
+
 	InitSD();
 
 	//Library initializations
@@ -126,7 +130,6 @@ void loop() {
 	Temp_ReadAll();  // reads into array Temp_Data[], in deg C
 	// the above two Readalls take peak 2.9msec, avg 2.2msec
 	DoPressure();
-	DoKeyInput();
 	if (millis() >= nextTime2) {
 		nextTime2 += loopPeriod2;
 		DoHeartBeat(); // blink heartbeat LED
@@ -137,6 +140,7 @@ void loop() {
 	}
 	if (millis() >= nextTime3) {
 		nextTime3 += loopPeriod3;
+		DoKeyInput();
 		DoDisplay();
 	}
 	switch (Serial.read()) {
