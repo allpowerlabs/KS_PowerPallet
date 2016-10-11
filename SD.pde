@@ -14,7 +14,10 @@ boolean InitSD() {
 		sd_loaded = true;
 		data_log_num++;
 		sprintf_P(sd_data_file_name, PSTR("dat%05i.csv"), data_log_num);
-		sprintf_P(sd_log_file_name, PSTR("log%05i.txt"), data_log_num);
+		//sprintf_P(sd_log_file_name, PSTR("log%05i.txt"), data_log_num);
+
+		dataFile = SD.open(sd_data_file_name, FILE_WRITE);  //if file doesn't exist it will be created
+
 		SerialPrint_P(PSTR("# Writing data to "));
 		Serial.println(sd_data_file_name);
 		eeprom_write_word((uint16_t *)(30), data_log_num);
@@ -22,17 +25,14 @@ boolean InitSD() {
 return sd_loaded;
 }
 
-void DatalogSD(char file_name[13], boolean newline) {    //file_name should be 8.3 format names
-  //SD.begin(SS_PIN);
-  File dataFile = SD.open(file_name, FILE_WRITE);  //if file doesn't exist it will be created
-                                                   //if file exists, it will be appended to, even though no seek is performed?
+void DatalogSD(boolean newline) {    //file_name should be 8.3 format names
   if (dataFile) {
 	dataFile.print(string_buffer);
-    dataFile.close();
+	dataFile.flush();
   }
   else {
 	SerialPrint_P(PSTR("# Error loading "));
-	Serial.println(file_name);
+	Serial.println(sd_data_file_name);
 	sd_loaded = false;
   }
 }

@@ -79,7 +79,7 @@ void DoDatalogging() {
 	Serial.print(string_buffer);
 	// Output to SD card
 	if (sd_loaded){
-		DatalogSD(sd_data_file_name, true);
+		DatalogSD(true);
 	}
 	lineCount++;
 }

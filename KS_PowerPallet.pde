@@ -78,6 +78,7 @@ int Press[NPRESS]; //values in ADC units and corrected for sensor offset (calibr
 
 // SD Card
 boolean sd_loaded;
+File dataFile;
 
 char sd_data_file_name[16] = "No SD Card";  //Create an array that contains the name of our datalog file, updated upon reboot
 char sd_log_file_name[16] = "No SD Card";

@@ -83,8 +83,8 @@ void DoDisplay() {
 			}
 			Disp_RC(1,0);
 			Disp_PutStr(sd_data_file_name);
-			Disp_RC(2,0);
-			Disp_PutStr(sd_log_file_name);
+			//Disp_RC(2,0);
+			//Disp_PutStr(sd_log_file_name);
 			break;
 
 		default:
