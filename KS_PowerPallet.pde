@@ -30,11 +30,11 @@
 #include "AshAuger.h"		// Ash auger typedefs.
 #include "Auger.h"
 
-#define RELEASE_CYCLE RELEASE_PRODUCTION
+#define RELEASE_CYCLE RELEASE_DEVELOPMENT
 #define V_MAJOR "1"
 #define V_MINOR "3"
-#define V_MAINT "3"
-#define V_BUILD "300"
+#define V_MAINT "4"
+#define V_BUILD "001"
 #include "Version.h"
 
 /*
@@ -75,21 +75,16 @@ const char help[] PROGMEM = {
   "# T: add 100 ms from Sample Period (loopPeriod1)\r\n"
   "# g: Shake grate\r\n"
   "# G: Switch Grate Shaker mode (Off/On/Pressure Ratio)\r\n"
-  "# m: add 5ms to grate shake interval\r\n"
-  "# M: subtract 5 ms from grate shake interval\r\n"
-  "# e: Engine Governor Tuning mode\r\n"
   "# hH: Print Help Text\r\n" };
 
 // Analog Input Mapping
 #define ANA_LAMBDA ANA0
 #define ANA_FUEL_SWITCH ANA1
 #define ANA_ENGINE_SWITCH ANA2
-#define ANA_OIL_PRESSURE ANA3
+#define ANA_CONDENSATE_PRESSURE ANA3
 #define ANA_AUGER_CURRENT ANA4  //sense current in auger motor
 #define ANA_THROTTLE_POS ANA5
-#define ANA_COOLANT_TEMP ANA6
-#define ANA_DIAL ABSENT
-#define ANA_BATT_V ABSENT
+#define ANA_CONDENSATE_LEVEL ANA6
 
 int smoothed[8];  //array of smoothed analog signals.
 int smoothed_filters[8] = {0, 0, 0, 8, 0, 0, 0, 0};  //filter values for each analog channel
@@ -97,15 +92,13 @@ int analog_inputs[] = {ANA0, ANA1, ANA2, ANA3, ANA4, ANA5, ANA6, ANA7};
 
 // FET Mappings
 #define FET_AUGER FET0
-#define FET_GRATE ABSENT
 #define FET_RUN_ENABLE FET1
-#define FET_IGNITION FET2
-#define FET_STARTER FET3
+#define FET_CONDENSATE_PUMP FET2
+#define FET_CONDENSATE_FAN FET3
 #define FET_FLARE_IGNITOR FET4
 #define FET_O2_RESET FET5
 #define FET_ALARM FET6
 #define FET_AUGER_REV FET7
-#define FET_BLOWER ABSENT
 
 //Servo Mapping
 //TODO: Use these define
@@ -155,8 +148,7 @@ Servo Servo_Mixture;
 #define ENGINE_OFF 0
 #define ENGINE_ON 1
 #define ENGINE_STARTING 2
-#define ENGINE_GOV_TUNING 3
-#define ENGINE_SHUTDOWN 4
+#define ENGINE_SHUTDOWN 3
 
 //Lambda
 #define LAMBDA_SIGNAL_CHECK TRUE
@@ -215,8 +207,8 @@ char unique_number[5] = "#";
 #define TESTING_OFF 0
 #define TESTING_FUEL_AUGER 1
 #define TESTING_RUN_ENABLE 2
-#define TESTING_ENGINE_IGNITION 3
-#define TESTING_STARTER 4
+#define TESTING_CONDENSATE_PUMP 3
+#define TESTING_CONDENSATE_FAN 4
 #define TESTING_FLARE_IGNITOR 5
 #define TESTING_O2_RESET 6
 #define TESTING_ALARM 7
@@ -224,7 +216,7 @@ char unique_number[5] = "#";
 #define TESTING_ANA_LAMBDA 9
 #define TESTING_ANA_ENGINE_SWITCH 10
 #define TESTING_ANA_FUEL_SWITCH 11
-#define TESTING_ANA_OIL_PRESSURE 12
+#define TESTING_ANA_CONDENSATE_PRESSURE 12
 #define TESTING_SERVO 13     //used in Display to defeat any other writes to servo.  Must be last testing state!!!
 
 
@@ -240,23 +232,23 @@ unsigned long testing_state_entered = 0;
 int analog_input[] = {ANA0, ANA1, ANA2, ANA3, ANA4, ANA5, ANA6, ANA7};
 
 //const char testing_state_0[] PROGMEM = "Off";
-const char testing_state_1[] PROGMEM = "FET0 Fuel Auger Fwd";
+const char testing_state_1[] PROGMEM = "FET0 Feed Auger Fwd";
 const char testing_state_2[] PROGMEM = "FET1 Run Enable";
-const char testing_state_3[] PROGMEM = "FET2 Engine/Governor";
-const char testing_state_4[] PROGMEM = "FET3 Starter/Shutdwn";
+const char testing_state_3[] PROGMEM = "FET2 Condensate Pump";
+const char testing_state_4[] PROGMEM = "FET3 Condensate Fan";
 const char testing_state_5[] PROGMEM = "FET4 Flare";
-const char testing_state_6[] PROGMEM = "FET5 Ash Auger";
+const char testing_state_6[] PROGMEM = "FET5 O2 Reset";
 const char testing_state_7[] PROGMEM = "FET6 Alarm";
-const char testing_state_8[] PROGMEM = "FET7 Fuel Auger Rev";
+const char testing_state_8[] PROGMEM = "FET7 Feed Auger Rev";
 
-const char testing_state_9[] PROGMEM =  "ANA_Lambda";
-const char testing_state_10[] PROGMEM = "ANA_Fuel_Switch";
-const char testing_state_11[] PROGMEM = "ANA_Eng_Switch";
-const char testing_state_12[] PROGMEM = "ANA_Oil";
-const char testing_state_13[] PROGMEM = "ANA_Auger_current";
-const char testing_state_14[] PROGMEM = "ANA_Throttle_Pos";
-const char testing_state_15[] PROGMEM = "ANA_Coolant_Temp";
-const char testing_state_16[] PROGMEM = "Unused";
+const char testing_state_9[] PROGMEM =  "Lambda";
+const char testing_state_10[] PROGMEM = "Feed Switch";
+const char testing_state_11[] PROGMEM = "Eng Switch";
+const char testing_state_12[] PROGMEM = "Condensate Pressure";
+const char testing_state_13[] PROGMEM = "Feed Auger Current";
+const char testing_state_14[] PROGMEM = "Throttle Pos";
+const char testing_state_15[] PROGMEM = "Condensate Level";
+const char testing_state_16[] PROGMEM = "Ash Auger Current";
 
 const char * const TestingStateName[] PROGMEM = {testing_state_1, testing_state_2, testing_state_3, testing_state_4, testing_state_5, testing_state_6, testing_state_7, testing_state_8, testing_state_9, testing_state_10, testing_state_11, testing_state_12, testing_state_13, testing_state_14, testing_state_15, testing_state_16};
 
@@ -265,18 +257,18 @@ int lineCount = 0;
 
 const char config_0[] PROGMEM = "Reset Defaults?";
 const char config_1[] PROGMEM = "Engine Type    ";
-const char config_2[] PROGMEM = "Relay Board    ";
+const char config_2[] PROGMEM = "RESERVED        ";
 const char config_3[] PROGMEM = "Auger Rev (.1s)";
 const char config_4[] PROGMEM = "Auger Low (.1A)";
 const char config_5[] PROGMEM = "Auger High(.1A)";
-const char config_6[] PROGMEM = "Low Oil (PSI)  ";
+const char config_6[] PROGMEM = "RESERVED        ";
 const char config_7[] PROGMEM = "Datalog SD card";
 const char config_8[] PROGMEM = "Pratio Accum#  ";
 const char config_9[] PROGMEM = "High Coolant T ";
 const char config_10[] PROGMEM = "Display Per .1s";
-const char config_11[] PROGMEM = "Trst low temp?";
-const char config_12[] PROGMEM = "Trst High Temp";
-const char config_13[] PROGMEM = "Tred High Temp";
+const char config_11[] PROGMEM = "Trst low temp? ";
+const char config_12[] PROGMEM = "Trst High Temp ";
+const char config_13[] PROGMEM = "Tred High Temp ";
 const char config_14[] PROGMEM = "Pfilter Accum# ";
 const char config_15[] PROGMEM = "Grate Max Inter";
 const char config_16[] PROGMEM = "Grate Min Inter";
@@ -287,7 +279,7 @@ const char config_20[] PROGMEM = "Modbus Enabled?";  //Set to Modbus baud of zer
 const char config_21[] PROGMEM = "Modbus Baud    ";  //0:2400, 1:4800, 2:9600, 3:19200, 4:38400, 5:57600, 6:115200
 const char config_22[] PROGMEM = "Modbus Parity  ";  //0:None, 1:Odd, 2:Even
 const char config_23[] PROGMEM = "Modbus Address ";  //1-127
-const char config_24[] PROGMEM = "Grid tie?      ";
+const char config_24[] PROGMEM = "RESERVED       ";
 const char config_25[] PROGMEM = "Pratio Low     ";
 const char config_26[] PROGMEM = "Trst Warn Temp ";
 const char config_27[] PROGMEM = "Pratio High    ";
@@ -318,7 +310,7 @@ configurable Config[] = {
 	{config_3, plus_minus, 0, 254, 5},			// Auger Reverse Time
 	{config_4, plus_minus, 0, 40, 35},			// Auger Low Current
 	{config_5, plus_minus, 41, 135, 100},		// Auger High Current
-	{config_6, plus_minus, 1, 10, 6},			// Oil Low Pressure
+	{config_6, reserved, 1, 10, 6},				// RESERVED - Oil Low Pressure
 	{config_7, no_yes, 0, 254, 1},				// Data Log to SD Card
 	{config_8, reserved, 0, 15, 10},			// RESERVED - Pratio Accum Max
 	{config_9, plus_minus, 10, 254, 98},		// Coolant High Temperature
@@ -336,7 +328,7 @@ configurable Config[] = {
 	{config_21, plus_minus, 0, 6, 3},			// Modbus Baud
 	{config_22, plus_minus, 0, 3, 0},			// Modbus Parity
 	{config_23, plus_minus, 0, 127, 1},			// Modbus Address
-	{config_24, no_yes, 0, 254, 0},				// Grid-Tie Enable
+	{config_24, reserved, 0, 254, 0},			// RESERVED - Grid-Tie Enable
 	{config_25, plus_minus, 0, 100, 30},		// Pratio Low
 	{config_26, plus_minus_five, 0, 254, 150},	// T_RST Warn Temperature
 	{config_27, reserved, 0, 100, 60},			// P_ratio High
@@ -408,14 +400,6 @@ enum P_reactorLevels { OFF = 0, LITE = 1, MEDIUM = 2 , EXTREME = 3} P_reactorLev
 static char *P_reactorLevelName[] = { "Off", "Low", "Medium", "High"};
 int P_reactorLevelBoundary[4][2] = { { -100, 4000 }, {-500, -200}, {-2000,-750}, {-4000,-2000} };
 
-//oil pressure
-int EngineOilPressureValue;
-enum EngineOilPressureLevels { OIL_P_LOW = 0, OIL_P_NORMAL = 1, OIL_P_HIGH = 2} EngineOilPressureLevel;
-static char *EngineOilPressureName[] = { "Low", "Normal", "High"};
-//int EngineOilPressureLevelBoundary[2][2] = { { 0, low_oil_psi}, {600, 1024} };
-unsigned long oil_pressure_state = 0;
-
-
 // Loop variables - 0 is longest, 3 is most frequent, place code at different levels in loop() to execute more or less frequently
 //TO DO: move loops to hardware timer and interrupt based control, figure out interrupt prioritization
 
@@ -445,9 +429,6 @@ boolean ignitor_on;
 //Engine
 int engine_state = ENGINE_OFF;
 unsigned long engine_state_entered;
-unsigned long engine_end_cranking;
-int engine_crank_period = 10000; //length of time to crank engine before stopping (milliseconds)
-double battery_voltage;
 
 //Display
 int display_state = DISPLAY_SPLASH;
@@ -539,7 +520,7 @@ unsigned long alarm_start[ALARM_NUM] = {240000, //ALARM_AUGER_ON_LONG
                                         230, //ALARM_LOW_FUEL_REACTOR
                                         120000, //ALARM_LOW_TRED
                                         0, //ALARM_HIGH_BRED
-                                        1000, //ALARM_BAD_OIL_PRESSURE
+                                        0, //ALARM_BAD_OIL_PRESSURE
                                         30000, //ALARM_O2_NO_SIG
                                         60000, //ALARM_AUGER_LOW_CURRENT
                                         10, //ALARM_BOUND_AUGER
@@ -551,7 +532,7 @@ unsigned long alarm_start[ALARM_NUM] = {240000, //ALARM_AUGER_ON_LONG
                                         0, //ALARM_GRATE_FAULT
                                         0, //ALARM_ASHAUGER_STUCK
                                         0 //ALARM_ASHAUGER_FAULT
-                                        };  
+                                        };
 //time when engine will be shutdown
 unsigned long shutdown[ALARM_NUM] = {360000, //ALARM_AUGER_ON_LONG
                                      600000, //ALARM_AUGER_OFF_LONG
@@ -560,7 +541,7 @@ unsigned long shutdown[ALARM_NUM] = {360000, //ALARM_AUGER_ON_LONG
                                      0, //ALARM_LOW_FUEL_REACTOR
                                      0, //ALARM_LOW_TRED
                                      60000, //ALARM_HIGH_BRED
-                                     1000, //ALARM_BAD_OIL_PRESSURE
+                                     0, //ALARM_BAD_OIL_PRESSURE
                                      0, //ALARM_O2_NO_SIG
                                      180000, //ALARM_AUGER_LOW_CURRENT
                                      20, //ALARM_BOUND_AUGER
@@ -584,7 +565,7 @@ int alarm_shown = 0;
 #define ALARM_LOW_FUEL_REACTOR 4
 #define ALARM_LOW_TRED 5
 #define ALARM_HIGH_BRED 6
-#define ALARM_BAD_OIL_PRESSURE 7
+//#define ALARM_BAD_OIL_PRESSURE 7
 #define ALARM_O2_NO_SIG 8
 #define ALARM_AUGER_LOW_CURRENT 9
 #define ALARM_BOUND_AUGER 10
@@ -604,7 +585,7 @@ const char alarm_4[] PROGMEM = "Bad Filter P_ratio  ";
 const char alarm_5[] PROGMEM = "Reactor Fuel Low    ";
 const char alarm_6[] PROGMEM = "Trst low for engine ";
 const char alarm_7[] PROGMEM = "Tred high for engine";
-const char alarm_8[] PROGMEM = "Check Oil Pressure  ";
+const char alarm_8[] PROGMEM = "RESERVED            ";
 const char alarm_9[] PROGMEM  = "No O2 Sensor Signal ";
 const char alarm_10[] PROGMEM = "Auger Low Current   ";
 const char alarm_11[] PROGMEM = "FuelSwitch/Auger Jam";
@@ -689,10 +670,6 @@ void setup() {
 
   LoadPressureSensorCalibration();
   LoadServo();
-//  if (engine_type == 0) {
-//    shutdown[ALARM_AUGER_OFF_LONG] = shutdown[ALARM_AUGER_OFF_LONG] * 2;
-//    alarm_start[ALARM_AUGER_ON_LONG] = alarm_start[ALARM_AUGER_ON_LONG] * 2;
-//  }
 
   Serial.begin(115200);
 
@@ -733,7 +710,6 @@ void setup() {
     InitModbusSlave();
   }
 
-  if (!grid_tie) TransitionEngine(ENGINE_ON); //default to engine on. if PCU resets, don't shut a running engine off. in the ENGINE_ON state, should detect and transition out of engine on.
   TransitionLambda(LAMBDA_UNKNOWN);
   TransitionAuger(AUGER_OFF);
   TransitionDisplay(DISPLAY_SPLASH);
@@ -752,7 +728,6 @@ void loop() {
 			DoSerialIn();
 			DoLambda();
 			DoControlInputs();
-			DoOilPressure();
 			DoEngine();
 			DoFlare();
 			DoReactor();

@@ -273,9 +273,6 @@ void LogEngine(boolean header=false) {
     case ENGINE_STARTING:
       PrintColumn(P("Starting"));
       break;
-    case ENGINE_GOV_TUNING:
-      PrintColumn(P("Govenor Tuning"));
-      break;
     case ENGINE_SHUTDOWN:
       PrintColumn(P("Shutdown"));
       break;
@@ -283,30 +280,6 @@ void LogEngine(boolean header=false) {
       PrintColumnInt(engine_state);
       break;
     }
-  }
-}
-
-//void LogBatteryVoltage(boolean header=false) {
-//    if (header) {
-//      PrintColumn("battery_voltage");
-//    } else {
-//      PrintColumn(battery_voltage);
-//    }
-//}
-
-void LogOilPressure(boolean header=false){
-  if (header){
-    PrintColumn(P("OilPressureLevel"));
-    //if (engine_type == 1){ //20k
-      PrintColumn(P("OilPressurePSI"));
-    //}
-    //else {
-    //  PrintColumn(P("OilPressureValue"));
-    //}
-  }
-  else {
-    PrintColumn(EngineOilPressureLevel[EngineOilPressureName]);
-    PrintColumn(EngineOilPressureValue);
   }
 }
 
@@ -414,15 +387,8 @@ void DoDatalogging() {
   LogPID(header);
   LogReactor(header);
   LogEngine(header);
-  //LogEnergy(header);
   LogAuger(header);
-  LogOilPressure(header);
-  //LogFlows(header);
-  //LogHertz(header);
-  //LogCounterHertz(header);
-  //LogGovernor(header);
-  //LogPulseEnergy(header);
-  //LogBatteryVoltage(header);
+
   Serial.println(string_buffer);
   if (save_datalog_to_sd && sd_loaded){
     DatalogSD(sd_data_file_name, true);

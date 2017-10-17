@@ -193,8 +193,8 @@ void DoDisplay() {
     case TESTING_ANA_FUEL_SWITCH:
       sprintf(buf, "Value: %4i         ", int(analogRead(ANA_FUEL_SWITCH)));
       break;
-    case TESTING_ANA_OIL_PRESSURE:
-      sprintf(buf, "Value: %4i         ", int(analogRead(ANA_OIL_PRESSURE)));
+    case TESTING_ANA_CONDENSATE_PRESSURE:
+      sprintf(buf, "Value: %4i         ", int(analogRead(ANA_CONDENSATE_PRESSURE)));
       break;
       //    case TESTING_GOV_TUNING:
       //      break;
@@ -768,17 +768,6 @@ void update_config_var(int var_num){
       update_config_var(i);
     }
     break;
-  case 1:
-    //engine_type = getConfig(1);
-    //regs[MB_CONFIG1] = engine_type;
-    //if (engine_type == 0){
-    //    shutdown[ALARM_AUGER_OFF_LONG] = shutdown[ALARM_AUGER_OFF_LONG] * 2;  //10k power pallet goes through fuel slower, give it more time.
-    //}
-    break;
-  case 2:
-    //relay_board = getConfig(2);
-    //regs[MB_CONFIG2] = relay_board;
-    break;
   case 3:
     aug_rev_time = getConfig(3)*100;
     regs[MB_CONFIG3] = aug_rev_time;
@@ -794,10 +783,6 @@ void update_config_var(int var_num){
     AugerCurrentLevelBoundary[CURRENT_ON][1] = current_high_boundary - 5;
     AugerCurrentLevelBoundary[CURRENT_HIGH][0] = current_high_boundary;
     regs[MB_CONFIG5] = current_high_boundary;
-    break;
-  case 6:
-    low_oil_psi = getConfig(6);
-    regs[MB_CONFIG6] = low_oil_psi;
     break;
   case 7:
     save_datalog_to_sd = getConfig(7);

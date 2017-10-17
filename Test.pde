@@ -18,13 +18,13 @@ void TransitionTesting(int new_state) {
     turnAllOff();
     digitalWrite(FET_RUN_ENABLE,HIGH);
     break;
-  case TESTING_ENGINE_IGNITION:
+  case TESTING_CONDENSATE_PUMP:
     turnAllOff();
-    digitalWrite(FET_IGNITION,HIGH);
+    digitalWrite(FET_CONDENSATE_PUMP,HIGH);
     break;
-  case TESTING_STARTER:
+  case TESTING_CONDENSATE_FAN:
     turnAllOff();
-    digitalWrite(FET_STARTER,HIGH);
+    digitalWrite(FET_CONDENSATE_FAN,HIGH);
     break;
   case TESTING_FLARE_IGNITOR:
     turnAllOff();
@@ -36,7 +36,7 @@ void TransitionTesting(int new_state) {
     break;
   case TESTING_ALARM:
     turnAllOff();
-    digitalWrite(FET_ALARM,HIGH); // FET6 can't generate PWM due to Servo library using the related timer
+    digitalWrite(FET_ALARM,HIGH);
     break;
   case TESTING_ANA_LAMBDA:
     break;
@@ -44,7 +44,7 @@ void TransitionTesting(int new_state) {
     break;
   case TESTING_ANA_FUEL_SWITCH:
     break;
-  case TESTING_ANA_OIL_PRESSURE:
+  case TESTING_ANA_CONDENSATE_PRESSURE:
     break;
   }
   testing_state=new_state;
@@ -54,25 +54,20 @@ void GoToNextTestingState() {
   switch (testing_state) {
   case TESTING_OFF:
     TransitionTesting(TESTING_FUEL_AUGER);
-    //DoTesting();
     break;
   case TESTING_FUEL_AUGER:
-//    if (relay_board == 1){  //AUGER Reverse only on relay board
-      TransitionTesting(TESTING_FUEL_REV);
-//    } else {
-//      TransitionTesting(TESTING_GRATE);
-//    }
+	TransitionTesting(TESTING_FUEL_REV);
     break;
   case TESTING_FUEL_REV:
     TransitionTesting(TESTING_RUN_ENABLE);
     break;
   case TESTING_RUN_ENABLE:
-    TransitionTesting(TESTING_ENGINE_IGNITION);
+    TransitionTesting(TESTING_CONDENSATE_PUMP);
     break;
-  case TESTING_ENGINE_IGNITION:
-    TransitionTesting(TESTING_STARTER);
+  case TESTING_CONDENSATE_PUMP:
+    TransitionTesting(TESTING_CONDENSATE_FAN);
     break;
-  case TESTING_STARTER:
+  case TESTING_CONDENSATE_FAN:
     TransitionTesting(TESTING_FLARE_IGNITOR);
     break;
   case TESTING_FLARE_IGNITOR:
@@ -92,9 +87,6 @@ void GoToNextTestingState() {
     TransitionTesting(TESTING_ANA_FUEL_SWITCH);
     break;
   case TESTING_ANA_FUEL_SWITCH:
-    TransitionTesting(TESTING_ANA_OIL_PRESSURE);
-    break;
-  case TESTING_ANA_OIL_PRESSURE:
     TransitionTesting(TESTING_OFF);
     break;
   }
@@ -103,11 +95,11 @@ void GoToNextTestingState() {
 void turnAllOff(){
     digitalWrite(FET_AUGER,LOW);
     digitalWrite(FET_RUN_ENABLE,LOW);
-    digitalWrite(FET_IGNITION,LOW);
-    digitalWrite(FET_STARTER,LOW);
+    digitalWrite(FET_CONDENSATE_PUMP,LOW);
+    digitalWrite(FET_CONDENSATE_FAN,LOW);
     digitalWrite(FET_FLARE_IGNITOR,LOW);
     digitalWrite(FET_O2_RESET,LOW);
-    digitalWrite(FET_ALARM,LOW); // FET6 can't generate PWM due to Servo library using the related timer
+    digitalWrite(FET_ALARM,LOW);
     digitalWrite(FET_AUGER_REV,LOW);
 }
 

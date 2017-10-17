@@ -192,8 +192,6 @@ void resetAlarm(int alarm_num){
     break;
   case ALARM_HIGH_BRED:
     break;
-  case ALARM_BAD_OIL_PRESSURE:
-    break;
   case ALARM_O2_NO_SIG:
     TransitionLambda(LAMBDA_NO_SIGNAL);
     break;
@@ -220,7 +218,7 @@ void resetAlarm(int alarm_num){
 	break;
   }
 }
- 
+
 int getAlarmBin(){
   int bin = 0;
   if (alarm_count>0){

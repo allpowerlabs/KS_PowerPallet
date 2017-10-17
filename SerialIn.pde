@@ -79,11 +79,11 @@ void DoSerialIn() {
       Log_p("Sample Period now:");
       Logln(loopPeriod1);
       break;
-    case 'g':  
+    case 'g':
 		Log_p("Broken, will fix later...");
 		//Logln("Grate Shaken");
       break;
-    case 'G':  
+    case 'G':
       switch (GrateGetMode()) {
       case DISABLED:
         GrateSwitchMode(MANUAL);
@@ -95,7 +95,7 @@ void DoSerialIn() {
         GrateSwitchMode(DISABLED);
         break;
       }
-      break;  
+      break;
     case 'm':
       // grate_max_interval += 5;
       // grate_min_interval = grate_max_interval*0.5;
@@ -113,10 +113,7 @@ void DoSerialIn() {
       // Log_p("Grate Min Interval now:");
       // Logln(grate_min_interval);
 	  Log_p("Broken, will fix later...");
-      break;   
-    case 'e':
-      TransitionEngine(ENGINE_GOV_TUNING);
-      break; 
+      break;
 //    case 'x':
 //      testSD();
 //      break;
@@ -154,7 +151,7 @@ void DoSerialIn() {
    case 'H':
 //      Logln(P(help));
       printProgStr(help);
-      break; 
+      break;
    case '?':
       SerialShowInfo();
       break;
@@ -176,13 +173,13 @@ void DoSerialIn() {
 //      Serial.read
     }
   }
-  
+
 }
 
 int SerialReadInt(){
   byte incomingByte;
-  int integerValue = 0;  
-  while(1) {            
+  int integerValue = 0;
+  while(1) {
     incomingByte = Serial.read();
     if (incomingByte == '\n') break;   // exit the while(1), we're done receiving
     if (incomingByte == -1) continue;  // if no characters are in the buffer read() returns -1
@@ -210,7 +207,7 @@ void SerialReadString(char endString){
     charCount += 1;
   }
 }
-    
+
 
 
 void PrintLambdaUpdate(double P, double I, double D, double nP, double nI, double nD) {
@@ -250,7 +247,7 @@ void printProgStr(const char str[])
 {
   char c;
   if(!str) return;
-  while((c = (char) pgm_read_byte_far(str++))) 
+  while((c = (char) pgm_read_byte_far(str++)))
     Serial.write(c);
 }
 
@@ -262,7 +259,7 @@ void SerialShowInfo(void) {
    sprintf(buf, "%10s %5s", serial_num, unique_number);
    Serial.println(buf);
  }
- 
+
  void SerialShowSDInfo(void) {
  }
 
