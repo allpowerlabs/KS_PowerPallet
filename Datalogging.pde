@@ -93,16 +93,36 @@ void LogFilter(boolean header = false) {
   if (header) {
     PrintColumn(P("P_ratio_filter"));
     PrintColumn(P("P_ratio_filter_state"));
+	PrintColumn(P("Condensate_Level"));
+	PrintColumn(P("Condensate_Recirc_Pressure"));
+	PrintColumn(P("Condensate_Recirc_State"));
   }
   else {
     PrintColumn(pRatioFilter);
     //TODO: Move to enum
     if (pRatioFilterHigh) {
-      PrintColumn(P("Bad"));
+		PrintColumn(P("Bad"));
     }
     else {
-      PrintColumn(P("Good"));
+		PrintColumn(P("Good"));
     }
+	if (condensate_level == CONDENSATE_LEVEL_HIGH) {
+		PrintColumn(P("High"));
+	} else {
+		PrintColumn(P("Normal"));
+	}
+	PrintColumnInt(condensate_recirc_pressure);
+	switch (condensate_recirc_state) {
+	case CONDENSATE_RECIRC_OFF:
+		PrintColumn(P("OFF"));
+		break;
+	case CONDENSATE_RECIRC_NORMAL:
+		PrintColumn(P("NORMAL"));
+		break;
+	case CONDENSATE_RECIRC_HIGH:
+		PrintColumn(P("HIGH"));
+		break;
+	}
   }
 }
 

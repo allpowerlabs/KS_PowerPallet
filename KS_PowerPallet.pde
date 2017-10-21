@@ -81,10 +81,10 @@ const char help[] PROGMEM = {
 #define ANA_LAMBDA ANA0
 #define ANA_FUEL_SWITCH ANA1
 #define ANA_ENGINE_SWITCH ANA2
-#define ANA_CONDENSATE_PRESSURE ANA3
+#define ANA_CONDENSATE_LEVEL ANA3
 #define ANA_AUGER_CURRENT ANA4  //sense current in auger motor
 #define ANA_THROTTLE_POS ANA5
-#define ANA_CONDENSATE_LEVEL ANA6
+#define ANA_CONDENSATE_PRESSURE ANA6
 
 int smoothed[8];  //array of smoothed analog signals.
 int smoothed_filters[8] = {0, 0, 0, 8, 0, 0, 0, 0};  //filter values for each analog channel
@@ -149,6 +149,14 @@ Servo Servo_Mixture;
 #define ENGINE_ON 1
 #define ENGINE_STARTING 2
 #define ENGINE_SHUTDOWN 3
+
+//Condensate Recirculation States
+#define CONDENSATE_RECIRC_OFF 0
+#define CONDENSATE_RECIRC_NORMAL 1
+#define CONDENSATE_RECIRC_HIGH 2
+
+#define CONDENSATE_LEVEL_NORMAL 0
+#define CONDENSATE_LEVEL_HIGH 1
 
 //Lambda
 #define LAMBDA_SIGNAL_CHECK TRUE
@@ -244,10 +252,10 @@ const char testing_state_8[] PROGMEM = "FET7 Feed Auger Rev";
 const char testing_state_9[] PROGMEM =  "Lambda";
 const char testing_state_10[] PROGMEM = "Feed Switch";
 const char testing_state_11[] PROGMEM = "Eng Switch";
-const char testing_state_12[] PROGMEM = "Condensate Pressure";
+const char testing_state_12[] PROGMEM = "Condensate Level";
 const char testing_state_13[] PROGMEM = "Feed Auger Current";
 const char testing_state_14[] PROGMEM = "Throttle Pos";
-const char testing_state_15[] PROGMEM = "Condensate Level";
+const char testing_state_15[] PROGMEM = "Condensate Pressure";
 const char testing_state_16[] PROGMEM = "Ash Auger Current";
 
 const char * const TestingStateName[] PROGMEM = {testing_state_1, testing_state_2, testing_state_3, testing_state_4, testing_state_5, testing_state_6, testing_state_7, testing_state_8, testing_state_9, testing_state_10, testing_state_11, testing_state_12, testing_state_13, testing_state_14, testing_state_15, testing_state_16};
@@ -384,6 +392,15 @@ float pRatioFilter;
 boolean pRatioFilterHigh;
 int filter_pratio_accumulator;
 
+// Condensate Recirculation
+int condensate_recirc_state;
+unsigned long condensate_recirc_state_entered;
+int condensate_level;
+int condensate_recirc_pressure;
+#define CONDENSATE_RECIRC_PRESSURE_LOW (15)
+#define CONDENSATE_RECIRC_PRESSURE_HIGH (80)
+#define ADC_TO_RECIRC_PRESSURE(p) (p)
+
 // Temperature Levels
 #define TEMP_LEVEL_COUNT 5
 enum TempLevels { COLD = 0,COOL = 1,WARM = 2 ,HOT = 3, EXCESSIVE = 4} TempLevel;
@@ -407,7 +424,6 @@ int loopPeriod1 = 1000;
 unsigned long nextTime1;
 int loopPeriod2 = 100;
 unsigned long nextTime2;
-
 
 //Control
 int control_state = CONTROL_OFF;
@@ -734,6 +750,7 @@ void loop() {
 			DoAuger();
 			DoGrate();
 			DoAshAuger();	// New!
+			DoCondensateRecirc();
 			if (use_modbus == 1){
 			  DoModbus();
 			}
