@@ -13,9 +13,9 @@ void DoFilter() {
 
 void DoCondensateRecirc() {
 	if (analogRead(ANA_CONDENSATE_LEVEL) > 515) {
-		condensate_level = CONDENSATE_LEVEL_HIGH;
-	} else {
 		condensate_level = CONDENSATE_LEVEL_NORMAL;
+	} else {
+		condensate_level = CONDENSATE_LEVEL_HIGH;
 	}
 
 	condensate_recirc_pressure = ADC_TO_RECIRC_PRESSURE(analogRead(ANA_CONDENSATE_PRESSURE));
