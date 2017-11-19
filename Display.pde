@@ -92,77 +92,6 @@ void DoDisplay() {
 		Disp_PutStr(buf);
 	}
     break;
-  case DISPLAY_ENGINE:
-    Disp_CursOff();
-    Disp_RC(0,0);
-#if T_ENG_COOLANT != ABSENT
-    sprintf(buf, "Tcool%4i  ", Temp_Data[T_ENG_COOLANT]);
-#else
-    sprintf(buf, "Tcool  NA  ");
-#endif
-    Disp_PutStr(buf);
-    Disp_RC(0,11);
-    Disp_PutStr(P("           "));
-    //Row 1
-    Disp_RC(1,0);
-    strcpy_P(buf, blank);
-    Disp_PutStr(buf);
-    //Row 2
-    Disp_RC(2,0);
-    strcpy_P(buf, blank);
-    Disp_PutStr(buf);
-    //Row 3
-    Disp_RC(3,0);
-    strcpy_P(buf, blank);
-    Disp_PutStr(buf);
-    Disp_CursOff();
-    break;
-  case DISPLAY_TESTING:
-    Disp_CursOff();
-    item_count = 1;
-    //Row 0
-    Disp_RC(0,0);
-    Disp_PutStr(P("Testing             "));
-    //Row 1
-    Disp_RC(1,0);
-    strcpy_P(config_buffer, (char*)pgm_read_word(&(TestingStateName[testing_state])));
-    sprintf(buf, "%-20s", config_buffer);
-    Disp_PutStr(buf);
-    //Row 2
-    Disp_RC(2,0);
-    switch (testing_state) {
-    case TESTING_ANA_LAMBDA:
-      sprintf(buf, "Value: %4i         ", int(analogRead(ANA_LAMBDA)));
-      break;
-    case TESTING_ANA_ENGINE_SWITCH:
-      sprintf(buf, "Value: %4i         ", int(analogRead(ANA_ENGINE_SWITCH)));
-      break;
-    case TESTING_ANA_FUEL_SWITCH:
-      sprintf(buf, "Value: %4i         ", int(analogRead(ANA_FUEL_SWITCH)));
-      break;
-    case TESTING_ANA_CONDENSATE_PRESSURE:
-      sprintf(buf, "Value: %4i         ", int(analogRead(ANA_CONDENSATE_PRESSURE)));
-      break;
-      //    case TESTING_GOV_TUNING:
-      //      break;
-    default:
-      sprintf(buf,"                   ");
-    }
-    Disp_PutStr(buf);
-    //Row 3
-    switch (cur_item) {
-    case 1: // Testing
-      if (key == 2) {
-        GoToNextTestingState(); //first testing state
-      }
-      Disp_RC(3,0);
-      Disp_PutStr(P("NEXT       TEST     "));
-      break;
-    default:
-      Disp_RC(3,0);
-      Disp_PutStr(P("NEXT                "));
-    }
-    break;
   case DISPLAY_LAMBDA:
      Disp_CursOff();
     item_count = 3;  // was 4, but moved Lambda display out of the edit path
@@ -428,47 +357,6 @@ void DoDisplay() {
       }
     }
     break;
-    //  case DISPLAY_SD:
-    //    Disp_CursOff();
-    //    Disp_RC(0,0);
-    //    Disp_PutStr("   Test SD Card     ");
-    //    Disp_RC(1,0);
-    //    Disp_PutStr("See Serial Monitor  ");
-    //    Disp_RC(2,0);
-    //    Disp_PutStr("for more information");
-    //    Disp_RC(3,0);
-    //    Disp_PutStr("NEXT            TEST");
-    //    if (key == 3 and cur_item == 1) {  //only allow the button to be pressed once
-    //      testSD();
-    //      cur_item++;
-    //    }
-    //    break;
-//  case DISPLAY_PHIDGET:
-//      Disp_CursOff();
-////    Disp_RC(0,0);
-////    sprintf(buf, "O2%4i Fu%4iKey%4i", analogRead(ANA0),analogRead(ANA1),analogRead(ANA2));
-////    Disp_PutStr(buf);
-////    Disp_RC(1,0);
-////    sprintf(buf, "Oil%4iAug%4iTh%4i", analogRead(ANA3),analogRead(ANA4),analogRead(ANA5));
-////    Disp_PutStr(buf);
-////    Disp_RC(2,0);
-////    sprintf(buf, "CoolT%4i Aux%4i   ", analogRead(ANA6),analogRead(ANA7));
-////    Disp_PutStr(buf);
-////    Disp_RC(3,0);
-////    Disp_PutStr("NEXT                ");
-//    Disp_RC(0,0);
-//    sprintf(buf, "Phidgits:     0:%4i", analogRead(ANA0));
-//    Disp_PutStr(buf);
-//    Disp_RC(1,0);
-//    sprintf(buf, "1:%4i 2:%4i 3:%4i", analogRead(ANA1),analogRead(ANA2),analogRead(ANA3));
-//    Disp_PutStr(buf);
-//    Disp_RC(2,0);
-//    sprintf(buf, "4:%4i 5:%4i 6:%4i", analogRead(ANA4),analogRead(ANA5),analogRead(ANA6));
-//    Disp_PutStr(buf);
-//    Disp_RC(3,0);
-//    sprintf(buf, "NEXT          7:%4i", analogRead(ANA7));
-//    Disp_PutStr(buf);
-//    break;
   case DISPLAY_ANA:
     Disp_CursOff();
     item_count = 7;
@@ -566,10 +454,8 @@ void TransitionDisplay(int new_state) {
 	cur_item = 0;
 	switch (new_state) {
 	case DISPLAY_LAMBDA:
-	case DISPLAY_TESTING:
 	case DISPLAY_SERVO:
 	case DISPLAY_CALIBRATE_PRESSURE:
-	case DISPLAY_SD:
 		cur_item = 1;
 		break;
 	case DISPLAY_RELAY:
@@ -596,9 +482,6 @@ void DoKeyInput() {
 	  if (cur_item < 1)
 		TransitionDisplay(DISPLAY_GRATE);
       break;
-    case DISPLAY_ENGINE:
-      TransitionDisplay(DISPLAY_REACTOR);
-      break;
     case DISPLAY_LAMBDA:
       TransitionDisplay(DISPLAY_INFO);
       break;
@@ -617,16 +500,6 @@ void DoKeyInput() {
         TransitionDisplay(DISPLAY_RELAY);
       }
       else {
-        TransitionDisplay(DISPLAY_REACTOR);
-      }
-      break;
-    case DISPLAY_TESTING:
-      turnAllOff();
-      if (engine_state == ENGINE_OFF){
-        TransitionDisplay(DISPLAY_SERVO);
-      }
-      else {
-        TransitionTesting(TESTING_OFF);
         TransitionDisplay(DISPLAY_REACTOR);
       }
       break;
@@ -718,11 +591,6 @@ void DoHeartBeat() {
   //PORTJ ^= 0x80;    // toggle the heartbeat LED
 }
 
-//void TransitionMessage(String t_message) {
-//  transition_message = t_message;
-//  transition_entered = millis();
-//}
-
 void saveConfig(int item, int state){  //EEPROM:  0-499 for internal states, 500-999 for configurable states, 1000-4000 for data logging configurations.
   if (item == 0  and state == 1){
     resetConfig();
@@ -777,18 +645,9 @@ void update_config_var(int var_num){
     save_datalog_to_sd = getConfig(7);
     regs[MB_CONFIG7] = save_datalog_to_sd;
     break;
-  case 8:
-    //pratio_max = getConfig(8)*5;
-    //alarm_start[ALARM_BAD_REACTOR] = pratio_max;
-    //regs[MB_CONFIG8] = pratio_max;
-    break;
   case 9:
     high_coolant_temp = getConfig(9);
     regs[MB_CONFIG9] = high_coolant_temp;
-    break;
-  case 10:
-    //display_per = getConfig(10);
-    //regs[MB_CONFIG10] = display_per;
     break;
   case 11:
     tred_low_temp = getConfig(11)*5;
@@ -801,11 +660,6 @@ void update_config_var(int var_num){
   case 13:
     tbred_high = getConfig(13)*5;
     regs[MB_CONFIG13] = tbred_high;
-    break;
-  case 14:
-    //pfilter_alarm = getConfig(14);
-    //alarm_start[ALARM_BAD_FILTER] = pfilter_alarm;
-    //regs[MB_CONFIG14] = pfilter_alarm;
     break;
   case 15:
     regs[MB_CONFIG15] = getConfig(15)*5;
@@ -822,10 +676,6 @@ void update_config_var(int var_num){
   case 18:
     servo_start = getConfig(18);
     regs[MB_CONFIG18] = servo_start;
-    break;
-  case 19:
-    //lambda_rich = getConfig(19);
-    //regs[MB_CONFIG19] = lambda_rich;
     break;
   case 20:
     use_modbus = getConfig(20);
@@ -855,12 +705,6 @@ void update_config_var(int var_num){
     break;
   case 26:
     ttred_warn = getConfig(26)*5;
-    break;
-  case 27:
-//    pratio_high_boundary = getConfig(27);
-//    pratio_high = pratio_high_boundary/100.0;
-//    pRatioReactorLevelBoundary[0][0] = pratio_high;
-//    pRatioReactorLevelBoundary[1][1] = pratio_high;
     break;
   case 28:
     AshAugerReset();

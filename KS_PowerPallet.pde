@@ -186,18 +186,14 @@ Servo Servo_Mixture;
 //Display States
 #define DISPLAY_SPLASH 0
 #define DISPLAY_REACTOR 1
-#define DISPLAY_ENGINE 2
-#define DISPLAY_TEST 3
-#define DISPLAY_LAMBDA 4
-#define DISPLAY_GRATE 5
-#define DISPLAY_INFO 6
-#define DISPLAY_TESTING 7
-#define DISPLAY_SERVO 8
-#define DISPLAY_CALIBRATE_PRESSURE 9
-#define DISPLAY_CONFIG 10
-#define DISPLAY_SD 11
-#define DISPLAY_RELAY 12
-#define DISPLAY_ANA 13
+#define DISPLAY_LAMBDA 2
+#define DISPLAY_GRATE 3
+#define DISPLAY_INFO 4
+#define DISPLAY_SERVO 5
+#define DISPLAY_CALIBRATE_PRESSURE 6
+#define DISPLAY_CONFIG 7
+#define DISPLAY_RELAY 8
+#define DISPLAY_ANA 9
 #define DISPLAY_ALARM 999
 
 const char menu1[] PROGMEM = "NEXT  ADV   +    -  ";
