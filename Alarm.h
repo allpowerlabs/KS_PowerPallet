@@ -1,9 +1,23 @@
 
-typedef void (*reset_f)(int);
+/*
+	Alarm States:
+	Active - the alarm has been triggered and has not been silenced by the user
+	Silenced - the alarm has been triggered, but the user has requested it to be quiet
+*/
 
-typedef struct alarm_s {
+enum alarm_state {
+	ALARM_ACTIVE,
+	ALARM_SILENCED
+};
+
+struct alarm {
 	const char * message;
-	reset_f reset;
-	unsigned silent:1;
-	alarm_s * next;
-} alarm_s;
+	const char * message2;
+	void (*reset)(void); // Pointer to a reset function, called when the user resets the alarm
+	unsigned long delay; // count or time in milliseconds to wait before alarm goes off
+	unsigned long shutdown; // delay after alarm activation when engine will be shutdown
+	unsigned long on;  // Time when the alarm was activated
+	unsigned char silenced;
+	struct alarm * prev;
+	struct alarm * next;
+};

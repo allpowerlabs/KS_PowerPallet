@@ -127,7 +127,7 @@ void DoGrate() {
 	if (vnh_get_mode(grate.hbr) != VNH_STANDBY && (!gpio_get_pin(grate.hbr->ena) || !gpio_get_pin(grate.hbr->enb))) {
 		Logln_p("Grate: Motor drive fault!");
 		GrateSwitchMode(DISABLED);  // Disable the grate
-		setAlarm(ALARM_GRATE_FAULT);
+		setAlarm(&ALARM_GRATE_FAULT);
 		// Alarm
 		// alarm(grate.fault_alarm);
 	}

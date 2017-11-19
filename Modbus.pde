@@ -81,7 +81,7 @@ void DoModbus() {
         written.num_regs=0;
     }
 
-    regs[MB_ALARMS] = getAlarmBin();
+    regs[MB_ALARMS] = 0; // Broken, was getAlarmBin();
     regs[MB_FUELSWITCHLEVEL] = getFuelSwitch();
     regs[MB_P_RATIO_FILTER_STATE] = -500;  //int(pRatioFilterHigh);
     regs[MB_P_RATIO_STATE_REACTOR] = (int)pRatioReactorLevel;	 //pRatioReactorLevel[pRatioReactorLevelName]

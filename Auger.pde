@@ -15,6 +15,12 @@ void AugerInit() {
 	fuel_switch_hysteresis = getConfig(34) * 1000;
 }
 
+// This function is called when a user resets an auger alarm.
+void AugerReset(void) {
+	fuel_state_entered = millis();
+    TransitionAuger(AUGER_OFF);
+}
+
 void DoAuger() {
   checkAuger();
   switch (auger_state) {
@@ -25,7 +31,7 @@ void DoAuger() {
     if (P_reactorLevel == OFF) {
       auger_state_entered = millis(); //reset to zero if no vacuum and auger off
     }
-    if (millis() - auger_state_entered > shutdown[ALARM_AUGER_OFF_LONG] && engine_state == ENGINE_ON){
+    if (millis() - auger_state_entered > ALARM_AUGER_OFF_LONG.shutdown && engine_state == ENGINE_ON){
       Logln_p("Auger off too long");
       TransitionAuger(AUGER_ALARM);
     }
@@ -41,7 +47,7 @@ void DoAuger() {
     if (AugerCurrentLevel != CURRENT_LOW && AugerCurrentLevel != CURRENT_OFF && millis() - auger_state_entered > 500){ //switch forward instead?
       TransitionAuger(AUGER_FORWARD);
     }
-    if ((millis() - auger_state_entered) > shutdown[ALARM_AUGER_LOW_CURRENT]){  //turn engine and auger off if auger current low for 3 minutes
+    if ((millis() - auger_state_entered) > ALARM_AUGER_LOW_CURRENT.shutdown){  //turn engine and auger off if auger current low for 3 minutes
       TransitionAuger(AUGER_ALARM);
         Logln_p("Low Auger Current for too long");
     }
@@ -61,7 +67,7 @@ void DoAuger() {
       if (AugerCurrentLevel >= CURRENT_LOW && millis() - auger_state_entered > 500){
 		TransitionAuger(AUGER_CURRENT_LOW);
       }
-    if ((millis() - auger_state_entered) > shutdown[ALARM_AUGER_ON_LONG]){  //turn engine and auger off if auger runs non-stop for too long, use auger_direction_entered???
+    if ((millis() - auger_state_entered) > ALARM_AUGER_ON_LONG.shutdown){  //turn engine and auger off if auger runs non-stop for too long, use auger_direction_entered???
       TransitionAuger(AUGER_ALARM);
 		Logln_p("Auger on too long");
     }
@@ -87,7 +93,7 @@ void DoAuger() {
     if (millis() - auger_direction_entered > aug_rev_time){
       TransitionAuger(AUGER_FORWARD);
     }
-    if (auger_rev_count > shutdown[ALARM_BOUND_AUGER]){  //catch oscillating auger from broken Fuel Switch
+    if (auger_rev_count > ALARM_BOUND_AUGER.shutdown){  //catch oscillating auger from broken Fuel Switch
       Logln_p("Auger Bound or broken Fuel Switch, stopping Auger");
       TransitionAuger(AUGER_ALARM);
     }

@@ -46,25 +46,25 @@ void DoEngine() {
 		}
 		if (Temp_Data[T_ENG_COOLANT] > high_coolant_temp) {
   			Log_p("Engine coolant temp too high"); Logln(buf);
-  			setAlarm(ALARM_HIGH_COOLANT_TEMP);
+  			setAlarm(&ALARM_HIGH_COOLANT_TEMP);
   			TransitionEngine(ENGINE_SHUTDOWN);
   		}
-		if ((P_reactorLevel != OFF) && (Temp_Data[T_TRED] < tred_low_temp) && (engine_state_entered + shutdown[ALARM_TRED_LOW] < millis())) {
+		if ((P_reactorLevel != OFF) && (Temp_Data[T_TRED] < tred_low_temp) && (engine_state_entered + ALARM_TRED_LOW.shutdown < millis())) {
 			Log_p("Reduction zone temp too low"); Logln(buf);
-			setAlarm(ALARM_TRED_LOW);
+			setAlarm(&ALARM_TRED_LOW);
 			TransitionEngine(ENGINE_SHUTDOWN);
 		}
-		if (alarm_on[ALARM_TTRED_HIGH] > shutdown[ALARM_TTRED_HIGH]){
+		if (ALARM_TTRED_HIGH.on > ALARM_TTRED_HIGH.shutdown){
 			Log_p("Top of reduction zone temp too high"); Logln(buf);
 			TransitionEngine(ENGINE_SHUTDOWN);
 		}
-		if (alarm_on[ALARM_TBRED_HIGH] > shutdown[ALARM_TBRED_HIGH]){
+		if (ALARM_TBRED_HIGH.on > ALARM_TBRED_HIGH.shutdown){
 			Log_p("Bottom of reduction zone temp too high"); Logln(buf);
 			TransitionEngine(ENGINE_SHUTDOWN);
 		}
 		if (Press[P_COMB] < -7472) {
 			Log_p("Reactor Pressure too high (above 30 inch water)"); Logln(buf);
-			setAlarm(ALARM_HIGH_PCOMB);
+			setAlarm(&ALARM_HIGH_PCOMB);
 			TransitionEngine(ENGINE_SHUTDOWN);
 		}
 		if (auger_state == AUGER_ALARM) {
@@ -108,35 +108,9 @@ void TransitionEngine(int new_state) {
 			break;
 		case ENGINE_SHUTDOWN:
 			Log(p_buffer); Logln_p("Shutdown");
-			Log("Shutdown from alarm:");
-			if (EngineShutdownFromAlarm()){
-				Logln_p("True");
-			} else {
-				Logln_p("False");
-			}
 			digitalWrite(FET_RUN_ENABLE,HIGH);
 			break;
 	}
 	engine_state=new_state;
 }
 
-boolean EngineShutdownFromAlarm() {
-  boolean alarms = false;
-  for (int i=0; i< ALARM_NUM; i++){
-    if ((shutdown[i]>0) && (alarm_on[i] >= shutdown[i])) {
-
-      strcpy_P(p_buffer, (char*)pgm_read_word(&(display_alarm[i])));
-      Serial.print("Shutdown Alarm:");
-      Serial.print(p_buffer);
-      Serial.print(" i:");
-      Serial.print(i);
-      Serial.print(" alarm on:");
-      Serial.print(alarm_on[i]);
-      Serial.println();
-      //Logln_p(String(millis()-alarm_on[i]));
-      alarms = true;
-      //break;
-     }
-  }
-  return alarms;
-}

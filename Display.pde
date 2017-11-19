@@ -1,3 +1,5 @@
+struct alarm * alarm_shown;  // Pointer to currently displayed alarm
+
 void DoDisplay() {
   char config_buffer[] = "               ";
   char config_choice_buffer[] = "        ";
@@ -25,124 +27,69 @@ void DoDisplay() {
     }
     break;
   case DISPLAY_REACTOR:
-    Disp_CursOff();
-	item_count = alarm_count;
-	if (cur_item < 1 && alarm && alarm_count > 0) cur_item = 1;
-	if (cur_item>item_count) {  // Keep the cur_item within bounds
-		if (alarm) cur_item = 1;
-		else cur_item = 0;
+	if (alarm_shown) {
+		TransitionDisplay(DISPLAY_ALARM);
+		return;
 	}
-    if (cur_item > 0) {
-	  alarm_shown = alarm_queue[cur_item - 1];
-      //Row 0
-      Disp_RC(0, 0);
-      if (shutdown[alarm_shown]> 0){
-        sprintf(buf, "SHUTDOWN ALARM %2i/%2i", cur_item, alarm_count);
-      }
-      else {
-        sprintf(buf, "      ALARM   %2i/%2i ", cur_item, alarm_count);
-      }
-      Disp_PutStr(buf);
-      //Row 1
-      Disp_RC(1, 0);
-      strcpy_P(p_buffer, (char*)pgm_read_word(&(display_alarm[alarm_shown])));
-      Disp_PutStr(p_buffer);
-      //Row 2
-      Disp_RC(2, 0);
-      strcpy_P(p_buffer, (char*)pgm_read_word(&(display_alarm2[alarm_shown])));
-      Disp_PutStr(p_buffer);
-      if (shutdown[alarm_shown] > 999 && engine_state == ENGINE_ON){     //anything less than 999 is a count and not a shutdown time in millisecond so don't show.
-        Disp_RC(2, 13);
-        sprintf(buf, "OFF:%3i", (shutdown[alarm_shown] - alarm_start[alarm_shown] - (millis() - alarm_on[alarm_shown]))/1000);
-        Disp_PutStr(buf);
-      }
-      //Row 3
-      Disp_RC(3, 0);
-	  if (alarm_count > 1 || !alarm)
-		Disp_PutStr(P("     ADV  "));
-	  else
-		Disp_PutStr(P("          "));
-	  Disp_RC(3, 9);
-	  if (alarm)
-		Disp_PutStr(P("QUIET "));
-	  else
-		Disp_PutStr(P("      "));
-	  Disp_RC(3, 15);
-      if (millis() - alarm_on[alarm_shown] > 4000){ //Wait to show RESET button in case new alarm state has taken over screen.
-        Disp_PutStr(P("RESET"));
-      }
-	  else Disp_PutStr(P("     "));
-	  if (key == 2) {
-		  if (alarm) {
-			alarm = false;
-			cur_item = 0;
-		  }
-	  }
-	  if (millis() - alarm_on[alarm_shown] > 4000){ //wait until RESET button shows up, a wait of 4 seconds is given so that
-		if (key == 3) {
-			removeAlarm(alarm_shown);
-			resetAlarm(alarm_shown);
-			cur_item = 1; //start at beginning of alarm queue
-		}
-	  }
-    }
-    else {
-		//Row 0
-		Disp_RC(0, 0);
-        sprintf(buf, "Trst %4i  ", Temp_Data[T_TRED]);
-        Disp_PutStr(buf);
-        Disp_RC(0, 11);
-        sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
-        Disp_PutStr(buf);
+	item_count = 0;
+    Disp_CursOff();
 
-		//Row 1
-		Disp_RC(1, 0);
+	//Row 0
+	Disp_RC(0, 0);
+	sprintf(buf, "Trst %4i  ", Temp_Data[T_TRED]);
+	Disp_PutStr(buf);
+	Disp_RC(0, 11);
+	sprintf(buf, "Pcomb%4i", Press[P_COMB] / 25);
+	Disp_PutStr(buf);
 
-		sprintf(buf, "Tred %4i  ", Temp_Data[T_BRED]);
+	//Row 1
+	Disp_RC(1, 0);
+	sprintf(buf, "Tred %4i  ", Temp_Data[T_BRED]);
+	Disp_PutStr(buf);
+	Disp_RC(1, 11);
+	sprintf(buf, "Preac%4i", Press[P_REACTOR] / 25);
+	Disp_PutStr(buf);
 
-		Disp_PutStr(buf);
-		Disp_RC(1, 11);
-		sprintf(buf, "Preac%4i", Press[P_REACTOR] / 25);
-		Disp_PutStr(buf);
-		//Row 2
-		Disp_RC(2,0);
-		if (P_reactorLevel != OFF) {
+	//Row 2
+	Disp_RC(2,0);
+	if (P_reactorLevel != OFF) {
 		//the value only means anything if the pressures are high enough, otherwise it is just noise
 		sprintf(buf, "Pratio%3i  ", int(pRatioReactor*100)); //pressure ratio
 		Disp_PutStr(buf);
-		}
-		else {
+	}
+	else {
 		Disp_PutStr(P("Pratio --  "));
-		}
-		Disp_RC(2, 11);
-		if (true) {
+	}
+	Disp_RC(2, 11);
+	if (true) {
 		sprintf(buf, "Pfilt%4i", Press[P_FILTER] / 25);
-		}
-		else {
+	}
+	else {
 		//TO DO: Implement filter warning
 		if (pRatioFilterHigh) {
-		  sprintf(buf, "Pfilt Bad");
+			sprintf(buf, "Pfilt Bad");
 		}
 		else {
-		  sprintf(buf, "PfiltGood");
+			sprintf(buf, "PfiltGood");
 		}
+	}
+	Disp_PutStr(buf);
+
+	//Row 3
+	if (engine_state == ENGINE_SHUTDOWN) {
+		Disp_RC(3,0);
+		Disp_PutStr("      SHUTDOWN      ");
+	} else {
+		Disp_RC(3,0);
+		if ((getAlarmCount() > 0) && (millis() % 1000 > 500)) {
+			sprintf(buf, "NEXT ALARM");
+		} else {
+			sprintf(buf, "NEXT      ");
 		}
 		Disp_PutStr(buf);
-		//Row 3
-    if (engine_state == ENGINE_SHUTDOWN) {
-      Disp_RC(3,0);
-      Disp_PutStr("      SHUTDOWN      ");
-    } else {
-      Disp_RC(3,0);
-      if ((alarm_count > 0) && (millis() % 1000 > 500))
-        sprintf(buf, "NEXT ALARM", cur_item);
-      else
-        sprintf(buf, "NEXT      ");
-      Disp_PutStr(buf);
-      Disp_RC(3,10);
-      sprintf(buf, " T: %6lu", millis() / 1000);
-      Disp_PutStr(buf);
-    }
+		Disp_RC(3,10);
+		sprintf(buf, " T: %6lu", millis() / 1000);
+		Disp_PutStr(buf);
 	}
     break;
   case DISPLAY_ENGINE:
@@ -541,63 +488,99 @@ void DoDisplay() {
     Disp_PutStr("NEXT  ADV           ");
     break;
 
-    //    case DISPLAY_TEMP2:
-    //      break;
-    //    case DISPLAY_FETS:
-    //      break;
+	case DISPLAY_ALARM:
+		if (!alarm_shown) {
+			TransitionDisplay(DISPLAY_REACTOR);
+			return;
+		}
+		item_count = 0;
+		Disp_CursOff();
+
+		//Row 0
+		Disp_RC(0, 0);
+		if (alarm_shown->shutdown > 0){
+			sprintf(buf, "SHUTDOWN ALARM      "); //%2i/%2i", cur_item, getAlarmCount());
+		}
+		else {
+			sprintf(buf, "      ALARM         "); //%2i/%2i ", cur_item, getAlarmCount());
+		}
+		Disp_PutStr(buf);
+
+		//Row 1
+		Disp_RC(1, 0);
+		strcpy_P(p_buffer, alarm_shown->message);
+		Disp_PutStr(p_buffer);
+
+		//Row 2
+		Disp_RC(2, 0);
+		if (alarm_shown->message2) {
+			strcpy_P(p_buffer, alarm_shown->message2);
+		} else {
+			strcpy_P(p_buffer, blank);
+		}
+		Disp_PutStr(p_buffer);
+		if (alarm_shown->shutdown > 999 && engine_state == ENGINE_ON){     //anything less than 999 is a count and not a shutdown time in millisecond so don't show.
+			Disp_RC(2, 13);
+			sprintf(buf, "OFF:%3i", (millis() - alarm_shown->on - alarm_shown->shutdown - alarm_shown->delay)/1000);
+			Disp_PutStr(buf);
+		}
+
+		//Row 3
+		Disp_RC(3, 0);
+		Disp_PutStr(P("EXIT"));
+
+		if (getAlarmCount() > 1) { Disp_PutStr(P(" ADV  ")); }
+		else { Disp_PutStr(P("      ")); }
+
+		Disp_RC(3, 9);
+		if (annoying) { Disp_PutStr(P("QUIET ")); }
+		else {Disp_PutStr(P("      "));}
+
+		Disp_RC(3, 15);
+		//Wait to show RESET button in case new alarm state has taken over screen.
+		if (millis() - alarm_shown->on > 4000){
+			Disp_PutStr(P("RESET"));
+		}
+		else {
+			Disp_PutStr(P("     "));
+		}
+
+		// Special key handling for alarm display
+		if (key == 2) {
+			silenceAllAlarms();
+		}
+		//wait until RESET button shows up
+		if (key == 3 && (millis() - alarm_shown->on > 4000)) {
+			resetAlarm(alarm_shown);
+			alarm_shown = getNextAlarm(alarm_shown); //start at beginning of alarm queue
+		}
+		break;
   }
   key = -1; //important, must clear key to read new input
 }
 
 void TransitionDisplay(int new_state) {
-  //Enter
-  display_state_entered = millis();
-  switch (new_state) {
-  case DISPLAY_SPLASH:
-    break;
-  case DISPLAY_REACTOR:
-    cur_item = 0;
-    break;
-  case DISPLAY_ENGINE:
-    break;
-  case DISPLAY_LAMBDA:
-    cur_item = 1;
-    break;
-  case DISPLAY_GRATE:
-    config_changed = false;
-    //cur_item = 1;
-    break;
-  case DISPLAY_TESTING:
-    cur_item = 1;
-    break;
-  case DISPLAY_INFO:
-    break;
-  case DISPLAY_SERVO:
-    cur_item = 1;
-    break;
-  case DISPLAY_CALIBRATE_PRESSURE:
-    cur_item = 1;
-    break;
-  case DISPLAY_RELAY:
-    turnAllOff();
-    TransitionAuger(AUGER_ALARM);  //stop the auger control
-    cur_item = 0;
-    break;
-  case DISPLAY_CONFIG:
-    cur_item = 0;
-    config_changed = false;
-    break;
-    //  case DISPLAY_PHIDGET:
-    //    break;
-  case DISPLAY_SD:
-    cur_item = 1;
-    break;
-  case DISPLAY_ANA:
-    cur_item = 0;
-    break;
-  }
-  display_state=new_state;
-  Disp_Clear(); // Clear display between menus
+	//Enter
+	display_state_entered = millis();
+	config_changed = false;
+	cur_item = 0;
+	switch (new_state) {
+	case DISPLAY_LAMBDA:
+	case DISPLAY_TESTING:
+	case DISPLAY_SERVO:
+	case DISPLAY_CALIBRATE_PRESSURE:
+	case DISPLAY_SD:
+		cur_item = 1;
+		break;
+	case DISPLAY_RELAY:
+		turnAllOff();
+		TransitionAuger(AUGER_ALARM);  //stop the auger control
+		break;
+	default:
+		break;
+	}
+	display_state=new_state;
+	Disp_Clear(); // Clear display between menus
 }
 
 void DoKeyInput() {
@@ -671,37 +654,43 @@ void DoKeyInput() {
       TransitionTesting(TESTING_OFF);
       break;
     case DISPLAY_CALIBRATE_PRESSURE:                 //assume that engine state is off
-      //      TransitionDisplay(DISPLAY_RELAY);
-      //      break;
-      //    case DISPLAY_RELAY:
       TransitionDisplay(DISPLAY_CONFIG);
       TransitionTesting(TESTING_OFF);
       break;
     case DISPLAY_CONFIG:
-      //      TransitionDisplay(DISPLAY_PHIDGET);
-      //      break;
-      //    case DISPLAY_PHIDGET:
-      //      TransitionDisplay(DISPLAY_SD);
-      //      break;
-      //    case DISPLAY_SD:
       TransitionDisplay(DISPLAY_REACTOR);
       break;
+	case DISPLAY_ALARM:
+		alarm_shown = 0;
+		TransitionDisplay(DISPLAY_REACTOR);
     }
     key = -1; //key caught
   }
   if (key == 1) {
-	if (display_state == DISPLAY_GRATE) return; // Bug out
-    if (display_state == DISPLAY_CONFIG and config_changed == true){
-      saveConfig(cur_item, config_var);
-      update_config_var(cur_item);
-      config_changed = false;
-    }
-    if (display_state == DISPLAY_RELAY){
-      config_changed = false;
-      turnAllOff();
-    }
-    cur_item += 1;
-	while (display_state == DISPLAY_CONFIG && Config[cur_item].choices == reserved) cur_item ++;  // Skip over any reserved configs
+	cur_item++;
+	switch (display_state) {
+	case DISPLAY_GRATE:
+		return;  // Key handling happens in DisplayManualMode()
+	case DISPLAY_CONFIG:
+		if (config_changed) {
+			saveConfig(cur_item, config_var);
+			update_config_var(cur_item);
+			config_changed = false;
+		}
+		while (Config[cur_item].choices == reserved) {
+			cur_item ++;  // Skip over any reserved configs
+		}
+		break;
+	case DISPLAY_RELAY:
+		config_changed = false;
+		turnAllOff();
+		break;
+	case DISPLAY_REACTOR:
+	case DISPLAY_ALARM:
+		alarm_shown = getNextAlarm(alarm_shown);
+		break;
+	}
+
     if (cur_item > item_count) {
       switch (display_state) {
 		case DISPLAY_REACTOR:

@@ -3,6 +3,11 @@ void InitLambda() {
   LoadLambda();
 }
 
+// Called when user resets Lambda alarm
+void LambdaReset(void) {
+	TransitionLambda(LAMBDA_NO_SIGNAL);
+}
+
 void DoLambda() {
   lambda_input = GetLambda();
   switch(lambda_state) {

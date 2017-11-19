@@ -14,7 +14,7 @@ struct {
 	unsigned oc_accum;			// Over-current accumulator
 	unsigned p_gain;
 	unsigned long run_period;	// This is how long we run in auto mode
-	timer_s run_timer;	// Time how long we've been running 
+	timer_s run_timer;	// Time how long we've been running
 	timer_s drive_timer;	// Time in the current drive state
 	unsigned mode;			// Run modes are AUTO, MANUAL, and DISABLED
 	unsigned drive_state;	// Drive state of the ash auger run cycle
@@ -103,11 +103,11 @@ void AshAugerStop() {
 }
 
 void DoAshAuger() {
-	unsigned duty; 
+	unsigned duty;
 	unsigned vnh_mode;
 	unsigned current;
-	
-	
+
+
 	// Current control
 	duty = pwm_get_duty(ashAuger.pwm);
 	vnh_mode = vnh_get_mode(ashAuger.vnh);
@@ -116,14 +116,14 @@ void DoAshAuger() {
 	if (vnh_mode == VNH_FORWARD || vnh_mode == VNH_REVERSE) {
 		// TO-DO: Make this PI control
 		// Ramp up when below target
-		if (current < ashAuger.limit_current) 
+		if (current < ashAuger.limit_current)
 			duty = u_addlim(duty, ashAuger.p_gain, PWM_MAX);
 		// Otherwise, ramp down
-		else 
+		else
 			duty = u_sublim(duty, ashAuger.p_gain, 0);
 		// Set duty cycle
 		pwm_set_duty(ashAuger.pwm, duty);
-		
+
 		// Obstruction detection
 		if (current > ashAuger.high_current)
 			ashAuger.oc_accum = u_addlim(ashAuger.oc_accum, ASH_AUGER_ACCUM_RISE, ~0);
@@ -135,17 +135,17 @@ void DoAshAuger() {
 		Logln_p("Ash Auger: Auger is stuck!");
 		AshAugerSwitchMode(DISABLED);  // Disable the auger
 		// Ring the alarm, like Tenor Saw
-		setAlarm(ALARM_ASHAUGER_STUCK);
+		setAlarm(&ALARM_ASHAUGER_STUCK);
 		// alarm(ashAuger.oc_alarm);
 	}
 	// Check for H-bridge channel faults
 	if (vnh_mode != VNH_STANDBY && (!gpio_get_pin(ashAuger.vnh->ena) || !gpio_get_pin(ashAuger.vnh->enb))) {
 		Logln_p("Ash Auger: Auger drive fault!");
 		AshAugerSwitchMode(DISABLED);  // Disable the auger
-		setAlarm(ALARM_ASHAUGER_FAULT);
+		setAlarm(&ALARM_ASHAUGER_FAULT);
 		// alarm(ashAuger.fault_alarm);
 	}
-	
+
 	// Stop the ash auger when the timer runs out in AUTO mode
 	if (ashAuger.mode == AUTO && ashAuger.drive_state != STANDBY) {
 		if (!timer_read(&ashAuger.run_timer)) {
@@ -153,10 +153,10 @@ void DoAshAuger() {
 			AshAugerStop();
 		}
 	}
-	
-	/* 
+
+	/*
 	Drive state handling.
-	The basic strategy is to go forward until we encounter an obstruction.  We 
+	The basic strategy is to go forward until we encounter an obstruction.  We
 	then brake, reverse for a moment, brake again, and resume going forward.
 	There's a minimum forward time, so we don't reverse more than we go forward
 	when the auger is stuck.  Over-current is cumulative, so we can raise an
