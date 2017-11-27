@@ -531,7 +531,7 @@ const char alarm_4[] PROGMEM = "Reactor Fuel Low    ";
 const char alarm_5[] PROGMEM = "Trst low for engine ";
 const char alarm_6[] PROGMEM = "Tred high for engine";
 const char alarm_7[] PROGMEM = "RESERVED            ";
-const char alarm_8[] PROGMEM  = "No O2 Sensor Signal ";
+const char alarm_8[] PROGMEM = "No O2 Sensor Signal ";
 const char alarm_9[] PROGMEM = "Auger Low Current   ";
 const char alarm_10[] PROGMEM = "FuelSwitch/Auger Jam";
 const char alarm_11[] PROGMEM = "High P_comb         ";
@@ -557,13 +557,19 @@ const char alarm2_11[] PROGMEM = "Check Air Intake    ";
 const char alarm2_14[] PROGMEM = "Reduce Load         ";
 const char alarm2_15[] PROGMEM = "Reduce Load         ";
 
+const char message_filter_condesate[] PROGMEM = "Filter Condensate   ";
+const char message_pump_low[] PROGMEM = "Pump Pressure Low   ";
+const char message_pump_high[] PROGMEM = "Pump Pressure High  ";
+const char message_level_high[] PROGMEM = "Level High          ";
+const char message_level_low[] PROGMEM = "Level Low           ";
+
 struct alarm ALARM_AUGER_ON_LONG = {
-	alarm_0,
-	alarm2_0,
-	AugerReset,
-	240000,
-	360000,
-	0, 0, 0, 0
+	alarm_0, // message line 1
+	alarm2_0, // message line 2
+	AugerReset, // reset function (or NULL)
+	240000, // Warning delay time
+	360000, // Shutdown delay time
+	0, 0, 0, 0 // On time, Silenced, Prev Alarm, Next Alarm (initialize these to 0)
 };
 struct alarm ALARM_AUGER_OFF_LONG = {
 	alarm_1,
@@ -691,6 +697,30 @@ struct alarm ALARM_ASHAUGER_FAULT = {
 	AshAugerReset,
 	0,
 	0,
+	0, 0, 0, 0
+};
+struct alarm ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW = {
+	message_filter_condesate,
+	message_pump_low,
+	NULL,
+	10000,
+	60000,
+	0, 0, 0, 0
+};
+struct alarm ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH = {
+	message_filter_condesate,
+	message_pump_high,
+	NULL,
+	10000,
+	60000,
+	0, 0, 0, 0
+};
+struct alarm ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH = {
+	message_filter_condesate,
+	message_level_high,
+	NULL,
+	60000,
+	300000,
 	0, 0, 0, 0
 };
 

@@ -19,18 +19,16 @@ void DoCondensateRecirc() {
 	}
 
 	condensate_recirc_pressure = ADC_TO_RECIRC_PRESSURE(analogRead(ANA_CONDENSATE_PRESSURE));
-	if (condensate_recirc_pressure > CONDENSATE_RECIRC_PRESSURE_HIGH) {
-
-	} else {
-	}
-	if (condensate_recirc_pressure < CONDENSATE_RECIRC_PRESSURE_LOW) {
-
-	} else {
-	}
 
 	switch (condensate_recirc_state) {
 	case CONDENSATE_RECIRC_OFF:
-		if ((P_reactorLevel != OFF) && T_tredLevel > COLD) {
+		if (
+			(P_reactorLevel != OFF) &&
+			(T_tredLevel > COLD) &&
+			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.shutdown > (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.on)) &&
+			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.shutdown > (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.on)) &&
+			(ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.shutdown > (millis() - ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.on))
+		) {
 			TransitionCondensateRecirc(CONDENSATE_RECIRC_NORMAL);
 		}
 		break;
@@ -43,7 +41,23 @@ void DoCondensateRecirc() {
 				TransitionCondensateRecirc(CONDENSATE_RECIRC_HIGH);
 			}
 		}
-		// if (shutdown alarm) TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
+		if (condensate_recirc_pressure > CONDENSATE_RECIRC_PRESSURE_HIGH) {
+			setAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH);
+		} else {
+			removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH);
+		}
+		if (condensate_recirc_pressure < CONDENSATE_RECIRC_PRESSURE_LOW) {
+			setAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
+		} else {
+			removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
+		}
+		if (
+			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.on)) ||
+			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.on)) ||
+			(ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.on))
+		) {
+			TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
+		}
 		break;
 	case CONDENSATE_RECIRC_HIGH:
 		if ((millis() - condensate_recirc_state_entered) > 30000) {
@@ -54,7 +68,23 @@ void DoCondensateRecirc() {
 				TransitionCondensateRecirc(CONDENSATE_RECIRC_NORMAL);
 			}
 		}
-		// if (shutdown alarm) TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
+		if (condensate_recirc_pressure > CONDENSATE_RECIRC_PRESSURE_HIGH) {
+			setAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH);
+		} else {
+			removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH);
+		}
+		if (condensate_recirc_pressure < CONDENSATE_RECIRC_PRESSURE_LOW) {
+			setAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
+		} else {
+			removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
+		}
+		if (
+			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.on)) ||
+			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.on)) ||
+			(ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.on))
+		) {
+			TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
+		}
 		break;
 	}
 }
