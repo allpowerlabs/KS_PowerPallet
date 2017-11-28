@@ -209,7 +209,7 @@ unsigned int getAlarmCount(void) {
 
 long getAlarmShutdownTime (struct alarm * alarm) {
 	if (alarm->on) {
-		return (alarm->on + alarm->shutdown) - millis();
+		return (long)(alarm->on + alarm->shutdown) - millis();
 	} else {
 		return INT_MAX;
 	}

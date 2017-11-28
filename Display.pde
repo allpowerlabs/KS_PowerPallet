@@ -377,6 +377,9 @@ void DoDisplay() {
     break;
 
 	case DISPLAY_ALARM:
+		if (alarm_shown->on == 0) {
+			alarm_shown = getNextAlarm(NULL);
+		}
 		if (!alarm_shown) {
 			TransitionDisplay(DISPLAY_REACTOR);
 			return;
@@ -387,7 +390,7 @@ void DoDisplay() {
 		//Row 0
 		Disp_RC(0, 0);
 		if (alarm_shown->shutdown > 0){
-			sprintf(buf, "SHUTDOWN ALARM      "); //%2i/%2i", cur_item, getAlarmCount());
+			sprintf(buf, "SHUTDOWN ALARM    "); //%2i/%2i", cur_item, getAlarmCount());
 		}
 		else {
 			sprintf(buf, "      ALARM         "); //%2i/%2i ", cur_item, getAlarmCount());
@@ -409,7 +412,7 @@ void DoDisplay() {
 		Disp_PutStr(p_buffer);
 		if (alarm_shown->shutdown > 999 && engine_state == ENGINE_ON){     //anything less than 999 is a count and not a shutdown time in millisecond so don't show.
 			Disp_RC(2, 13);
-			sprintf(buf, "OFF:%3i", (millis() - alarm_shown->on - alarm_shown->shutdown - alarm_shown->delay)/1000);
+			sprintf(buf, "OFF:%3i", getAlarmShutdownTime(alarm_shown)/1000);
 			Disp_PutStr(buf);
 		}
 
