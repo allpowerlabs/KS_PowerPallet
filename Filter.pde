@@ -32,6 +32,7 @@ void DoCondensateRecirc() {
 			TransitionCondensateRecirc(CONDENSATE_RECIRC_NORMAL);
 		}
 		break;
+
 	case CONDENSATE_RECIRC_NORMAL:
 		removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH);
 
@@ -56,14 +57,16 @@ void DoCondensateRecirc() {
 			removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
 		}
 
-		if (
-			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH) <= 0) ||
-			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW) <= 0)
-		) {
+		if (getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH) <= 0){
 			TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
-			//EngineShutdown();
+			ShutdownEngine(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH);
+		}
+		else if (getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW) <= 0){
+			TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
+			ShutdownEngine(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
 		}
 		break;
+
 	case CONDENSATE_RECIRC_HIGH:
 		if ((millis() - condensate_recirc_state_entered) > ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.delay) {
 			setAlarm(&ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH);
@@ -90,13 +93,17 @@ void DoCondensateRecirc() {
 			removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
 		}
 
-		if (
-			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH) <= 0) ||
-			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW) <= 0) ||
-			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH) <= 0)
-		) {
+		if (getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH) <= 0){
 			TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
-			//EngineShutdown();
+			ShutdownEngine(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH);
+		}
+		else if (getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW) <= 0){
+			TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
+			ShutdownEngine(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
+		}
+		else if (getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH) <= 0){
+			TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
+			ShutdownEngine(&ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH);
 		}
 		break;
 	}

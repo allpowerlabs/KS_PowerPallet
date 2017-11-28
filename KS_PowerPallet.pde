@@ -446,6 +446,7 @@ boolean ignitor_on;
 //Engine
 int engine_state = ENGINE_OFF;
 unsigned long engine_state_entered;
+struct alarm * engine_shutdown_alarm;
 
 //Display
 int display_state = DISPLAY_SPLASH;

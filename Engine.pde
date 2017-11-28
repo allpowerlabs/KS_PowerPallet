@@ -70,6 +70,10 @@ void DoEngine() {
 		if (auger_state == AUGER_ALARM) {
 			TransitionEngine(ENGINE_SHUTDOWN);
 		}
+		if (engine_shutdown_alarm) {
+			engine_shutdown_alarm = NULL;
+			TransitionEngine(ENGINE_SHUTDOWN);
+		}
 	break;
     case ENGINE_STARTING:
 		if (control_state == CONTROL_OFF & millis()-control_state_entered > 100) {
@@ -114,3 +118,11 @@ void TransitionEngine(int new_state) {
 	engine_state=new_state;
 }
 
+// This function prints a message to the log and signals to the engine state machine that it should shut down
+void ShutdownEngine (struct alarm * alarm) {
+	Log_p("Engine Shutdown From Alarm: ");
+	strcpy_P(p_buffer, alarm->message);
+	Logln(p_buffer);
+
+	engine_shutdown_alarm = alarm;
+}
