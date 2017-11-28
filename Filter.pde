@@ -25,9 +25,9 @@ void DoCondensateRecirc() {
 		if (
 			(P_reactorLevel != OFF) &&
 			(T_tredLevel > COLD) &&
-			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.shutdown > (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.on)) &&
-			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.shutdown > (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.on)) &&
-			(ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.shutdown > (millis() - ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.on))
+			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH) > 0 ) &&
+			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW) > 0 ) &&
+			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH) > 0)
 		) {
 			TransitionCondensateRecirc(CONDENSATE_RECIRC_NORMAL);
 		}
@@ -41,22 +41,27 @@ void DoCondensateRecirc() {
 				TransitionCondensateRecirc(CONDENSATE_RECIRC_HIGH);
 			}
 		}
+
 		if (condensate_recirc_pressure > CONDENSATE_RECIRC_PRESSURE_HIGH) {
 			setAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH);
 		} else {
 			removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH);
 		}
+
 		if (condensate_recirc_pressure < CONDENSATE_RECIRC_PRESSURE_LOW) {
 			setAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
 		} else {
 			removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
 		}
+
+		removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH);
+
 		if (
-			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.on)) ||
-			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.on)) ||
-			(ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.on))
+			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH) <= 0) ||
+			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW) <= 0)
 		) {
 			TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
+			//EngineShutdown();
 		}
 		break;
 	case CONDENSATE_RECIRC_HIGH:
@@ -68,22 +73,28 @@ void DoCondensateRecirc() {
 				TransitionCondensateRecirc(CONDENSATE_RECIRC_NORMAL);
 			}
 		}
+
 		if (condensate_recirc_pressure > CONDENSATE_RECIRC_PRESSURE_HIGH) {
 			setAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH);
 		} else {
 			removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH);
 		}
+
 		if (condensate_recirc_pressure < CONDENSATE_RECIRC_PRESSURE_LOW) {
 			setAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
 		} else {
 			removeAlarm(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW);
 		}
+
+		setAlarm(&ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH);
+
 		if (
-			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH.on)) ||
-			(ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW.on)) ||
-			(ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.shutdown < (millis() - ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH.on))
+			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_HIGH) <= 0) ||
+			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_PRESSURE_LOW) <= 0) ||
+			(getAlarmShutdownTime(&ALARM_CONDENSATE_RECIRCULATION_LEVEL_HIGH) <= 0)
 		) {
 			TransitionCondensateRecirc(CONDENSATE_RECIRC_OFF);
+			//EngineShutdown();
 		}
 		break;
 	}
@@ -93,17 +104,17 @@ void TransitionCondensateRecirc(int newState) {
 	condensate_recirc_state_entered = millis();
 	switch (newState) {
 	case CONDENSATE_RECIRC_OFF:
-		Log_p("New Concentrate Recirculation State: OFF");
+		Logln_p("New Concentrate Recirculation State: OFF");
 		digitalWrite(FET_CONDENSATE_PUMP,LOW);
 		digitalWrite(FET_CONDENSATE_FAN,LOW);
 		break;
 	case CONDENSATE_RECIRC_NORMAL:
-		Log_p("New Concentrate Recirculation State: NORMAL");
+		Logln_p("New Concentrate Recirculation State: NORMAL");
 		digitalWrite(FET_CONDENSATE_PUMP,HIGH);
 		digitalWrite(FET_CONDENSATE_FAN,HIGH);
 		break;
 	case CONDENSATE_RECIRC_HIGH:
-		Log_p("New Concentrate Recirculation State: HIGH");
+		Logln_p("New Concentrate Recirculation State: HIGH");
 		digitalWrite(FET_CONDENSATE_PUMP,HIGH);
 		digitalWrite(FET_CONDENSATE_FAN,LOW);
 		break;

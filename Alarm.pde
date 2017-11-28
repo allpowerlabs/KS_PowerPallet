@@ -136,6 +136,7 @@ Engine warning alarm resets
 
 void setAlarm (struct alarm * alarm){
 	if (alarm->on == 0){
+		Log_p("Alarm: ");
 		strcpy_P(p_buffer, alarm->message);
 		Logln(p_buffer);
 		alarm->on = millis();
@@ -153,7 +154,7 @@ void setAlarm (struct alarm * alarm){
 
 void removeAlarm (struct alarm * alarm){
 	if (alarm->on > 0) {
-		Log_p("Removing: ");
+		Log_p("Removing Alarm: ");
 		strcpy_P(p_buffer, alarm->message);
 		Logln(p_buffer);
 		alarm->on = 0;
@@ -174,7 +175,7 @@ void removeAlarm (struct alarm * alarm){
 
 // This function is called when a user resets an alarm
 void resetAlarm (struct alarm * alarm) {
-	Log_p("Alarm Reset by User"); Logln(buf);
+	Logln_p("Alarm Reset by User");
 	if (alarm->reset) {
 		alarm->reset();
 	}
@@ -206,3 +207,10 @@ unsigned int getAlarmCount(void) {
 	return alarm_count;
 }
 
+long getAlarmShutdownTime (struct alarm * alarm) {
+	if (alarm->on) {
+		return (alarm->on + alarm->shutdown) - millis();
+	} else {
+		return INT_MAX;
+	}
+}

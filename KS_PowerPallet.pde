@@ -2,6 +2,7 @@
 // Library used to run APL Power Pallet
 // Developed for the APL GCU/PCU: http://gekgasifier.pbworks.com/Gasifier-Control-Unit
 
+#include <limits.h>
 #include <avr/eeprom.h>
 #include <EEPROM.h>         // included with Arduino, can read/writes to non-volatile memory
 #include <Servo.h>          // Arduino's native servo library
@@ -396,7 +397,10 @@ int condensate_level;
 int condensate_recirc_pressure;
 #define CONDENSATE_RECIRC_PRESSURE_LOW (15)
 #define CONDENSATE_RECIRC_PRESSURE_HIGH (80)
-#define ADC_TO_RECIRC_PRESSURE(p) (p)
+#define CONDENSATE_RECIRC_PRESSURE_MAX (100)
+#define CONDENSATE_RECIRC_PRESSURE_ADC_MIN (102)
+#define CONDENSATE_RECIRC_PRESSURE_SCALE_COEF (8.184)
+#define ADC_TO_RECIRC_PRESSURE(p) ((( (p) - CONDENSATE_RECIRC_PRESSURE_ADC_MIN) / CONDENSATE_RECIRC_PRESSURE_SCALE_COEF))
 
 // Temperature Levels
 #define TEMP_LEVEL_COUNT 5
